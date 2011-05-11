@@ -68,7 +68,7 @@ public class E_FuncCELL_URI extends XLExprFunction {
                 if (value1 == null){
                     return null;
                 }
-		int row = ((CellRange) absolute).getRow();
+		int row = ((CellRange) absolute).getRow() + 1;
                 String column = Utils.indexToAlpha(((CellRange) absolute).getColumn());
 		return new E_String(value0.getValue() + column + row);
 	}

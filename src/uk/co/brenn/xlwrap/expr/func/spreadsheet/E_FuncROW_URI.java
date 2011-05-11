@@ -65,7 +65,7 @@ public class E_FuncROW_URI extends XLExprFunction {
                 if (value1 == null){
                     return null;
                 }
-		int row = ((CellRange) absolute).getRow();
+		int row = ((CellRange) absolute).getRow() + 1;
 		return new E_String(prefix + row);
 	}
 	
