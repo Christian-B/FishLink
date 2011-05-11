@@ -19,11 +19,13 @@ public class ChristianDemo {
 
     private static String MAP_FILE_NAME = "test.trig";
 
-    private static String RDF_FILE_NAME = "testOutput.xml";
+    private static String RDF_FILE_NAME = "testOutput.rdf";
+
+    private static String doi = "doi12345";
 
     public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
         BrennRegister.register();
-        MapWrite mapWrite = new MapWrite(XLS_FILE_PATH);
+        MapWrite mapWrite = new MapWrite(XLS_FILE_PATH, doi);
         mapWrite.writeMap(MAP_FILE_NAME);
         mapWrite.runMap(MAP_FILE_NAME, RDF_FILE_NAME);
     }

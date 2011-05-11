@@ -38,12 +38,16 @@ public class MapWrite {
 
 //    private String rdfFileName;
 
-    private static String RDF_FILE_ROOT = "output/rdf";
+    private static String RDF_FILE_ROOT = "output/rdf/";
 
     //Urgently needs changing to an FBA address
-    private String RDF_BASE_URL = "http://rpc466.cs.man.ac.uk:2020/";
+    private String RDF_BASE_URL = "http://rdf.fba.org.uk/";
 
     private String PREFIX = "TarnsSchema";
+
+    private String doi;
+
+    private String sheet = "Sheet1";
 
     //Excell columns and Rows used here are Excell based and not 0 based as XLWrap uses internally
 
@@ -64,8 +68,9 @@ public class MapWrite {
     ExecutionContext context;
 
     //, String mapFileName, String rdfFileName
-    public MapWrite (String xlsPath) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+    public MapWrite (String xlsPath, String doi) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         this.xlsPath = xlsPath;
+        this.doi = doi;
 //        this.mapFileName = MAP_FILE_ROOT + mapFileName;
 //        this.rdfFileName = RDF_FILE_ROOT + rdfFileName;
         context  = new ExecutionContext();
@@ -178,6 +183,16 @@ public class MapWrite {
         return value.toString().replace("\"","");
     }
 
+    private void writeRowURI(BufferedWriter writer, String feild, String column) throws IOException{
+        writer.write("[ xl:uri \"ROW_URI('" + RDF_BASE_URL + feild + "/" + doi + "/" + sheet + "/row', " +
+           column + firstData + ")\"^^xl:Expr ] ");
+    }
+
+    private void writeCellURI(BufferedWriter writer, String feild, String link) throws IOException{
+         writer.write("[ xl:uri \"CELL_URI('" + RDF_BASE_URL + feild + "/" + doi + "/" + sheet + "/', "
+             + link + firstData + ")\"^^xl:Expr ] ");
+    }
+
     private void writeLink (BufferedWriter writer, String column, int row)
             throws XLWrapException, XLWrapEOFException, IOException{
         String feild = getCellValue ("A", row);
@@ -196,11 +211,11 @@ public class MapWrite {
         writer.write("	vocab:has" + feild + "\t");
         boolean rowBased = link.equalsIgnoreCase("ROW");
         if (rowBased){
-            writer.write("[ xl:uri \"ROW_URI('" + RDF_BASE_URL + feild + "/', " + column + firstData +
-                    ")\"^^xl:Expr ] ;");
+            writeRowURI(writer, feild, column);
+            writer.write(" ;");
         } else {
-            writer.write("[ xl:uri \"CELL_URI('" + RDF_BASE_URL + feild + "/', " + link + firstData +
-                    ")\"^^xl:Expr ] ;");
+            writeCellURI(writer, feild, link);
+            writer.write(" ;");
         }
         writer.newLine();
     }
@@ -245,11 +260,16 @@ public class MapWrite {
         }
         boolean rowBased = idType.equalsIgnoreCase("ROW");
         if (rowBased){
-            writer.write("	[ xl:uri \"ROW_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
-                    ")\"^^xl:Expr ] a ex:" + category + " ;");
+            writeRowURI(writer, category, column);
+            //writer.write("	[ xl:uri \"ROW_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
+            //        ")\"^^xl:Expr ] a ex:" + category + " ;");
+            writer.write(" a ex:" + category + " ;");
         } else {
-            writer.write("	[ xl:uri \"CELL_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
-                    ")\"^^xl:Expr ] a ex:" + category + " ;");
+            //writer.write("	[ xl:uri \"CELL_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
+            //        ")\"^^xl:Expr ] a ex:" + category + " ;");
+            writer.write("	");
+            writeCellURI(writer, category, column);
+            writer.write(" a ex:" + category + " ;");
         }
         writer.newLine();
         writer.write("	vocab:has" + feild + "\t\"" + column + firstData + "\"^^xl:Expr ;");
@@ -302,7 +322,7 @@ public class MapWrite {
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         //m.write(writer, "RDF/XML", RDF_BASE_URL);
         m.write(writer, "RDF/XML");
-        System.out.println("Done writing rdf file");
+        System.out.println("Done writing rdf file to "+ out.getAbsolutePath());
     }
 
 }
