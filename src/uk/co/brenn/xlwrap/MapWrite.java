@@ -30,11 +30,15 @@ import java.io.Writer;
  */
 public class MapWrite {
 
-    private String MAP_FILE_NAME = "output/mappings/test2.trig";
+//    private String mapFileName;
 
-    private String XLS_FILE_NAME = "c:/Dropbox/FISH.Link_code/tarns/TarnschemFinalOntology.xls";
+    private static String MAP_FILE_ROOT = "output/mappings/";
 
-    private String RDF_FILE_NAME = "output/rdf/testOutput.xml";
+    private String xlsPath = "c:/Dropbox/FISH.Link_code/tarns/TarnschemFinalOntology.xls";
+
+//    private String rdfFileName;
+
+    private static String RDF_FILE_ROOT = "output/rdf";
 
     //Urgently needs changing to an FBA address
     private String RDF_BASE_URL = "http://rpc466.cs.man.ac.uk:2020/";
@@ -59,7 +63,11 @@ public class MapWrite {
 
     ExecutionContext context;
 
-    public MapWrite () throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+    //, String mapFileName, String rdfFileName
+    public MapWrite (String xlsPath) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+        this.xlsPath = xlsPath;
+//        this.mapFileName = MAP_FILE_ROOT + mapFileName;
+//        this.rdfFileName = RDF_FILE_ROOT + rdfFileName;
         context  = new ExecutionContext();
         String columnA;
         int row = 4;
@@ -161,7 +169,7 @@ public class MapWrite {
         String sheetName = null; //null is first (0) sheet.
         int col = Utils.alphaToIndex(column);
         int actualRow = row - 1;
-        CellRange cellRange = new CellRange("File:" +XLS_FILE_NAME, sheetName, col, actualRow);
+        CellRange cellRange = new CellRange("File:" +xlsPath, sheetName, col, actualRow);
         Cell cell = context.getCell(cellRange);
         XLExprValue<?> value = Utils.getXLExprValue(cell);
         if (value == null){
@@ -271,9 +279,9 @@ public class MapWrite {
         writer.newLine();
     }
 
-    private void writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
-        File mapFile = new File(MAP_FILE_NAME);
-        File xlsFile = new File(XLS_FILE_NAME);
+    public void writeMap(String mapFileName) throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
+        File mapFile = new File(MAP_FILE_ROOT + mapFileName);
+        File xlsFile = new File(xlsPath);
         BufferedWriter mapWriter = new BufferedWriter(new FileWriter(mapFile));
         writePrefix(mapWriter);
         writeMapping(mapWriter, xlsFile);
@@ -282,14 +290,14 @@ public class MapWrite {
         System.out.println("Done writing map file");
     }
 
-    private void runMap() throws XLWrapException, IOException{
-        XLWrapMapping map = MappingParser.parse(MAP_FILE_NAME);
+    public void runMap(String mapFileName, String rdfFileName) throws XLWrapException, IOException{
+        XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + mapFileName);
 
         XLWrapMaterializer mat = new XLWrapMaterializer();
         Model m = mat.generateModel(map);
         m.setNsPrefix("ex", RDF_BASE_URL);
 
-        File out = new File (RDF_FILE_NAME);
+        File out = new File (RDF_FILE_ROOT + rdfFileName);
         FileWriter writer = new FileWriter(out);
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         //m.write(writer, "RDF/XML", RDF_BASE_URL);
@@ -297,10 +305,4 @@ public class MapWrite {
         System.out.println("Done writing rdf file");
     }
 
-    public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
-        BrennRegister.register();
-        MapWrite mapWrite = new MapWrite();
-        mapWrite.writeMap();
-        mapWrite.runMap();
-    }
 }
