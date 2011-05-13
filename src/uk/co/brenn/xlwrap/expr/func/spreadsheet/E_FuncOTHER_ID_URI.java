@@ -36,18 +36,18 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  * @author dorgon
  *
  */
-public class E_FuncOTHER_COLUMN_URI extends XLExprFunction {
+public class E_FuncOTHER_ID_URI extends XLExprFunction {
 
 	/**
 	 * default constructor
 	 */
-	public E_FuncOTHER_COLUMN_URI() {
+	public E_FuncOTHER_ID_URI() {
 	}
 
 	/**
 	 * single argument (a range)
 	 */
-	public E_FuncOTHER_COLUMN_URI(XLExpr arg) {
+	public E_FuncOTHER_ID_URI(XLExpr arg) {
 		args.add(arg);
 	}
 
@@ -61,15 +61,8 @@ public class E_FuncOTHER_COLUMN_URI extends XLExprFunction {
 		if (!(absolute instanceof CellRange))
 			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
                 String prefix = getArg(0).eval(context).getValue().toString();
-                //Get the id value
                 XLExprValue<?> value1 = getArg(1).eval(context);
-                //Check it is not null
                 if (value1 == null){
-                    return null;
-                }
-                //Check the feild being added is not null.
-                XLExprValue<?> value2 = getArg(2).eval(context);
-                if (value2 == null){
                     return null;
                 }
 		return new E_String(prefix + value1);

@@ -16,6 +16,7 @@ import at.jku.xlwrap.map.expr.func.FunctionRegistry;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.map.range.CellRange;
 import at.jku.xlwrap.spreadsheet.Cell;
+import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import com.hp.hpl.jena.rdf.model.Model;
 import java.io.BufferedWriter;
@@ -43,7 +44,7 @@ public class MapWrite {
     //Urgently needs changing to an FBA address
     private String RDF_BASE_URL = "http://rdf.fba.org.uk/";
 
-    private String PREFIX = "TarnsSchema";
+    //private String PREFIX = "TarnsSchema";
 
     private String doi;
 
@@ -74,6 +75,9 @@ public class MapWrite {
 //        this.mapFileName = MAP_FILE_ROOT + mapFileName;
 //        this.rdfFileName = RDF_FILE_ROOT + rdfFileName;
         context  = new ExecutionContext();
+        Workbook workbook = context.getWorkbook(xlsPath);
+        String[] sheetNames = workbook.getSheetNames();
+        System.out.println(sheetNames.length);
         String columnA;
         int row = 4;
         columnA = getCellValue("A",row);
@@ -183,14 +187,23 @@ public class MapWrite {
         return value.toString().replace("\"","");
     }
 
-    private void writeRowURI(BufferedWriter writer, String feild, String column) throws IOException{
-        writer.write("[ xl:uri \"ROW_URI('" + RDF_BASE_URL + feild + "/" + doi + "/" + sheet + "/row', " +
-           column + firstData + ")\"^^xl:Expr ] ");
-    }
-
-    private void writeCellURI(BufferedWriter writer, String feild, String link) throws IOException{
-         writer.write("[ xl:uri \"CELL_URI('" + RDF_BASE_URL + feild + "/" + doi + "/" + sheet + "/', "
-             + link + firstData + ")\"^^xl:Expr ] ");
+    private void writeURI(BufferedWriter writer, String type, String feild, String idType, String column) throws IOException {
+        System.out.println(feild + " " + idType + " " + column);
+        if (feild.toLowerCase().equals("id")){
+            writer.write("[ xl:uri \"ID_URI('" + RDF_BASE_URL + type + "/" + doi + "/" + sheet + "/', " +
+                    column + firstData + ")\"^^xl:Expr ] ");
+        } else if(feild.toLowerCase().equals("value") || idType.equalsIgnoreCase("n/a")){
+            writer.write("[ xl:uri \"CELL_URI('" + RDF_BASE_URL + type + "/" + doi + "/" + sheet + "/', " +
+                column + firstData + ")\"^^xl:Expr ] ");
+        } else if (idType == null){
+            System.out.println("Skippig column " + column + " as no idType provided");
+        } else if (idType.equalsIgnoreCase("ROW")){
+            writer.write("[ xl:uri \"ROW_URI('" + RDF_BASE_URL + type + "/" + doi + "/" + sheet + "/row', " +
+                    column + firstData + ")\"^^xl:Expr ] ");
+        } else {
+            writer.write("[ xl:uri \"OTHER_ID_URI('" + RDF_BASE_URL + type + "/" + doi + "/" + sheet + "/', " +
+                idType + firstData + "," + column + firstData + ")\"^^xl:Expr ] ");
+        }
     }
 
     private void writeLink (BufferedWriter writer, String column, int row)
@@ -209,14 +222,8 @@ public class MapWrite {
             return;
         }
         writer.write("	vocab:has" + feild + "\t");
-        boolean rowBased = link.equalsIgnoreCase("ROW");
-        if (rowBased){
-            writeRowURI(writer, feild, column);
-            writer.write(" ;");
-        } else {
-            writeCellURI(writer, feild, link);
-            writer.write(" ;");
-        }
+        writeURI(writer, feild, feild, link, column);
+        writer.write(" ;");
         writer.newLine();
     }
 
@@ -248,31 +255,15 @@ public class MapWrite {
             System.out.println("Skippig column " + column + " as no Category provided");
             return;
         }
-        String feild = getCellValue (column, FIELD_ROW);
-        if (feild == null){
+        String field = getCellValue (column, FIELD_ROW);
+        if (field == null){
             System.out.println("Skippig column " + column + " as no Feild provided");
             return;
         }
         String idType = getCellValue (column, ID_TYPE_ROW);
-        if (idType == null){
-            System.out.println("Skippig column " + column + " as no idType provided");
-            return;
-        }
-        boolean rowBased = idType.equalsIgnoreCase("ROW");
-        if (rowBased){
-            writeRowURI(writer, category, column);
-            //writer.write("	[ xl:uri \"ROW_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
-            //        ")\"^^xl:Expr ] a ex:" + category + " ;");
-            writer.write(" a ex:" + category + " ;");
-        } else {
-            //writer.write("	[ xl:uri \"CELL_URI('" + RDF_BASE_URL + category + "/', " + column + firstData +
-            //        ")\"^^xl:Expr ] a ex:" + category + " ;");
-            writer.write("	");
-            writeCellURI(writer, category, column);
-            writer.write(" a ex:" + category + " ;");
-        }
+        writeURI(writer, category, field, idType, column);
         writer.newLine();
-        writer.write("	vocab:has" + feild + "\t\"" + column + firstData + "\"^^xl:Expr ;");
+        writer.write("	vocab:has" + field + "\t\"" + column + firstData + "\"^^xl:Expr ;");
         writer.newLine();
         for (int row = firstLink; row <= lastLink; row++){
             writeLink(writer, column, row);
@@ -281,7 +272,7 @@ public class MapWrite {
             writeConstant(writer, column, row);
         }
 
-        writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + PREFIX + category+ "'\"^^xl:Expr ] ;");
+        writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
         writer.newLine();
 
         writer.write(".");
@@ -293,6 +284,7 @@ public class MapWrite {
         writer.write(":template {");
         writer.newLine();
         for (char x = 'B'; x < 'Y'; x++){
+            System.out.println(x);
             writeTemplateColumn(writer, ""+x);
         }
         writer.write("}");
