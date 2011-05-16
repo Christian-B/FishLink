@@ -37,19 +37,45 @@ public class WorkbookWrite {
 
     private ExecutionContext context;
  
-    private String workbookPath;
     private String doi;
 
     SheetWrite[] sheetWrites;
 
+    private static String dataRoot;
+
+    private static String metaRoot;
+
+    public static void setRoots(String metaRoot, String dataRoot){
+        WorkbookWrite.dataRoot = dataRoot;
+        WorkbookWrite.metaRoot = metaRoot;
+    }
+
     //, String mapFileName, String rdfFileName
-    public WorkbookWrite (ExecutionContext context, String workbookPath, String doi) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
-        this.doi = doi;
-        Workbook workbook = context.getWorkbook(workbookPath);
+    public WorkbookWrite (ExecutionContext context, String metaFileName) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+        Workbook workbook = context.getWorkbook(metaRoot + metaFileName);
+        Sheet metaData = workbook.getSheet("MetaData");
+        Cell cell;
+        try{
+            cell = metaData.getCell(1, 0);
+        } catch (NullPointerException e) {
+            throw new XLWrapMapException("Workbook: " + metaFileName + " does not have a \"MetaData\" sheet.");
+        }
+        String dataFileName = cell.getText();
+        Workbook dataWorkbook = context.getWorkbook(dataRoot + dataFileName);
+
+        cell = metaData.getCell(1, 1);
+        doi = cell.getText();
+
         String[] sheetNames = workbook.getSheetNames();
-        sheetWrites = new SheetWrite[sheetNames.length];
+        sheetWrites = new SheetWrite[sheetNames.length - 2];
+        int j = 0;
         for (int i = 0; i< sheetNames.length; i++ ){
-            sheetWrites[i] = new SheetWrite (context, workbookPath, doi, i);
+            if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
+                //do nothing
+            } else {
+                sheetWrites[j] = new SheetWrite(context, workbook, dataRoot + dataFileName, doi, sheetNames[i]);
+                j++;
+            }
         }
     }
 
@@ -79,8 +105,8 @@ public class WorkbookWrite {
         writer.newLine();
     }
 
-     public void writeMap(String mapFileName) throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
-        File mapFile = new File(MAP_FILE_ROOT + mapFileName);
+     public void writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
+        File mapFile = new File(MAP_FILE_ROOT + doi + ".trig");
         BufferedWriter mapWriter = new BufferedWriter(new FileWriter(mapFile));
         writePrefix(mapWriter);
 
@@ -103,14 +129,14 @@ public class WorkbookWrite {
         System.out.println("Done writing map file");
     }
 
-    public void runMap(String mapFileName, String rdfFileName) throws XLWrapException, IOException{
-        XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + mapFileName);
+    public void runMap() throws XLWrapException, IOException{
+        XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + doi + ".trig");
 
         XLWrapMaterializer mat = new XLWrapMaterializer();
         Model m = mat.generateModel(map);
         m.setNsPrefix("ex", RDF_BASE_URL);
 
-        File out = new File (RDF_FILE_ROOT + rdfFileName);
+        File out = new File (RDF_FILE_ROOT + doi + ".rdf");
         FileWriter writer = new FileWriter(out);
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         //m.write(writer, "RDF/XML", RDF_BASE_URL);
