@@ -141,7 +141,7 @@ public class SheetWrite {
         writer.newLine();
         writer.write("				a xl:RowShift ;");
         writer.newLine();
-        writer.write("				xl:restriction \"B" + firstData + ":" + LAST_DATA_COLUMN + firstData + "\" ;");
+        writer.write("				xl:restriction \"A" + firstData + ":" + LAST_DATA_COLUMN + firstData + "\" ;");
         writer.newLine();
         writer.write("				xl:steps \"1\" ;");
         writer.newLine();
@@ -169,7 +169,7 @@ public class SheetWrite {
     }
 
     private void writeURI(BufferedWriter writer, String type, String feild, String idType, String dataColumn) throws IOException, XLWrapMapException {
-        System.out.println(feild + " " + idType + " " + dataColumn);
+        System.out.println(type + " " + feild + " " + idType + " " + dataColumn);
         if (feild.toLowerCase().equals("id")){
             writer.write("[ xl:uri \"ID_URI('" + RDF_BASE_URL + type + "/" + doi + "/" + sheetInURI + "', " +
                     dataColumn + firstData + ")\"^^xl:Expr ] ");
@@ -254,7 +254,7 @@ public class SheetWrite {
             return;
         }
         String idType = getCellValue (metaColumn, ID_TYPE_ROW);
-        writeURI(writer, category, field, idType, metaColumn);
+        writeURI(writer, category, field, idType, dataColumn);
         writer.write (" a ex:");
         writer.write (category);
         writer.write (" ;");
@@ -283,7 +283,7 @@ public class SheetWrite {
         writer.newLine();
         for (char meta = 'B'; meta < 'Y'; meta++){
             int charValue = Character.valueOf(meta);
-            String data = String.valueOf( (char) (charValue + 1));
+            String data = String.valueOf( (char) (charValue - 1));
             System.out.println(meta + "  " + data);
             writeTemplateColumn(writer, "" + meta, data);
         }
