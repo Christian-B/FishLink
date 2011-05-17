@@ -34,9 +34,12 @@ create the folders In the place you put the XLWrap-Addon
 output/mappings
 output/rdf
 
-copy the class ChristianDemo
+Example data is available to FISH.Link project members.
+Please email Christian for access to the dropbox folder.
+
+copy the class ChristianRun
 in your copied demo class
--point XLS_FILE_NAME to your Dropbox folder/Fish.Link/data/TarnsschemaFinalOntology.xls
+-point DROPBOX to your Dropbox folder
 -run your demo class
 
 
