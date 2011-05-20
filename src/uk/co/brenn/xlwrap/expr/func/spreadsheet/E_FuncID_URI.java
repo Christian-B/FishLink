@@ -55,11 +55,11 @@ public class E_FuncID_URI extends XLExprFunction {
 	public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
 		// ignores actual cell value, just use the range reference to determine row
 
-		if (!(args.get(1) instanceof E_RangeRef))
-			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
-		Range absolute = ((E_RangeRef) args.get(1)).getRange().getAbsoluteRange(context);
-		if (!(absolute instanceof CellRange))
-			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
+		//if (!(args.get(1) instanceof E_RangeRef))
+		//	throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
+		//Range absolute = ((E_RangeRef) args.get(1)).getRange().getAbsoluteRange(context);
+		//if (!(absolute instanceof CellRange))
+		//	throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
                 String prefix = getArg(0).eval(context).getValue().toString();
                 XLExprValue<?> value1 = getArg(1).eval(context);
                 if (value1 == null){
