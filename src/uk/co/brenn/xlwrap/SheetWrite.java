@@ -259,6 +259,18 @@ public class SheetWrite {
         if (feild == null){
             return;
         }
+        if (feild.contains("*")){
+            //Link from previous row.
+            return;
+        }
+        String nextFeild = getCellValue ("A", row + 1);
+        String type = feild;
+        if (nextFeild.contains("*") && nextFeild.contains(feild)){
+            type = getCellValue (metaColumn, row + 1);
+            if (type == null){
+                type = feild;
+            }
+        }
         String link = getCellValue (metaColumn, row);
         System.out.println("writeLink " + metaColumn + "\t" + feild + "\t" + link);
         if (link == null){
@@ -268,14 +280,14 @@ public class SheetWrite {
         if (link.equalsIgnoreCase("n/a")){
             return;
         }
-        writer.write("	vocab:has" + feild + "\t");
+        writer.write("	vocab:has" + type + "\t");
         writeURI(writer, feild, feild, link, dataColumn, ignoreZeros);
         writer.write(" ;");
         writer.newLine();
     }
 
     private void writeConstant (BufferedWriter writer, String metaColumn, int row)
-            throws XLWrapException, XLWrapEOFException, IOException{
+            throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException{
         String feild = getCellValue ("A", row);
         if (feild == null){
             return;
@@ -289,8 +301,26 @@ public class SheetWrite {
         if (value.equalsIgnoreCase("n/a")){
             return;
         }
-        writer.write("	vocab:has" + feild + "\t");
-        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE('" + value + "')\"^^xl:Expr ] ;");
+        if (value.contains("!")){
+            if (value.startsWith("!")){
+                value = value.substring(1) + firstData;
+            } else {
+                throw new XLWrapMapException("Unexpected \"!\" in cell "+ metaSheet.getName() + "!" + metaColumn + row);
+            }
+        } else {
+            value = "'" + value + "'";
+        }
+        if (feild.contains("/")){
+            String nextValue = getCellValue (metaColumn, row+1);
+            if (nextValue == null){
+                writer.write("	vocab:has" + feild.substring(0, feild.indexOf('/')) + "\t");
+            } else {
+                writer.write("	vocab:has" + feild.substring(feild.indexOf('/')+1) + "\t");
+            }
+        } else {
+            writer.write("	vocab:has" + feild + "\t");
+        }
+        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
         //writer.write ("\"" + value + "\" ;");
         writer.newLine();
     }
