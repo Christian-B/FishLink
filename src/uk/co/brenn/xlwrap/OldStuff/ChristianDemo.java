@@ -3,11 +3,12 @@
  * and open the template in the editor.
  */
 
-package uk.co.brenn.xlwrap;
+package uk.co.brenn.xlwrap.OldStuff;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.IOException;
+import uk.co.brenn.xlwrap.XLWrapMapException;
 import uk.co.brenn.xlwrap.expr.func.BrennRegister;
 
 /**

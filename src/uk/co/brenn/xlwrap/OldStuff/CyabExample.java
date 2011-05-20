@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.brenn.xlwrap;
+package uk.co.brenn.xlwrap.OldStuff;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.dataset.XLWrapDatasetAssembler;

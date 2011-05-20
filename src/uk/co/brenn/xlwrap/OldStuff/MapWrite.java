@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package uk.co.brenn.xlwrap;
+package uk.co.brenn.xlwrap.OldStuff;
 
 import uk.co.brenn.xlwrap.expr.func.BrennRegister;
 import at.jku.xlwrap.common.Utils;
@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import uk.co.brenn.xlwrap.XLWrapMapException;
 
 /**
  *

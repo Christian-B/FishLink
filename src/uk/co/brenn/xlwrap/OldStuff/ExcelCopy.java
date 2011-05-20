@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package uk.co.brenn.xlwrap;
+package uk.co.brenn.xlwrap.OldStuff;
 
 import java.io.File;
 import java.io.IOException;
