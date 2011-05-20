@@ -23,5 +23,7 @@ public class BrennRegister {
         FunctionRegistry.register(functionClass);
         functionClass = E_FuncOTHER_ID_URI.class;
         FunctionRegistry.register(functionClass);
+        functionClass = E_FuncSHEET_REFERENCE.class;
+        FunctionRegistry.register(functionClass);
     }
 }
