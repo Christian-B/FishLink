@@ -67,6 +67,9 @@ public class WorkbookWrite {
         doi = cell.getText();
 
         String[] sheetNames = workbook.getSheetNames();
+        for (int i = 0; i< sheetNames.length; i++ ){
+            System.out.println( sheetNames[i]);
+        }
         sheetWrites = new SheetWrite[sheetNames.length - 2];
         int j = 0;
         for (int i = 0; i< sheetNames.length; i++ ){
