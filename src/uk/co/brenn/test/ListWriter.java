@@ -3,9 +3,11 @@
  * and open the template in the editor.
  */
 
-package uk.co.brenn.metadata;
+package uk.co.brenn.test;
 
 import org.apache.poi.ss.usermodel.Name;
+import uk.co.brenn.metadata.CYAB_Sheet;
+import uk.co.brenn.metadata.CYAB_Workbook;
 
 /**
  *
