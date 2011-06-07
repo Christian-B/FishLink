@@ -12,11 +12,10 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
@@ -28,6 +27,7 @@ import org.apache.poi.ss.usermodel.Name;
 public class MetaDataCreator {
 
     static private String MAIN_ROOT = "c:Dropbox/FishLink XLWrap data/";
+    static private String MASTER_FILE = "data/MetaMaster.xlsx";
     static private String LIST_SHEET = "Lists";
 
     private String metaMaster;
@@ -37,6 +37,9 @@ public class MetaDataCreator {
     static private int CATEGORY_ROW = 1;
     static private int FIELD_ROW = 2;
     private Sheet Sheet;
+
+    public MetaDataCreator(){
+    }
 
     public MetaDataCreator(String metaMasterPath, String metaDir, String dataDir){
         metaMaster = metaMasterPath;
@@ -237,10 +240,32 @@ public class MetaDataCreator {
         writeMeta(metaWorkbook, dataFile);
     }
 
+    public void prepareMetaData(String dataPath, String targetPath) throws FileNotFoundException,
+            IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
+        ExecutionContext context =  new ExecutionContext();
+        Workbook dataWorkbook;
+        try {
+            dataWorkbook = context.getWorkbook(dataPath);
+        } catch (Exception e){
+            //assume the "file:" bit is missing
+            dataWorkbook = context.getWorkbook("file:" + dataPath);
+        }
+        Workbook masterWorkbook = context.getWorkbook("file:" + MASTER_FILE);
+        CYAB_Workbook metaWorkbook = new CYAB_Workbook();
+        //addMetaDataSheet(metaWorkbook, dataFile, doi);
+        createNamedRanges(masterWorkbook, metaWorkbook);
+        //ListWriter.writeLists(masterWorkbook, metaWorkbook);
+        prepareSheets(masterWorkbook, metaWorkbook,dataWorkbook);
+        metaWorkbook.write(targetPath);
+    }
+
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
             JavaToExcelException, XLWrapException, XLWrapEOFException{
-        MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "metaMaster.xls", MAIN_ROOT + "Meta Data/",MAIN_ROOT + "Raw Data/");
+        MetaDataCreator creator = new MetaDataCreator(MASTER_FILE, MAIN_ROOT + "Meta Data/",MAIN_ROOT + "Raw Data/");
         ExecutionContext context = new ExecutionContext();
         creator.prepareMetaData (context, "Records.xls", "rec12564");
+        creator.prepareMetaData (context, "Species.xls", "spec564");
+        creator.prepareMetaData (context, "Stokoe.xls", "stokoe32433232");
+        creator.prepareMetaData (context, "Tarns.xls", "tarns33exdw2");
     }
 }
