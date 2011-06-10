@@ -32,8 +32,11 @@ public class ChristianRun {
     public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
         ExecutionContext context = new ExecutionContext();
         BrennRegister.register();
-        loadXLS(context, "FBA_Tarn_MetaData.xls");
         //loadXLS(context, "CumbriaTarnsPart1MetaData.xls");
+        //loadXLS(context, "FBA_Tarn_MetaData.xls");
+        //loadXLS(context, "RecordsMetaData1.xlsx");
+        loadXLS(context, "TarnschemFinalMetaData1.xls");
+
     }
 
 }
