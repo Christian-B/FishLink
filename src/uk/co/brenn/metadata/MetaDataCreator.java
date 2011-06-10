@@ -15,8 +15,10 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 
@@ -83,7 +85,7 @@ public class MetaDataCreator {
             //=OFFSET(Sheet1!$A$1,0,0,COUNTA(Sheet1!$A:$A),1)
             //String rangeDef = "OFFSET('" + LIST_SHEET + "'!$" + columnName + "$1,0,0,COUNTA('" + LIST_SHEET + "'!$" +
             //        columnName + ":$" + columnName + ")-1,1)";
-            System.out.println (rangeName + " = " + rangeDef);
+            //ystem.out.println (rangeName + " = " + rangeDef);
             range.setRefersToFormula(rangeDef);
             zeroColumn++;
             rangeName = getTextZeroBased(masterSheet, zeroColumn, 0);
@@ -140,7 +142,7 @@ public class MetaDataCreator {
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String list = getTextZeroBased(masterSheet, 2, zeroRow);
             //ystem.out.println(column + ":" + list);
-             String popupTitle = getTextZeroBased(masterSheet, 3, zeroRow);
+            String popupTitle = getTextZeroBased(masterSheet, 3, zeroRow);
             String popupMessage =  getTextZeroBased(masterSheet, 4, zeroRow);
             String errorStyleString =  getTextZeroBased(masterSheet, 5, zeroRow);
             int errorStyle = DataValidation.ErrorStyle.STOP;
@@ -159,14 +161,16 @@ public class MetaDataCreator {
         }
     }
 
-    private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String column)
+    private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String metaColumn)
             throws XLWrapException{
-        metaSheet.setValue(column, letterRow, column);
+        int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
+        String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
+        System.out.println("copying from "+ dataColumn + " to " + metaColumn);
+        metaSheet.setValue(metaColumn, letterRow, dataColumn);
         int maxRow = dataSheet.getRows();
         if (maxRow > 100){
             maxRow = 100;
         }
-        int zeroColumn = POI_Utils.alphaToIndex(column) - 1; //-1 as Column A of Data goes in B of Meta
         for (int zeroRow = 0; zeroRow < maxRow; zeroRow++){
             //ystem.out.println(zeroRow);
             try {
@@ -176,22 +180,23 @@ public class MetaDataCreator {
                     case BOOLEAN:
                         boolean booleanValue = cell.getBoolean();
                         //ystem.out.println(booleanValue);
-                        metaSheet.setValue(column, letterRow + zeroRow + 1, booleanValue);
+                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, booleanValue);
                         break;
                     case NUMBER:
                         double doubleValue = cell.getNumber();
                         //ystem.out.println("number" + doubleValue);
-                        metaSheet.setValue(column, letterRow + zeroRow + 1, doubleValue);
+                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, doubleValue);
                         break;
                     case TEXT:
                         String textValue = cell.getText();
                         //ystem.out.println(textValue);
-                        metaSheet.setValue(column, letterRow + zeroRow + 1, textValue);
+                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, textValue);
                         break;
                     case DATE:
                         Date dateValue = cell.getDate();
-                        //ystem.out.println(dateValue);
-                        metaSheet.setValue(column, letterRow + zeroRow + 1, dateValue);
+                        String format = cell.getDateFormat();
+                       //ystem.out.println(dateValue);
+                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, dateValue, format);
                         break;
                     case NULL:
                         //ystem.out.println("null");
@@ -211,9 +216,9 @@ public class MetaDataCreator {
         int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
         for ( int zeroDataColumn = 0;  zeroDataColumn < lastColumn; zeroDataColumn++){
-            String column = POI_Utils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
-            prepareDropDowns(masterSheet, lastMetaRow, metaSheet, column);
-            copyData(lastMetaRow + 2, metaSheet, dataSheet, column);
+            String metaColumn = POI_Utils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
+            prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
+            copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
         }
     }
 
@@ -230,6 +235,7 @@ public class MetaDataCreator {
 
     public void prepareMetaData(ExecutionContext context, String dataFile, String doi) throws FileNotFoundException,
             IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
+        System.out.println("Preparing meta data collector for " + dataFile);
         Workbook dataWorkbook = context.getWorkbook("file:" + dataRoot +dataFile);
         Workbook masterWorkbook = context.getWorkbook("file:" + metaMaster);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();

@@ -5,17 +5,21 @@
 
 package uk.co.brenn.metadata;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 /**
@@ -24,10 +28,22 @@ import org.apache.poi.ss.util.CellRangeAddressList;
  */
 public class CYAB_Sheet {
 
-    Sheet poiSheet;
+    private Sheet poiSheet;
+
+    private CellStyle dateStyle;
+    //private CellStyle timeStyle;
+    private CellStyle dateAndTimeStyle;
 
     CYAB_Sheet(Sheet sheet) {
         poiSheet = sheet;
+        Workbook wb = sheet.getWorkbook();
+        CreationHelper createHelper = wb.getCreationHelper();
+        dateAndTimeStyle = wb.createCellStyle();
+        dateAndTimeStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
+        dateStyle = wb.createCellStyle();
+        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
+        //timeStyle = wb.createCellStyle();
+        //timeStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm"));
     }
 
     /**
@@ -147,6 +163,38 @@ public class CYAB_Sheet {
     public void setValue (String column, int row, Date value){
         Cell cell = getCell(column, row);
         cell.setCellValue(value);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(value);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        if (hours == 0 && minutes == 0){
+            //TODO: check for seconds
+            cell.setCellStyle(dateStyle);
+            CellStyle test = cell.getCellStyle();
+        } else {
+            //TODO: Check if just a time
+            cell.setCellStyle(dateAndTimeStyle);
+        }
+    }
+
+    /**
+     * Sets the value of the cell to the Date.
+     *
+     * Creates the row and or cell if required.
+     *
+     * @param row Using Excel counting
+     * @param column Using Excel names
+     * @param value Integer value
+     * @param format String format of the datacell;
+     */
+    public void setValue (String column, int row, Date value, String format){
+        Cell cell = getCell(column, row);
+        cell.setCellValue(value);
+        Workbook wb = poiSheet.getWorkbook();
+        CreationHelper createHelper = wb.getCreationHelper();
+        CellStyle cellStyle = wb.createCellStyle();
+        cellStyle.setDataFormat(createHelper.createDataFormat().getFormat(format));
+        cell.setCellStyle(cellStyle);
     }
 
     public String findFreeColumn (){
@@ -169,7 +217,7 @@ public class CYAB_Sheet {
             int errorStyle, String errorTitle, String errorMessage)
             throws JavaToExcelException {
         //ystem.out.println ("list at " + column + row);
-        System.out.println(column + ": " + rule);
+        //ystem.out.println(column + ": " + rule);
         int columnNumber = POI_Utils.alphaToIndex(column);
         CellRangeAddressList addressList = new CellRangeAddressList(row - 1, row -1, columnNumber,  columnNumber);
         DataValidationHelper dataValidationHelper = poiSheet.getDataValidationHelper();
