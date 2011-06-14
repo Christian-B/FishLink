@@ -24,7 +24,7 @@ public class CreateMetaData {
             System.exit(2);
         }
         MetaDataCreator metaDataCreator = new MetaDataCreator();
-        metaDataCreator.prepareMetaData(args[0], args[1]);
+        metaDataCreator.prepareMetaDataOnTarget(args[0], args[1]);
     }
 
 }

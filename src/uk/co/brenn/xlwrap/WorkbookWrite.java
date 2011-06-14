@@ -5,14 +5,10 @@
 
 package uk.co.brenn.xlwrap;
 
-import at.jku.xlwrap.common.Utils;
 import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.exec.XLWrapMaterializer;
 import at.jku.xlwrap.map.MappingParser;
 import at.jku.xlwrap.map.XLWrapMapping;
-import at.jku.xlwrap.map.expr.val.XLExprValue;
-import at.jku.xlwrap.map.range.CellRange;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
@@ -22,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import uk.co.brenn.metadata.MetaDataCreator;
 
 /**
  *
@@ -35,8 +32,6 @@ public class WorkbookWrite {
 
     private static String RDF_BASE_URL = "http://rdf.fba.org.uk/";
 
-    private ExecutionContext context;
- 
     private String doi;
 
     SheetWrite[] sheetWrites;
@@ -51,8 +46,8 @@ public class WorkbookWrite {
     }
 
     //, String mapFileName, String rdfFileName
-    public WorkbookWrite (ExecutionContext context, String metaFileName) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
-        Workbook workbook = context.getWorkbook(metaRoot + metaFileName);
+    public WorkbookWrite (String metaFileName) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+        Workbook workbook = MetaDataCreator.getExecutionContext().getWorkbook(metaRoot + metaFileName);
         Sheet metaData = workbook.getSheet("MetaData");
         Cell cell;
         try{
@@ -61,7 +56,7 @@ public class WorkbookWrite {
             throw new XLWrapMapException("Workbook: " + metaFileName + " does not have a \"MetaData\" sheet.");
         }
         String dataFileName = cell.getText();
-        Workbook dataWorkbook = context.getWorkbook(dataRoot + dataFileName);
+        Workbook dataWorkbook = MetaDataCreator.getExecutionContext().getWorkbook(dataRoot + dataFileName);
 
         cell = metaData.getCell(1, 1);
         doi = cell.getText();
@@ -73,7 +68,9 @@ public class WorkbookWrite {
             if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
                 //do nothing
             } else {
-                sheetWrites[j] = new SheetWrite(context, workbook, dataRoot + dataFileName, doi, sheetNames[i]);
+                sheetWrites[j] = new SheetWrite(workbook, dataRoot + dataFileName, doi, sheetNames[i]);
+                MasterReader masterReader = new MasterReader ();
+                masterReader.check(sheetWrites[j]);
                 j++;
             }
         }
@@ -106,6 +103,7 @@ public class WorkbookWrite {
     }
 
      public void writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
+        System.out.println("write map");
         File mapFile = new File(MAP_FILE_ROOT + doi + ".trig");
         BufferedWriter mapWriter = new BufferedWriter(new FileWriter(mapFile));
         writePrefix(mapWriter);
@@ -115,7 +113,6 @@ public class WorkbookWrite {
         mapWriter.write("{ [] a xl:Mapping ;");
         mapWriter.newLine();
         for (int i = 0; i < sheetWrites.length; i++){
-            System.out.println(i);
             sheetWrites[i].writeMapping(mapWriter);
         }
         mapWriter.write("}");
@@ -130,6 +127,7 @@ public class WorkbookWrite {
     }
 
     public void runMap() throws XLWrapException, IOException{
+        System.out.println("Running map");
         XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + doi + ".trig");
 
         XLWrapMaterializer mat = new XLWrapMaterializer();

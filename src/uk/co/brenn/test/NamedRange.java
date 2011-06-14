@@ -24,7 +24,7 @@ public class NamedRange {
         for (int i = 0; i < values.length; i++){
             listSheet.setValue(column, i + 2, values[i]);
         }
-        System.out.println (column);
+        //ystem.out.println (column);
         rangeName.setRefersToFormula("'Lists'!$" + column + "$2:$" + column + "$" + (values.length + 2));
     }
 

@@ -15,10 +15,8 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 
@@ -32,21 +30,43 @@ public class MetaDataCreator {
     static private String MASTER_FILE = "data/MetaMaster.xlsx";
     static private String LIST_SHEET = "Lists";
 
-    private String metaMaster;
     private String metaRoot;
-    private String dataRoot;
     
     static private int CATEGORY_ROW = 1;
     static private int FIELD_ROW = 2;
     private Sheet Sheet;
 
-    public MetaDataCreator(){
+    private static ExecutionContext context1;
+
+    private static Workbook masterWorkbook;
+
+    public MetaDataCreator(String metaDir){
+        metaRoot = metaDir;
     }
 
-    public MetaDataCreator(String metaMasterPath, String metaDir, String dataDir){
-        metaMaster = metaMasterPath;
-        metaRoot = metaDir;
-        dataRoot = dataDir;
+    public MetaDataCreator(){
+    }
+    
+    private static Workbook getMasterWorkbook() throws XLWrapException{
+        if (masterWorkbook == null){
+            masterWorkbook = getExecutionContext().getWorkbook("file:" + MASTER_FILE);
+        }
+        return masterWorkbook;
+    }
+
+    public static ExecutionContext getExecutionContext(){
+        if (context1 == null){
+            context1 = new ExecutionContext();
+        }
+        return context1;
+    }
+
+    public static Sheet getMasterDropdownSheet() throws XLWrapException{
+        return getMasterWorkbook().getSheet("Sheet1");
+    }
+
+    public static Sheet getMasterListSheet() throws XLWrapException{
+        return getMasterWorkbook().getSheet(LIST_SHEET);
     }
 
     private void addMetaDataSheet(CYAB_Workbook dataWorkbook, String dataFile, String doi){
@@ -62,12 +82,13 @@ public class MetaDataCreator {
         metaWorkbook.write(metaRoot + fileFront + "MetaData.xls");
     }
 
-    private void createNamedRanges (Workbook masterWorkbook, CYAB_Workbook metaWorkbook)
+    private void createNamedRanges (CYAB_Workbook metaWorkbook)
             throws XLWrapException, XLWrapEOFException, JavaToExcelException{
-        Sheet masterSheet =  masterWorkbook.getSheet(LIST_SHEET);
+        Sheet masterSheet =  getMasterListSheet();
         CYAB_Sheet metaSheet = metaWorkbook.getSheet(LIST_SHEET);
         int zeroColumn = 0;
         String rangeName =  getTextZeroBased(masterSheet, zeroColumn, 0);
+        //ystem.out.println(zeroColumn + " "  + rangeName);
         int categories = -1;
         while (!rangeName.isEmpty()) {
             String columnName = POI_Utils.indexToAlpha(zeroColumn);
@@ -80,6 +101,7 @@ public class MetaDataCreator {
                 fieldName = getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             } while (!fieldName.isEmpty());
             Name range = metaWorkbook.createName();
+            //ystem.out.println("now: " + rangeName);
             range.setNameName(rangeName);
             String rangeDef = "'" + LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
             //=OFFSET(Sheet1!$A$1,0,0,COUNTA(Sheet1!$A:$A),1)
@@ -89,6 +111,7 @@ public class MetaDataCreator {
             range.setRefersToFormula(rangeDef);
             zeroColumn++;
             rangeName = getTextZeroBased(masterSheet, zeroColumn, 0);
+            //ystem.out.println(zeroColumn + " "  + rangeName);
             if (rangeName.isEmpty() && categories == -1){
                 //ystem.out.println("doing categories");
                 //found the space between Categories and the other nameRanges
@@ -103,7 +126,7 @@ public class MetaDataCreator {
         range.setRefersToFormula("'" + LIST_SHEET + "'!$A1:$" + columnName + "$1");
     }
 
-    private String getTextZeroBased(Sheet sheet, int column, int row) throws XLWrapException, XLWrapEOFException{
+    public static String getTextZeroBased(Sheet sheet, int column, int row) throws XLWrapException, XLWrapEOFException{
         if (column >= sheet.getColumns()){
             return "";
         }
@@ -165,7 +188,7 @@ public class MetaDataCreator {
             throws XLWrapException{
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
-        System.out.println("copying from "+ dataColumn + " to " + metaColumn);
+        //ystem.out.println("copying from "+ dataColumn + " to " + metaColumn);
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
         int maxRow = dataSheet.getRows();
         if (maxRow > 100){
@@ -222,9 +245,9 @@ public class MetaDataCreator {
         }
     }
 
-    private void prepareSheets(Workbook masterWorkbook, CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
+    private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
             throws JavaToExcelException, XLWrapException, XLWrapEOFException{
-        Sheet masterSheet = masterWorkbook.getSheet("Sheet1");
+        Sheet masterSheet = getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
             Sheet dataSheet = dataWorkbook.getSheet(dataSheets[i]);
@@ -233,45 +256,40 @@ public class MetaDataCreator {
         }
     }
 
-    public void prepareMetaData(ExecutionContext context, String dataFile, String doi) throws FileNotFoundException,
+    public void prepareMetaDataOnDoi(String dataRoot, String dataFile, String doi) throws FileNotFoundException,
             IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
         System.out.println("Preparing meta data collector for " + dataFile);
-        Workbook dataWorkbook = context.getWorkbook("file:" + dataRoot +dataFile);
-        Workbook masterWorkbook = context.getWorkbook("file:" + metaMaster);
+        Workbook dataWorkbook = getExecutionContext().getWorkbook("file:" + dataRoot +dataFile);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         addMetaDataSheet(metaWorkbook, dataFile, doi);
-        createNamedRanges(masterWorkbook, metaWorkbook);
+        createNamedRanges(metaWorkbook);
         //ListWriter.writeLists(masterWorkbook, metaWorkbook);
-        prepareSheets(masterWorkbook, metaWorkbook,dataWorkbook);
+        prepareSheets(metaWorkbook,dataWorkbook);
         writeMeta(metaWorkbook, dataFile);
     }
 
-    public void prepareMetaData(String dataPath, String targetPath) throws FileNotFoundException,
+    public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws FileNotFoundException,
             IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
-        ExecutionContext context =  new ExecutionContext();
         Workbook dataWorkbook;
         try {
-            dataWorkbook = context.getWorkbook(dataPath);
+            dataWorkbook = getExecutionContext().getWorkbook(dataPath);
         } catch (Exception e){
             //assume the "file:" bit is missing
-            dataWorkbook = context.getWorkbook("file:" + dataPath);
+            dataWorkbook = getExecutionContext().getWorkbook("file:" + dataPath);
         }
-        Workbook masterWorkbook = context.getWorkbook("file:" + MASTER_FILE);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
-        //addMetaDataSheet(metaWorkbook, dataFile, doi);
-        createNamedRanges(masterWorkbook, metaWorkbook);
-        //ListWriter.writeLists(masterWorkbook, metaWorkbook);
-        prepareSheets(masterWorkbook, metaWorkbook,dataWorkbook);
+        createNamedRanges(metaWorkbook);
+        prepareSheets(metaWorkbook,dataWorkbook);
         metaWorkbook.write(targetPath);
     }
 
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
             JavaToExcelException, XLWrapException, XLWrapEOFException{
-        MetaDataCreator creator = new MetaDataCreator(MASTER_FILE, MAIN_ROOT + "Meta Data/",MAIN_ROOT + "Raw Data/");
-        ExecutionContext context = new ExecutionContext();
-        creator.prepareMetaData (context, "Records.xls", "rec12564");
-        creator.prepareMetaData (context, "Species.xls", "spec564");
-        creator.prepareMetaData (context, "Stokoe.xls", "stokoe32433232");
-        creator.prepareMetaData (context, "Tarns.xls", "tarns33exdw2");
+        MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "Meta Data/");
+
+        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Records.xls", "rec12564");
+        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
+        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
+        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
     }
 }

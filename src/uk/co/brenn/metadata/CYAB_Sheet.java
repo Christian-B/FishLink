@@ -223,7 +223,21 @@ public class CYAB_Sheet {
         DataValidationHelper dataValidationHelper = poiSheet.getDataValidationHelper();
         DataValidationConstraint constraint;
         if (rule.isEmpty()){
-            constraint = dataValidationHelper.createCustomConstraint("true");
+            if (popupTitle.isEmpty() && popupMessage.isEmpty()){
+                return; //No rule or message so ignore.
+            }
+            //Create an any rule. Numberic method is only one that support Validation Type.
+            constraint = dataValidationHelper.createNumericConstraint(DataValidationConstraint.ValidationType.ANY, 
+                    DataValidationConstraint.OperatorType.IGNORED, null, null); 
+            //constraint = dataValidationHelper.createCustomConstraint("true");
+            //constraint.setOperator(row);
+        } else if (rule.startsWith("{")){
+            //ystem.out.println(rule);
+            rule = rule.replace("{", "");
+            rule = rule.replace("}", "");
+            String[] values = rule.split(",");
+            constraint = dataValidationHelper.createExplicitListConstraint(values);
+            //ystem.out.println(constraint.getExplicitListValues());
         } else {
             constraint = dataValidationHelper.createFormulaListConstraint(rule);
         }
