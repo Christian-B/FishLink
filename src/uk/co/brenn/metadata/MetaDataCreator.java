@@ -72,8 +72,8 @@ public class MetaDataCreator {
     private void addMetaDataSheet(CYAB_Workbook dataWorkbook, String dataFile, String doi){
         CYAB_Sheet sheet = dataWorkbook.getSheet("MetaData");
         sheet.setValue("A", 1, "File");
-        sheet.setValue("A", 2, dataFile);
-        sheet.setValue("B", 1, "Doi");
+        sheet.setValue("B", 1, dataFile);
+        sheet.setValue("A", 2, "Doi");
         sheet.setValue("B", 2, doi);
     }
 
@@ -163,6 +163,7 @@ public class MetaDataCreator {
     private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, CYAB_Sheet metaSheet, String column)
             throws JavaToExcelException, XLWrapException, XLWrapEOFException{
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
+//        for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String list = getTextZeroBased(masterSheet, 2, zeroRow);
             //ystem.out.println(column + ":" + list);
             String popupTitle = getTextZeroBased(masterSheet, 3, zeroRow);
@@ -287,8 +288,8 @@ public class MetaDataCreator {
             JavaToExcelException, XLWrapException, XLWrapEOFException{
         MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "Meta Data/");
 
-        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Records.xls", "rec12564");
-        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
+        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
+        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
         creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
         creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
     }

@@ -29,10 +29,10 @@ public class ChristianRun {
     public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
         BrennRegister.register();
         //loadXLS("CumbriaTarnsPart1MetaData.xls");
-        //loadXLS("FBA_Tarn_MetaData.xls");
+        //loadXLS("FBA_TarnsMetaData.xls");
         //loadXLS("RecordsMetaData.xls");
         loadXLS("SpeciesMetaData.xls");
-        //loadXLS("TarnschemFinalMetaData.xls");
+        loadXLS("TarnschemFinalMetaData.xls");
 
     }
 
