@@ -17,7 +17,7 @@ import uk.co.brenn.xlwrap.expr.func.BrennRegister;
 public class ChristianRun {
 
     //The file: bit is required by xlwrap whiuch can alos handle http urls.
-    static private String  DROPBOX = "file:c:Dropbox/FishLink XLWrap data/";
+    static private String  DROPBOX = "file:c:/Dropbox/FishLink XLWrap data/";
 
     private static void loadXLS(String name) throws XLWrapException, XLWrapEOFException, XLWrapMapException, IOException{
         //Adjust this file to the your local path

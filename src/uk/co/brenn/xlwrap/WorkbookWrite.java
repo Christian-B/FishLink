@@ -104,7 +104,11 @@ public class WorkbookWrite {
 
      public void writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
         System.out.println("write map");
-        File mapFile = new File(MAP_FILE_ROOT + doi + ".trig");
+        File mapFile = new File(MAP_FILE_ROOT);
+        if (!mapFile.exists()){
+            throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + MAP_FILE_ROOT + " Please create it.");
+        }
+        mapFile = new File(MAP_FILE_ROOT + doi + ".trig");
         BufferedWriter mapWriter = new BufferedWriter(new FileWriter(mapFile));
         writePrefix(mapWriter);
 
@@ -126,7 +130,7 @@ public class WorkbookWrite {
         System.out.println("Done writing map file");
     }
 
-    public void runMap() throws XLWrapException, IOException{
+    public void runMap() throws XLWrapException, IOException, XLWrapMapException{
         System.out.println("Running map");
         XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + doi + ".trig");
 
@@ -134,7 +138,11 @@ public class WorkbookWrite {
         Model m = mat.generateModel(map);
         m.setNsPrefix("ex", RDF_BASE_URL);
 
-        File out = new File (RDF_FILE_ROOT + doi + ".rdf");
+        File out = new File (RDF_FILE_ROOT);
+        if (!out.exists()){
+            throw new XLWrapMapException("Unable to find RDF_FILE_ROOT. " + RDF_FILE_ROOT + " Please create it.");
+        }
+        out = new File (RDF_FILE_ROOT + doi + ".rdf");
         FileWriter writer = new FileWriter(out);
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         //m.write(writer, "RDF/XML", RDF_BASE_URL);
