@@ -133,6 +133,9 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void writeVocab (BufferedWriter writer, String vocab) throws IOException{
+        if (vocab.startsWith("is") || vocab.startsWith("has")){
+            writer.write("	vocab:" + vocab + "\t");
+        }
         writer.write("	vocab:has" + vocab + "\t");
     }
 
