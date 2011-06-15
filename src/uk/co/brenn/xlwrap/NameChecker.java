@@ -21,7 +21,7 @@ public class NameChecker {
      HashMap<String,ArrayList<String>> categories;
 
      NameChecker() throws XLWrapException, XLWrapEOFException{
-        System.out.println("MasterNameChecker");
+        //stem.out.println("MasterNameChecker");
         Sheet masterSheet =  MetaDataCreator.getMasterListSheet();
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = 0;
@@ -42,7 +42,7 @@ public class NameChecker {
      }
 
     public void checkName (String sheetInfo, String category, String field) throws XLWrapMapException{
-        System.out.println("checking name");
+        //ystem.out.println("checking name");
         ArrayList<String> fields = categories.get(category);
         if (fields == null){
             throw new XLWrapMapException("Map used catagory "+ category + " which is not in the Master");

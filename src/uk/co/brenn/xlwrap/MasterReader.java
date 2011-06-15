@@ -31,7 +31,7 @@ public class MasterReader extends AbstractSheet {
     }
 
     public void check (SheetWrite other) throws XLWrapMapException, XLWrapException, XLWrapEOFException{
-        System.out.println("checking " + other.toString());
+        //ystem.out.println("checking " + other.toString());
        //categoryRow checked by findAndCheckMetaSplits
        //fieldRow checked by findAndCheckMetaSplits
        //idTypeRow checked by findAndCheckMetaSplits
@@ -55,6 +55,6 @@ public class MasterReader extends AbstractSheet {
                checkName (other, other.getCellValue("A", i), firstConstant, lastConstant);
            }
        }
-       System.out.println("checked" + other.toString());
+       //ystem.out.println("checked" + other.toString());
     }
 }
