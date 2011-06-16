@@ -98,15 +98,20 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeURI(BufferedWriter writer, String externalUri, String category, String field, String idType, String dataColumn,
             boolean ignoreZeros) throws IOException, XLWrapMapException {
-        String localUri = RDF_BASE_URL + category + "/" + doi + "/" + sheetInURI;
-        //ystem.out.println("writeURI " + externalUri + " " + category + " " + field + " " + idType + " " + dataColumn);
+        String uri;
+        if (externalUri.isEmpty()){
+            uri = RDF_BASE_URL + category + "/" + doi + "/" + sheetInURI;
+        } else {
+            uri = externalUri;
+        }
+        //ystem.out.println("writeURI " + uri + " " + category + " " + field + " " + idType + " " + dataColumn);
         if (field.toLowerCase().equals("id")){
-            writer.write("[ xl:uri \"ID_URI('" + externalUri + "', " + dataColumn + firstData + ","
+            writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ","
                     + ignoreZeros + ")\"^^xl:Expr ] ");
             return;
         }
         if(field.toLowerCase().equals("value")) {
-            writer.write("[ xl:uri \"CELL_URI('" + localUri + "', " + dataColumn + firstData + ","
+            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ","
                     + ignoreZeros + ")\"^^xl:Expr ] ");
             return;
         }
@@ -119,15 +124,15 @@ public class SheetWrite extends AbstractSheet{
                     " has an unexpected n/a IDType with field " + field);
         }
         if(category.toLowerCase().equals("observation")) {
-            writer.write("[ xl:uri \"OTHER_CELL_URI('" + localUri + "', " + idType + firstData + ","
+            writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idType + firstData + ","
                     + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
             return;
         }
         if (idType.equalsIgnoreCase("ROW")){
-            writer.write("[ xl:uri \"ROW_URI('" + localUri + "row', " + dataColumn + firstData + "," +
+            writer.write("[ xl:uri \"ROW_URI('" + uri + "row', " + dataColumn + firstData + "," +
                     ignoreZeros + ")\"^^xl:Expr ] ");
         } else {
-            writer.write("[ xl:uri \"OTHER_ID_URI('" + localUri + "', " + idType + firstData + "," +
+            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idType + firstData + "," +
                     dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
         }
     }
@@ -194,7 +199,7 @@ public class SheetWrite extends AbstractSheet{
             link = link.replaceAll("=", "");
             writeValue(writer, link); //Which includes the ;
         } else {
-            writeURI(writer, null, "link", feild, link, dataColumn, ignoreZeros);
+            writeURI(writer, "", "link", feild, link, dataColumn, ignoreZeros);
             writer.write(" ;");
         }
         writer.newLine();
@@ -245,56 +250,29 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private void writeVocab(BufferedWriter writer, String metaColumn, String field, String dataColumn)
+    private void writeData(BufferedWriter writer,  String field, String externalUri, String dataColumn)
             throws IOException, XLWrapException, XLWrapEOFException{
         //ystem.out.println ("write vocab " + field);
-        String noExternal = "\"" + dataColumn + firstData + "\"^^xl:Expr ;";
         writeVocab(writer, field);
-        String externalDoi;
-        String externalSheet;
-        if (externalSheetRow >= 1){
-            String externalSheetName = getCellValue (metaColumn, externalSheetRow);
-            if (externalSheetName == null || externalSheetName.isEmpty()) {
-                //data is a value
-                //ystem.out.println ("name is null");
-                writer.write(noExternal);
-            } else {
-                if (externalSheetName.startsWith("[")){
-                    externalDoi = externalSheetName.substring(1, externalSheetName.indexOf(']'));
-                    externalSheet = externalSheetName.substring( externalSheetName.indexOf(']')+1);
-                } else {
-                    externalDoi = doi;
-                    externalSheet = externalSheetName;
-                }
-                //dataColumn = getCellValue (metaColumn, externalColumnRow);
-                //data is an external link
-                //ystem.out.println ("external");
-                writer.write("[ xl:uri \"ID_URI('" + RDF_BASE_URL + field + "/" + externalDoi + "/" + externalSheet +
-                    "/', " + dataColumn + firstData + ")\"^^xl:Expr ];");
-            }
+        if (externalUri.isEmpty()) {
+            writer.write("\"" + dataColumn + firstData + "\"^^xl:Expr ;");
         } else {
-            //ystem.out.println ("sheetrow = null");
-            //data is a value
-            writer.write(noExternal);
+            writer.write("[ xl:uri \"ID_URI('" + externalUri + "'," + dataColumn + firstData + ", false)\"^^xl:Expr ];");
         }
         writer.newLine();
     }
 
-    private String getExternalField(String metaColumn) throws XLWrapException, XLWrapEOFException{
+    private String getExternalUri(String metaColumn, String field)
+            throws XLWrapException, XLWrapEOFException{
         if (externalSheetRow < 1){
             return "";
         }
-        String temp = getCellValue (metaColumn, externalSheetRow);
-        if (temp == null){
+        String externalFeild = getCellValue (metaColumn, externalSheetRow);
+        if (externalFeild == null){
             return "";
         }
-        return temp;
-    }
-
-    private String getExternalUri(String externalFeild, String metaColumn, String field)
-            throws XLWrapException, XLWrapEOFException{
         if (externalFeild.isEmpty()) {
-            return  RDF_BASE_URL + field + "/" + doi + "/" + sheetInURI;
+            return "";
         }
         String externalDoi;
         String externalSheet;
@@ -331,14 +309,13 @@ public class SheetWrite extends AbstractSheet{
         checkName(category, field);
         String idType = getCellValue (metaColumn, idTypeRow);
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
-        String externalField = getExternalField(metaColumn);
-        String externalUri = getExternalUri(externalField, metaColumn, field);
+        String externalUri = getExternalUri(metaColumn, field);
         writeURI(writer, externalUri, category, field, idType, dataColumn,ignoreZeros);
         writer.write (" a ex:");
         writer.write (category);
         writer.write (" ;");
         writer.newLine();
-        writeVocab(writer, metaColumn, field, dataColumn);
+        writeData(writer, field, externalUri, dataColumn);
         for (int row = firstLink; row <= lastLink; row++){
             writeLink(writer, metaColumn, dataColumn, row, ignoreZeros);
         }
@@ -346,7 +323,7 @@ public class SheetWrite extends AbstractSheet{
             writeConstant(writer, metaColumn, row);
         }
 
-        if (externalField.isEmpty()){
+        if (externalUri.isEmpty()){
             writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
             writer.newLine();
         }
