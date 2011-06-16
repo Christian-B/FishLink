@@ -206,16 +206,13 @@ public class CYAB_Sheet {
           cell = poiRow.getCell(columnNumber);
           columnNumber++;
        } while (cell != null);
-       if (columnNumber != 26){
-           char first = (char)( columnNumber+ 64);
-           return first + "";
-       }
-       return "none";
+       return POI_Utils.indexToAlpha(columnNumber);
    }
 
     void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage)
             throws JavaToExcelException {
+        System.out.println("addValidation!  Need to look into how different version of Excell handle this!");
         //ystem.out.println ("list at " + column + row);
         //ystem.out.println(column + ": " + rule);
         int columnNumber = POI_Utils.alphaToIndex(column);
