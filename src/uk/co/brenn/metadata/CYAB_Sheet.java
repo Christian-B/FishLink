@@ -209,6 +209,13 @@ public class CYAB_Sheet {
        return POI_Utils.indexToAlpha(columnNumber);
    }
 
+    void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
+            int errorStyle, String errorTitle, String errorMessage)
+            throws JavaToExcelException {
+        rule = rule.replaceAll("\\$"+replaceColum, column);
+        addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
+    }
+    
     void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage)
             throws JavaToExcelException {

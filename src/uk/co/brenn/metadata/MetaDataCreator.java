@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.Name;
  */
 public class MetaDataCreator {
 
-    static private String MAIN_ROOT = "c:Dropbox/FishLink XLWrap data/";
+    static private String MAIN_ROOT = "c:/Dropbox/FishLink XLWrap data/";
     static private String MASTER_FILE = "data/MetaMaster.xlsx";
     static private String LIST_SHEET = "Lists";
 
@@ -178,7 +178,7 @@ public class MetaDataCreator {
             }
             String errorTitle =  getTextZeroBased(masterSheet, 6, zeroRow);
             String errorMessage =  getTextZeroBased(masterSheet, 7, zeroRow);
-            metaSheet.addValidation(column, zeroRow + 1, list, popupTitle, popupMessage,
+            metaSheet.addValidation("B", column, zeroRow + 1, list, popupTitle, popupMessage,
                     errorStyle, errorTitle, errorMessage);
        // metaSheet.addListValidation(column, FIELD_ROW,  "INDIRECT(SUBSTITUTE($" + column + "$1,\" \",\"_\"))",
        //         "Type of feild", "Please select the feild that data in this column belongs to");
@@ -288,8 +288,8 @@ public class MetaDataCreator {
             JavaToExcelException, XLWrapException, XLWrapEOFException{
         MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "Meta Data/");
 
-        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
-        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
+        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
+        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
         creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
         creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
     }
