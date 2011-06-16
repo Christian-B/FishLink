@@ -199,7 +199,13 @@ public class SheetWrite extends AbstractSheet{
             link = link.replaceAll("=", "");
             writeValue(writer, link); //Which includes the ;
         } else {
-            writeURI(writer, "", "link", feild, link, dataColumn, ignoreZeros);
+            String exernalUri;
+            if (link.equals("row")){
+                exernalUri = "";
+            } else {
+                exernalUri = getOtherExternalId(link, feild);
+            }
+            writeURI(writer, exernalUri, "link", feild, link, dataColumn, ignoreZeros);
             writer.write(" ;");
         }
         writer.newLine();
@@ -260,6 +266,11 @@ public class SheetWrite extends AbstractSheet{
             writer.write("[ xl:uri \"ID_URI('" + externalUri + "'," + dataColumn + firstData + ", false)\"^^xl:Expr ];");
         }
         writer.newLine();
+    }
+
+    private String getOtherExternalId(String otherColumn, String field) throws XLWrapException, XLWrapEOFException{
+        String metaColumn = POI_Utils.indexToAlpha(POI_Utils.alphaToIndex(otherColumn)+1);
+        return getExternalUri(metaColumn, field);
     }
 
     private String getExternalUri(String metaColumn, String field)
