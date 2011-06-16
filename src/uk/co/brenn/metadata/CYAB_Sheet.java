@@ -219,7 +219,6 @@ public class CYAB_Sheet {
     void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage)
             throws JavaToExcelException {
-        System.out.println("addValidation!  Need to look into how different version of Excell handle this!");
         //ystem.out.println ("list at " + column + row);
         //ystem.out.println(column + ": " + rule);
         int columnNumber = POI_Utils.alphaToIndex(column);
@@ -242,6 +241,9 @@ public class CYAB_Sheet {
             String[] values = rule.split(",");
             constraint = dataValidationHelper.createExplicitListConstraint(values);
             //ystem.out.println(constraint.getExplicitListValues());
+        } else if (rule.equals("BLANK")){
+            constraint = dataValidationHelper.createTextLengthConstraint(
+                    DataValidationConstraint.OperatorType.LESS_THAN, "1", "1");
         } else {
             constraint = dataValidationHelper.createFormulaListConstraint(rule);
         }
@@ -252,7 +254,7 @@ public class CYAB_Sheet {
             dataValidation.setShowPromptBox(true);
         }
         dataValidation.setErrorStyle(errorStyle);
-        if (errorTitle.isEmpty()){
+        if (!errorTitle.isEmpty()){
             dataValidation.createErrorBox(errorTitle, errorMessage);
         }
         poiSheet.addValidationData(dataValidation);
