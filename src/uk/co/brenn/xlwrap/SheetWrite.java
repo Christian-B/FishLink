@@ -135,8 +135,19 @@ public class SheetWrite extends AbstractSheet{
     private void writeVocab (BufferedWriter writer, String vocab) throws IOException{
         if (vocab.startsWith("is") || vocab.startsWith("has")){
             writer.write("	vocab:" + vocab + "\t");
+        } else {
+            writer.write("	vocab:has" + vocab + "\t");
         }
-        writer.write("	vocab:has" + vocab + "\t");
+    }
+
+    private void writeValue(BufferedWriter writer, String value) throws IOException{
+        if (!value.startsWith("'")){
+            value = "'" + value ;
+        }
+        if (!value.endsWith("'")){
+            value = value + "'";
+        }
+        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
     }
 
     private void writeLink (BufferedWriter writer, String metaColumn, String dataColumn,
@@ -168,9 +179,13 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         writeVocab(writer, type);
-        //TODO checkthis
-        writeURI(writer, null, "link", feild, link, dataColumn, ignoreZeros);
-        writer.write(" ;");
+        if (link.startsWith("=")){
+            link = link.replaceAll("=", "");
+            writeValue(writer, link); //Which includes the ;
+        } else {
+            writeURI(writer, null, "link", feild, link, dataColumn, ignoreZeros);
+            writer.write(" ;");
+        }
         writer.newLine();
     }
 
@@ -201,15 +216,14 @@ public class SheetWrite extends AbstractSheet{
         if (feild.contains("/")){
             String nextValue = getCellValue (metaColumn, row+1);
             if (nextValue == null){
-                writer.write("	vocab:has" + feild.substring(0, feild.indexOf('/')) + "\t");
+                feild = feild.substring(0, feild.indexOf('/'));
             } else {
-                writer.write("	vocab:has" + feild.substring(feild.indexOf('/')+1) + "\t");
+                feild = feild.substring(feild.indexOf('/')+1);
             }
-        } else {
-            writeVocab (writer,	feild);
-        }
-        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
-        //writer.write ("\"" + value + "\" ;");
+        } 
+        writeVocab (writer,	feild);
+        writeValue(writer, value);
+         //writer.write ("\"" + value + "\" ;");
         writer.newLine();
     }
 
