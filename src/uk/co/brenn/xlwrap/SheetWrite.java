@@ -280,22 +280,30 @@ public class SheetWrite extends AbstractSheet{
         writer.newLine();
     }
 
-    private String getExternalUri(String metaColumn, String field) throws XLWrapException, XLWrapEOFException{
+    private String getExternalField(String metaColumn) throws XLWrapException, XLWrapEOFException{
         if (externalSheetRow < 1){
-            return  RDF_BASE_URL + field + "/" + doi + "/" + sheetInURI;
+            return "";
         }
-        String externalSheetName = getCellValue (metaColumn, externalSheetRow);
-        if (externalSheetName == null || externalSheetName.isEmpty()) {
+        String temp = getCellValue (metaColumn, externalSheetRow);
+        if (temp == null){
+            return "";
+        }
+        return temp;
+    }
+
+    private String getExternalUri(String externalFeild, String metaColumn, String field)
+            throws XLWrapException, XLWrapEOFException{
+        if (externalFeild.isEmpty()) {
             return  RDF_BASE_URL + field + "/" + doi + "/" + sheetInURI;
         }
         String externalDoi;
         String externalSheet;
-        if (externalSheetName.startsWith("[")){
-            externalDoi = externalSheetName.substring(1, externalSheetName.indexOf(']'));
-            externalSheet = externalSheetName.substring( externalSheetName.indexOf(']')+1);
+        if (externalFeild.startsWith("[")){
+            externalDoi = externalFeild.substring(1, externalFeild.indexOf(']'));
+            externalSheet = externalFeild.substring( externalFeild.indexOf(']')+1);
         } else {
             externalDoi = doi;
-            externalSheet = externalSheetName;
+            externalSheet = externalFeild;
         }
         return  RDF_BASE_URL + field + "/" + externalDoi + "/" + externalSheet + "/";
     }
@@ -323,7 +331,8 @@ public class SheetWrite extends AbstractSheet{
         checkName(category, field);
         String idType = getCellValue (metaColumn, idTypeRow);
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
-        String externalUri = getExternalUri(metaColumn, field);
+        String externalField = getExternalField(metaColumn);
+        String externalUri = getExternalUri(externalField, metaColumn, field);
         writeURI(writer, externalUri, category, field, idType, dataColumn,ignoreZeros);
         writer.write (" a ex:");
         writer.write (category);
@@ -337,8 +346,10 @@ public class SheetWrite extends AbstractSheet{
             writeConstant(writer, metaColumn, row);
         }
 
-        writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
-        writer.newLine();
+        if (externalField.isEmpty()){
+            writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
+            writer.newLine();
+        }
 
         writer.write(".");
         writer.newLine();
