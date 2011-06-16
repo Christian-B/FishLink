@@ -133,6 +133,9 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void writeVocab (BufferedWriter writer, String vocab) throws IOException{
+        //if (vocab.contains("/")){
+        //    int error = 1/0;
+        //}
         if (vocab.startsWith("is") || vocab.startsWith("has")){
             writer.write("	vocab:" + vocab + "\t");
         } else {
@@ -178,6 +181,14 @@ public class SheetWrite extends AbstractSheet{
         if (link.equalsIgnoreCase("n/a")){
             return;
         }
+        if (type.contains("/")){
+            String nextValue = getCellValue (metaColumn, row+1);
+            if (nextValue == null){
+                type = type.substring(0, type.indexOf('/'));
+            } else {
+                type = type.substring(type.indexOf('/')+1);
+            }
+        }
         writeVocab(writer, type);
         if (link.startsWith("=")){
             link = link.replaceAll("=", "");
@@ -213,14 +224,6 @@ public class SheetWrite extends AbstractSheet{
         } else {
             value = "'" + value + "'";
         }
-        if (feild.contains("/")){
-            String nextValue = getCellValue (metaColumn, row+1);
-            if (nextValue == null){
-                feild = feild.substring(0, feild.indexOf('/'));
-            } else {
-                feild = feild.substring(feild.indexOf('/')+1);
-            }
-        } 
         writeVocab (writer,	feild);
         writeValue(writer, value);
          //writer.write ("\"" + value + "\" ;");
