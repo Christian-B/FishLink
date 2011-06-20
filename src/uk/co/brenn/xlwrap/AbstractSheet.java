@@ -42,7 +42,7 @@ public class AbstractSheet {
 
     //, String mapFileName, String rdfFileName
     public AbstractSheet (Sheet theSheet)
-            throws XLWrapException, XLWrapEOFException {
+            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
         metaSheet = theSheet;
         findAndCheckMetaSplits();
     }
@@ -63,7 +63,7 @@ public class AbstractSheet {
         }
     }
 
-    private void findMetaSplits() throws XLWrapException, XLWrapEOFException{
+    private void findMetaSplits() throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         int row = 1;
         SplitType splitType = SplitType.NONE;
         do {
@@ -85,9 +85,10 @@ public class AbstractSheet {
                 //} else if (columnALower.equals("external column")){
                 //    externalColumnRow = row;
                 } else if (columnALower.contains("links")){
-                    firstLink = row + 1;
-                    endMataSplit(row, splitType);
-                    splitType = SplitType.LINKS;
+                    throw new XLWrapMapException ("Links not currently supproted");
+                    //firstLink = row + 1;
+                    //endMataSplit(row, splitType);
+                    //splitType = SplitType.LINKS;
                 } else if (columnALower.contains("constant")){
                     firstConstant = row + 1;
                     endMataSplit(row, splitType);
@@ -114,9 +115,9 @@ public class AbstractSheet {
         } while (true); //will return out when finished
     }
 
-    private void findAndCheckMetaSplits() throws XLWrapException, XLWrapEOFException{
+    private void findAndCheckMetaSplits() throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         lastDataColumn = POI_Utils.indexToAlpha(metaSheet.getColumns() -1);
-        System.out.println(lastDataColumn + " " + metaSheet.getColumns() + "  " + metaSheet.getSheetInfo());
+        //ystem.out.println(lastDataColumn + " " + metaSheet.getColumns() + "  " + metaSheet.getSheetInfo());
         findMetaSplits();
         if (categoryRow == -1) {
             throw new XLWrapException("Unable to find \"category\" in column A.");
@@ -133,12 +134,7 @@ public class AbstractSheet {
         return metaSheet.getName() + "template";
     }
 
-    protected String getCellValue (String column, int row) throws XLWrapException, XLWrapEOFException{
-        //String sheetName = null; //null is first (0) sheet.
-        int col = Utils.alphaToIndex(column);
-        int actualRow = row - 1;
-        //CellRange cellRange = new CellRange("File:" +xlsPath, sheetName, col, actualRow);
-        //Cell cell = context.getCell(cellRange);
+    private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapException, XLWrapEOFException{
         Cell cell = metaSheet.getCell(col, actualRow);
         XLExprValue<?> value = Utils.getXLExprValue(cell);
         if (value == null){
@@ -148,6 +144,19 @@ public class AbstractSheet {
         return value.toString().replace("\"","");
     }
 
+    protected String getCellValue (String column, int row) throws XLWrapException, XLWrapEOFException{
+        //String sheetName = null; //null is first (0) sheet.
+        int col = Utils.alphaToIndex(column);
+        int actualRow = row - 1;
+        return getZeroBasedCellValue (col, actualRow);
+    }
+
+    protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws XLWrapException, XLWrapEOFException{
+        int col = Utils.alphaToIndex(dataColumn) + 1;
+        int actualRow = row - 1;
+        //ystem.out.println (dataColumn + col + "  " + actualRow);
+        return getZeroBasedCellValue (col, actualRow);
+    }
 }
 
 

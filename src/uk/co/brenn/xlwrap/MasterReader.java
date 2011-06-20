@@ -16,7 +16,7 @@ import uk.co.brenn.metadata.MetaDataCreator;
 public class MasterReader extends AbstractSheet {
 
     public MasterReader ()
-            throws XLWrapException, XLWrapEOFException {
+            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
        super(MetaDataCreator.getMasterDropdownSheet());
     }
 
