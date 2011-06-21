@@ -41,6 +41,10 @@ public class NameChecker {
         }
      }
 
+    public boolean isCategory (String field) {
+        return categories.containsKey(field);
+    }
+
     public void checkName (String sheetInfo, String category, String field) throws XLWrapMapException{
         //ystem.out.println("checking name");
         ArrayList<String> fields = categories.get(category);
