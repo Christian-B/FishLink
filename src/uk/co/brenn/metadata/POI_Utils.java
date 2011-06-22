@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.metadata;
 
 /**
@@ -30,14 +25,12 @@ public class POI_Utils {
      */
     public static String indexToAlpha(int index){
         String reply = "";
-        //ystem.out.println(index);
         if (index < 26){
            char first = (char)( index + 65);
            reply = first + "";
         } else {
            char last = (char)(index - ((index / 26) * 26) + 65);
            String rest = indexToAlpha((index / 26)-1);
-           //ystem.out.println(rest + "-" + last);
            reply = rest + last;
         }
         if (index != alphaToIndex(reply)){

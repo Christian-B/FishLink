@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
@@ -30,11 +25,7 @@ public class MasterReader extends AbstractSheet {
         throw new XLWrapMapException ("In " + sheet.getSheetInfo() + " Map contains " + otherName + " in the master does not in the same place");
     }
 
-    public void check (SheetWrite other) throws XLWrapMapException, XLWrapException, XLWrapEOFException{
-        //ystem.out.println("checking " + other.toString());
-       //categoryRow checked by findAndCheckMetaSplits
-       //fieldRow checked by findAndCheckMetaSplits
-       //idTypeRow checked by findAndCheckMetaSplits
+    void check (SheetWrite other) throws XLWrapMapException, XLWrapException, XLWrapEOFException{
        if (other.externalSheetRow > 0){
            if (this.externalSheetRow == -1){
                 throw new XLWrapMapException("Map contains \"external sheet\" but master does not.");
@@ -45,16 +36,10 @@ public class MasterReader extends AbstractSheet {
                 throw new XLWrapMapException("Map contains \"ignore zero\" but master does not.");
            }
        }
-       if (other.firstLink > 0){
-           for (int i = other.firstLink; i <= other.lastLink; i++){
-               checkName (other, other.getCellValue("A", i), firstLink, lastLink);
-           }
-       }
        if (other.firstConstant > 0){
            for (int i = other.firstConstant; i <= other.lastConstant; i++){
                checkName (other, other.getCellValue("A", i), firstConstant, lastConstant);
            }
        }
-       //ystem.out.println("checked" + other.toString());
     }
 }

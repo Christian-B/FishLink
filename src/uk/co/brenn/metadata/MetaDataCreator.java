@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.metadata;
 
 import at.jku.xlwrap.common.XLWrapException;
@@ -12,7 +7,6 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
@@ -83,12 +77,11 @@ public class MetaDataCreator {
     }
 
     private void createNamedRanges (CYAB_Workbook metaWorkbook)
-            throws XLWrapException, XLWrapEOFException, JavaToExcelException{
+            throws XLWrapException, XLWrapEOFException {
         Sheet masterSheet =  getMasterListSheet();
         CYAB_Sheet metaSheet = metaWorkbook.getSheet(LIST_SHEET);
         int zeroColumn = 0;
         String rangeName =  getTextZeroBased(masterSheet, zeroColumn, 0);
-        //ystem.out.println(zeroColumn + " "  + rangeName);
         int categories = -1;
         while (!rangeName.isEmpty()) {
             String columnName = POI_Utils.indexToAlpha(zeroColumn);
@@ -101,20 +94,12 @@ public class MetaDataCreator {
                 fieldName = getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             } while (!fieldName.isEmpty());
             Name range = metaWorkbook.createName();
-            //ystem.out.println("now: " + rangeName);
             range.setNameName(rangeName);
             String rangeDef = "'" + LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
-            //=OFFSET(Sheet1!$A$1,0,0,COUNTA(Sheet1!$A:$A),1)
-            //String rangeDef = "OFFSET('" + LIST_SHEET + "'!$" + columnName + "$1,0,0,COUNTA('" + LIST_SHEET + "'!$" +
-            //        columnName + ":$" + columnName + ")-1,1)";
-            //ystem.out.println (rangeName + " = " + rangeDef);
             range.setRefersToFormula(rangeDef);
             zeroColumn++;
             rangeName = getTextZeroBased(masterSheet, zeroColumn, 0);
-            //ystem.out.println(zeroColumn + " "  + rangeName);
             if (rangeName.isEmpty() && categories == -1){
-                //ystem.out.println("doing categories");
-                //found the space between Categories and the other nameRanges
                 categories = zeroColumn -1;
                 zeroColumn++;
                 rangeName = getTextZeroBased(masterSheet, zeroColumn, 0);
@@ -144,11 +129,9 @@ public class MetaDataCreator {
             value = getTextZeroBased(masterSheet, 0, zeroRow);
             metaSheet.setValue("A",zeroRow + 1, value);
             zeroRow++;
-            //ystem.out.println (value);
         } while (!value.isEmpty());
         metaSheet.autoSizeColumn(0);
         int maxRow = dataSheet.getRows();
-        //ystem.out.println(maxRow);
         if (maxRow > 100){
             maxRow = 100;
         }
@@ -161,11 +144,9 @@ public class MetaDataCreator {
     }
 
     private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, CYAB_Sheet metaSheet, String column)
-            throws JavaToExcelException, XLWrapException, XLWrapEOFException{
+            throws XLWrapException, XLWrapEOFException{
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
-//        for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String list = getTextZeroBased(masterSheet, 2, zeroRow);
-            //ystem.out.println(column + ":" + list);
             String popupTitle = getTextZeroBased(masterSheet, 3, zeroRow);
             String popupMessage =  getTextZeroBased(masterSheet, 4, zeroRow);
             String errorStyleString =  getTextZeroBased(masterSheet, 5, zeroRow);
@@ -180,63 +161,49 @@ public class MetaDataCreator {
             String errorMessage =  getTextZeroBased(masterSheet, 7, zeroRow);
             metaSheet.addValidation("B", column, zeroRow + 1, list, popupTitle, popupMessage,
                     errorStyle, errorTitle, errorMessage);
-       // metaSheet.addListValidation(column, FIELD_ROW,  "INDIRECT(SUBSTITUTE($" + column + "$1,\" \",\"_\"))",
-       //         "Type of feild", "Please select the feild that data in this column belongs to");
         }
     }
 
     private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String metaColumn)
-            throws XLWrapException{
+            throws XLWrapException, XLWrapEOFException{
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
-        //ystem.out.println("copying from "+ dataColumn + " to " + metaColumn);
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
         int maxRow = dataSheet.getRows();
         if (maxRow > 100){
             maxRow = 100;
         }
         for (int zeroRow = 0; zeroRow < maxRow; zeroRow++){
-            //ystem.out.println(zeroRow);
-            try {
-                Cell cell = dataSheet.getCell(zeroColumn, zeroRow);
-                TypeAnnotation typeAnnotation = cell.getType();
-                switch (typeAnnotation){
-                    case BOOLEAN:
-                        boolean booleanValue = cell.getBoolean();
-                        //ystem.out.println(booleanValue);
-                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, booleanValue);
-                        break;
-                    case NUMBER:
-                        double doubleValue = cell.getNumber();
-                        //ystem.out.println("number" + doubleValue);
-                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, doubleValue);
-                        break;
-                    case TEXT:
-                        String textValue = cell.getText();
-                        //ystem.out.println(textValue);
-                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, textValue);
-                        break;
-                    case DATE:
-                        Date dateValue = cell.getDate();
-                        String format = cell.getDateFormat();
-                       //ystem.out.println(dateValue);
-                        metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, dateValue, format);
-                        break;
-                    case NULL:
-                        //ystem.out.println("null");
-                        //Moving to copy
-                        break;
-                    default:
-                        throw new XLWrapException("Unexpected Cell Type");
-                }
-            } catch (XLWrapEOFException ex) {
-                //ystem.out.println("Exception");
+            Cell cell = dataSheet.getCell(zeroColumn, zeroRow);
+            TypeAnnotation typeAnnotation = cell.getType();
+            switch (typeAnnotation){
+                case BOOLEAN:
+                    boolean booleanValue = cell.getBoolean();
+                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, booleanValue);
+                    break;
+                case NUMBER:
+                    double doubleValue = cell.getNumber();
+                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, doubleValue);
+                    break;
+                case TEXT:
+                    String textValue = cell.getText();
+                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, textValue);
+                    break;
+                case DATE:
+                    Date dateValue = cell.getDate();
+                    String format = cell.getDateFormat();
+                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, dateValue, format);
+                    break;
+                case NULL:
+                    break;
+                default:
+                    throw new XLWrapException("Unexpected Cell Type");
             }
         }
     }
 
     private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) 
-            throws JavaToExcelException, XLWrapException, XLWrapEOFException{
+            throws XLWrapException, XLWrapEOFException{
         int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
         for ( int zeroDataColumn = 0;  zeroDataColumn < lastColumn; zeroDataColumn++){
@@ -251,8 +218,9 @@ public class MetaDataCreator {
         if (dataSheet.getRows() < 1) return false;
         return true;
     }
+
     private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
-            throws JavaToExcelException, XLWrapException, XLWrapEOFException{
+            throws XLWrapException, XLWrapEOFException{
         Sheet masterSheet = getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
@@ -267,19 +235,18 @@ public class MetaDataCreator {
     }
 
     public void prepareMetaDataOnDoi(String dataRoot, String dataFile, String doi) throws FileNotFoundException,
-            IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
+            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException{
         System.out.println("Preparing meta data collector for " + dataFile);
         Workbook dataWorkbook = getExecutionContext().getWorkbook("file:" + dataRoot +dataFile);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
-        //ListWriter.writeLists(masterWorkbook, metaWorkbook);
         prepareSheets(metaWorkbook,dataWorkbook);
         writeMeta(metaWorkbook, dataFile);
     }
 
     public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws FileNotFoundException,
-            IOException, InvalidFormatException, JavaToExcelException, XLWrapException, XLWrapEOFException{
+            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException{
         Workbook dataWorkbook;
         try {
             dataWorkbook = getExecutionContext().getWorkbook(dataPath);
@@ -294,7 +261,7 @@ public class MetaDataCreator {
     }
 
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
-            JavaToExcelException, XLWrapException, XLWrapEOFException{
+           XLWrapException, XLWrapEOFException{
         MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "Meta Data/");
 
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");

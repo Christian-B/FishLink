@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
@@ -13,8 +8,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import uk.co.brenn.metadata.MetaDataCreator;
 import uk.co.brenn.metadata.POI_Utils;
 
@@ -40,11 +33,9 @@ public class SheetWrite extends AbstractSheet{
     private HashMap<String,String> categoryUris;
     private ArrayList<String> allColumns;
 
-    //, String mapFileName, String rdfFileName
     public SheetWrite (Workbook metaWorkbook, String dataURL, String doi, String sheetName)
             throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         super(metaWorkbook.getSheet(sheetName));
-        //ystem.out.println(this.lastDataColumn);
         this.doi = doi;
         dataPath = dataURL;
         Workbook dataWorkbook = MetaDataCreator.getExecutionContext().getWorkbook(dataPath);
@@ -107,48 +98,6 @@ public class SheetWrite extends AbstractSheet{
         writer.newLine();
     }
 
-    /*
-    private void XwriteURI(BufferedWriter writer, String externalUri, String category, String field, String idType, String dataColumn,
-            boolean ignoreZeros) throws IOException, XLWrapMapException {
-        String uri;
-        if (externalUri.isEmpty()){
-            uri = RDF_BASE_URL + category + "/" + doi + "/" + sheetInURI;
-        } else {
-            uri = externalUri;
-        }
-        //ystem.out.println("writeUri " + uri + " " + category + " " + field + " " + idType + " " + dataColumn);
-        if (field.toLowerCase().equals("id")){
-            writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ","
-                    + ignoreZeros + ")\"^^xl:Expr ] ");
-            return;
-        }
-        if(field.toLowerCase().equals("value")) {
-            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ","
-                    + ignoreZeros + ")\"^^xl:Expr ] ");
-            return;
-        }
-        if ((idType == null) || (idType.isEmpty())){
-            throw new XLWrapMapException("Column " + dataColumn + " in Sheet " + metaSheet.getName() +
-                    " has an unexpected emtpy IDType");
-        }
-        if (idType.equalsIgnoreCase("n/a")) {
-            throw new XLWrapMapException("Column " + dataColumn + " in Sheet " + metaSheet.getName() +
-                    " has an unexpected n/a IDType with field " + field);
-        }
-        if(category.toLowerCase().equals("observation")) {
-            writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idType + firstData + ","
-                    + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
-            return;
-        }
-        if (idType.equalsIgnoreCase("ROW")){
-            writer.write("[ xl:uri \"ROW_URI('" + uri + "row', " + dataColumn + firstData + "," +
-                    ignoreZeros + ")\"^^xl:Expr ] ");
-        } else {
-            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idType + firstData + "," +
-                    dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
-        }
-    }
- */
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
             String dataColumn, boolean ignoreZeros)
             throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException {
@@ -166,7 +115,6 @@ public class SheetWrite extends AbstractSheet{
             } else {
                 String idCategory = getMetaCellValueOnDataColumn(idType, categoryRow);
                 String idColumn = idColumns.get(idCategory);
-                System.out.println (idType + " " + idCategory + "/"+ idColumn);
                 writeUri(writer, idCategory, field, idColumn, ignoreZeros);
             }
         }
@@ -175,7 +123,6 @@ public class SheetWrite extends AbstractSheet{
     private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, boolean ignoreZeros)
             throws IOException, XLWrapMapException {
         String uri = categoryUris.get(category);
-        System.out.println("writeURI " + uri + " " + category + " " + field + " " + dataColumn);
         if (field.toLowerCase().equals("id")){
             writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ","
                     + ignoreZeros + ")\"^^xl:Expr ] ");
@@ -213,9 +160,6 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void writeVocab (BufferedWriter writer, String vocab) throws IOException{
-        //if (vocab.contains("/")){
-        //    int error = 1/0;
-        //}
         if (vocab.startsWith("is") || vocab.startsWith("has")){
             writer.write("	vocab:" + vocab + "\t");
         } else {
@@ -233,48 +177,6 @@ public class SheetWrite extends AbstractSheet{
         writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
     }
 
-    /*private void writeLink (BufferedWriter writer, String metaColumn, String dataColumn,
-            int row, boolean ignoreZeros)
-            throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException{
-        String feild = getCellValue ("A", row);
-        if (feild == null){
-            return;
-        }
-        String nextFeild = getCellValue ("A", row + 1);
-        String link = getCellValue (metaColumn, row);
-        //ystem.out.println("writeLink " + metaColumn + "\t" + feild + "\t" + link);
-        if (link == null){
-           //ystem.out.println("Skippig column " + metaColumn + " " + feild + "row as it is blank");
-            return;
-        }
-        if (link.equalsIgnoreCase("n/a")){
-            return;
-        }
-        if (feild.contains("/")){
-            String nextValue = getCellValue (metaColumn, row+1);
-            if (nextValue == null){
-                feild = feild.substring(0, feild.indexOf('/'));
-            } else {
-                feild = feild.substring(feild.indexOf('/')+1);
-            }
-        }
-        writeVocab(writer, feild);
-        if (link.startsWith("=")){
-            link = link.replaceAll("=", "");
-            writeValue(writer, link); //Which includes the ;
-        } else {
-            String exernalUri;
-            if (link.equals("row")){
-                exernalUri = "";
-            } else {
-                exernalUri = getOtherExternalId(link, feild);
-            }
-            writeUri(writer, exernalUri, "link", feild, link, dataColumn, ignoreZeros);
-            writer.write(" ;");
-        }
-        writer.newLine();
-    }
-*/
     private void writeConstant (BufferedWriter writer, String metaColumn, int row)
             throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException{
         String feild = getCellValue ("A", row);
@@ -282,9 +184,7 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         String value = getCellValue (metaColumn, row);
-        //ystem.out.println(metaColumn + "\t" + feild + "\t" + value);
         if (value == null){
-            //ystem.out.println("Skippig column " + metaColumn + " " + feild + "row as it is blank");
             return;
         }
         if (value.equalsIgnoreCase("n/a")){
@@ -292,7 +192,6 @@ public class SheetWrite extends AbstractSheet{
         }
         writeVocab (writer,	feild);
         writeValue(writer, value);
-         //writer.write ("\"" + value + "\" ;");
         writer.newLine();
     }
 
@@ -311,24 +210,6 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private String getRemoteUri(String metaColumn, String category)
-            throws XLWrapException, XLWrapEOFException{
-        String externalField = getExternal(metaColumn);
-        if (externalField.isEmpty()){
-            return null;
-        }
-        String externalDoi;
-        String externalSheet;
-        if (externalField.startsWith("[")){
-            externalDoi = externalField.substring(1, externalField.indexOf(']'));
-            externalSheet = externalField.substring( externalField.indexOf(']')+1);
-        } else {
-            externalDoi = doi;
-            externalSheet = externalField;
-        }
-        return  RDF_BASE_URL + category + "/" + externalDoi + "/" + externalSheet + "/";
-    }
-
     private String refersToCategory(String field) throws XLWrapEOFException, XLWrapException{
        if (this.isCategory(field)) {
            return field;
@@ -338,7 +219,6 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeData(BufferedWriter writer, String metaColumn)
             throws IOException, XLWrapException, XLWrapEOFException{
-        //ystem.out.println ("write vocab " + field);
         String field = getCellValue (metaColumn, fieldRow);
         writeVocab(writer, field);
         String category = refersToCategory(field);
@@ -351,35 +231,6 @@ public class SheetWrite extends AbstractSheet{
         }
         writer.newLine();
     }
-
-    /*private String getOtherExternalId(String otherColumn, String category) throws XLWrapException, XLWrapEOFException{
-        String metaColumn = POI_Utils.indexToAlpha(POI_Utils.alphaToIndex(otherColumn)+1);
-        return getExternalUri1(metaColumn, category);
-    }*/
-
-    /*private String getExternalUri(String metaColumn, String category)
-            throws XLWrapException, XLWrapEOFException{
-        if (externalSheetRow < 1){
-            return "";
-        }
-        String externalFeild = getCellValue (metaColumn, externalSheetRow);
-        if (externalFeild == null){
-            return "";
-        }
-        if (externalFeild.isEmpty()) {
-            return "";
-        }
-        String externalDoi;
-        String externalSheet;
-        if (externalFeild.startsWith("[")){
-            externalDoi = externalFeild.substring(1, externalFeild.indexOf(']'));
-            externalSheet = externalFeild.substring( externalFeild.indexOf(']')+1);
-        } else {
-            externalDoi = doi;
-            externalSheet = externalFeild;
-        }
-        return  RDF_BASE_URL + category + "/" + externalDoi + "/" + externalSheet + "/";
-    }*/
 
     private void checkName(String categery, String field)
             throws XLWrapException, XLWrapEOFException, XLWrapMapException{
@@ -431,7 +282,6 @@ public class SheetWrite extends AbstractSheet{
         String field = getCellValue (metaColumn, fieldRow);
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
-        System.out.println(metaColumn + " " + category + " "+ field + " " + idType + " " + external);
         if (category == null || category.toLowerCase().equals("undefined")) {
             System.out.println("Skippig column " + metaColumn + " as no Category provided");
             return false;
@@ -488,20 +338,6 @@ public class SheetWrite extends AbstractSheet{
        return  RDF_BASE_URL + category + "/" + doi + "/" + sheet + "/";
    }
 
-  /* private String makExternalUri(String externalField , String category)
-            throws XLWrapException, XLWrapEOFException{
-        String externalDoi;
-        String externalSheet;
-        if (externalField.startsWith("[")){
-            externalDoi = externalField.substring(1, externalField.indexOf(']'));
-            externalSheet = externalField.substring( externalField.indexOf(']')+1);
-        } else {
-            externalDoi = doi;
-            externalSheet = externalField;
-        }
-        return  RDF_BASE_URL + category + "/" + externalDoi + "/" + externalSheet + "/";
-    }
-*/
    private String getUri(String metaColumn , String category)
             throws XLWrapException, XLWrapEOFException{
         String externalField = getExternal(metaColumn);
@@ -520,15 +356,6 @@ public class SheetWrite extends AbstractSheet{
         return  RDF_BASE_URL + category + "/" + externalDoi + "/" + externalSheet + "/";
     }
 
-   /*private String getIdUri(String metaColumn, String category)
-            throws XLWrapException, XLWrapEOFException{
-        String externalField = getExternal(metaColumn);
-        if (externalField.isEmpty()){
-            return getCatgerogyUri(category);
-        }
-        return makExternalUri(externalField, category);
-    }
-*/
    private String metaToDataColumn(String metaColumn){
        return POI_Utils.indexToAlpha(POI_Utils.alphaToIndex(metaColumn)-1);
    }
@@ -576,7 +403,6 @@ public class SheetWrite extends AbstractSheet{
    private void findIds() throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         int maxColumn = POI_Utils.alphaToIndex(lastDataColumn);
         for (int i = 0; i < maxColumn; i++){
-            //ystem.out.println(i);
             String metaColumn = POI_Utils.indexToAlpha(i);
             String category = getCellValue (metaColumn, categoryRow);
             if (category == null || category.isEmpty()){
@@ -586,11 +412,7 @@ public class SheetWrite extends AbstractSheet{
                 findAll(category, metaColumn);
             }
         }
-        //for (String key : idColumns.keySet()) {
-            //ystem.out.println("Key: " + key + ", idColumn: " + idColumns.get(key) +
-        //            ", uri: " + categoryUris.get(key));
-        //}
-    }
+     }
 
     protected void writeTemplate(BufferedWriter writer) throws IOException, XLWrapException, XLWrapEOFException, XLWrapMapException{
         System.out.println("Writing template for "+sheet);
@@ -604,7 +426,6 @@ public class SheetWrite extends AbstractSheet{
         for (int i = 0; i < maxColumn; i++){
             String data = POI_Utils.indexToAlpha(i);
             String meta = POI_Utils.indexToAlpha(i+1);
-            //ystem.out.println("writeTemplate " + i + lastDataColumn);
             if (writeTemplateColumn(writer, meta, data)){
                 foundColumn = true;
             }

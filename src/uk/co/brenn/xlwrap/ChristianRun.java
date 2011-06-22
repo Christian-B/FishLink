@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
@@ -28,13 +23,13 @@ public class ChristianRun {
     }
     public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
         BrennRegister.register();
-        //loadXLS("TarnschemFinalMetaData.xls");
-        //loadXLS("CumbriaTarnsPart1MetaData.xls");
-        //loadXLS("FBA_TarnsMetaData.xls");
-        //loadXLS("RecordsMetaData.xls");
-        //loadXLS("SpeciesMetaData.xls");
-        //loadXLS("StokoeMetaData.xls");
-        //loadXLS("TarnsMetaData.xls");
+        loadXLS("TarnschemFinalMetaData.xls");
+        loadXLS("CumbriaTarnsPart1MetaData.xls");
+        loadXLS("FBA_TarnsMetaData.xls");
+        loadXLS("RecordsMetaData.xls");
+        loadXLS("SpeciesMetaData.xls");
+        loadXLS("StokoeMetaData.xls");
+        loadXLS("TarnsMetaData.xls");
         loadXLS("WillbyGroupsMetaData.xls");
 
     }

@@ -18,10 +18,9 @@ import uk.co.brenn.metadata.MetaDataCreator;
  */
 public class NameChecker {
 
-     HashMap<String,ArrayList<String>> categories;
+     private HashMap<String,ArrayList<String>> categories;
 
      NameChecker() throws XLWrapException, XLWrapEOFException{
-        //stem.out.println("MasterNameChecker");
         Sheet masterSheet =  MetaDataCreator.getMasterListSheet();
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = 0;
@@ -41,12 +40,11 @@ public class NameChecker {
         }
      }
 
-    public boolean isCategory (String field) {
+    boolean isCategory (String field) {
         return categories.containsKey(field);
     }
 
-    public void checkName (String sheetInfo, String category, String field) throws XLWrapMapException{
-        //ystem.out.println("checking name");
+    void checkName (String sheetInfo, String category, String field) throws XLWrapMapException{
         ArrayList<String> fields = categories.get(category);
         if (fields == null){
             throw new XLWrapMapException("Map used catagory "+ category + " which is not in the Master");

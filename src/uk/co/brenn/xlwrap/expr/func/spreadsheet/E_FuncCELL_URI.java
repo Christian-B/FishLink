@@ -1,5 +1,6 @@
 /**
  * Copyright 2009 Andreas Langegger, andreas@langegger.at, Austria
+ * Copyright 2011 Christian Brenninkmeijer, Brenninc@cs.man.ac.uk, UK
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -19,21 +20,18 @@ import at.jku.xlwrap.common.Utils;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.map.expr.E_RangeRef;
-import at.jku.xlwrap.map.expr.TypeCast;
 import at.jku.xlwrap.map.expr.XLExpr;
 import at.jku.xlwrap.map.expr.func.FunctionRegistry;
 import at.jku.xlwrap.map.expr.func.XLExprFunction;
-import at.jku.xlwrap.map.expr.val.E_Boolean;
-import at.jku.xlwrap.map.expr.val.E_Long;
 import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.map.range.CellRange;
 import at.jku.xlwrap.map.range.Range;
-import at.jku.xlwrap.map.range.Range.CellIterator;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 
 /**
  * @author dorgon
+ * @athour Christian
  *
  */
 public class E_FuncCELL_URI extends XLExprFunction {
@@ -61,10 +59,7 @@ public class E_FuncCELL_URI extends XLExprFunction {
 		if (!(absolute instanceof CellRange))
 			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
                 XLExprValue<?> value0 = getArg(0).eval(context);
-                //if (value0 == null){
-                //    return null;
-                //}
-                XLExprValue<?> value1 = getArg(1).eval(context);
+                 XLExprValue<?> value1 = getArg(1).eval(context);
                 if (value1 == null){
                     return null;
                 }

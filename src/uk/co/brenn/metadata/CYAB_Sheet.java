@@ -1,16 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.metadata;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import org.apache.poi.hssf.usermodel.DVConstraint;
-import org.apache.poi.hssf.usermodel.HSSFDataValidation;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -31,7 +22,7 @@ public class CYAB_Sheet {
     private Sheet poiSheet;
 
     private CellStyle dateStyle;
-    //private CellStyle timeStyle;
+
     private CellStyle dateAndTimeStyle;
 
     CYAB_Sheet(Sheet sheet) {
@@ -42,8 +33,6 @@ public class CYAB_Sheet {
         dateAndTimeStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
         dateStyle = wb.createCellStyle();
         dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
-        //timeStyle = wb.createCellStyle();
-        //timeStyle.setDataFormat(createHelper.createDataFormat().getFormat("h:mm"));
     }
 
     /**
@@ -197,30 +186,14 @@ public class CYAB_Sheet {
         cell.setCellStyle(cellStyle);
     }
 
-    public String findFreeColumn (){
-       Row poiRow = getRow(1);
-       int columnNumber = 0;
-       Cell cell;
-       do {
-          //ystem.out.println(columnNumber);
-          cell = poiRow.getCell(columnNumber);
-          columnNumber++;
-       } while (cell != null);
-       return POI_Utils.indexToAlpha(columnNumber);
-   }
-
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
-            int errorStyle, String errorTitle, String errorMessage)
-            throws JavaToExcelException {
+            int errorStyle, String errorTitle, String errorMessage) {
         rule = rule.replaceAll("\\$"+replaceColum, column);
         addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
-    void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
-            int errorStyle, String errorTitle, String errorMessage)
-            throws JavaToExcelException {
-        //ystem.out.println ("list at " + column + row);
-        //ystem.out.println(column + ": " + rule);
+    private void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
+            int errorStyle, String errorTitle, String errorMessage) {
         int columnNumber = POI_Utils.alphaToIndex(column);
         CellRangeAddressList addressList = new CellRangeAddressList(row - 1, row -1, columnNumber,  columnNumber);
         DataValidationHelper dataValidationHelper = poiSheet.getDataValidationHelper();
@@ -232,15 +205,11 @@ public class CYAB_Sheet {
             //Create an any rule. Numberic method is only one that support Validation Type.
             constraint = dataValidationHelper.createNumericConstraint(DataValidationConstraint.ValidationType.ANY, 
                     DataValidationConstraint.OperatorType.IGNORED, null, null); 
-            //constraint = dataValidationHelper.createCustomConstraint("true");
-            //constraint.setOperator(row);
         } else if (rule.startsWith("{")){
-            //ystem.out.println(rule);
             rule = rule.replace("{", "");
             rule = rule.replace("}", "");
             String[] values = rule.split(",");
             constraint = dataValidationHelper.createExplicitListConstraint(values);
-            //ystem.out.println(constraint.getExplicitListValues());
         } else if (rule.equals("BLANK")){
             constraint = dataValidationHelper.createTextLengthConstraint(
                     DataValidationConstraint.OperatorType.LESS_THAN, "1", "1");
@@ -262,31 +231,9 @@ public class CYAB_Sheet {
 
     /* Pass through methods */
     
-    public void addValidationData(HSSFDataValidation dataValidation) {
-        poiSheet.addValidationData(dataValidation);
-    }
-
-    String getSheetName(){
-        return poiSheet.getSheetName();
-    }
-
     void autoSizeColumn(int column) {
         poiSheet.autoSizeColumn(column);
     }
 
-    int getLastRowNum(){
-       return poiSheet.getLastRowNum();
-    }
-
-    int getLastCellNum(){
-        int maxCell = 0;
-        for (Iterator<Row> rit = poiSheet.rowIterator(); rit.hasNext(); ) {
-            Row row = rit.next();
-            if (row.getLastCellNum() > maxCell){
-                maxCell = row.getLastCellNum();
-            }
-        }
-        return maxCell;
-    }
 
 }

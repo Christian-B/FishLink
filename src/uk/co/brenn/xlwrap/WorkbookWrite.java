@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
@@ -34,7 +29,7 @@ public class WorkbookWrite {
 
     private String doi;
 
-    SheetWrite[] sheetWrites;
+    private SheetWrite[] sheetWrites;
 
     private static String dataRoot;
 
@@ -45,7 +40,6 @@ public class WorkbookWrite {
         WorkbookWrite.metaRoot = metaRoot;
     }
 
-    //, String mapFileName, String rdfFileName
     public WorkbookWrite (String metaFileName) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         Workbook workbook = MetaDataCreator.getExecutionContext().getWorkbook(metaRoot + metaFileName);
         Sheet metaData = workbook.getSheet("MetaData");
@@ -145,7 +139,6 @@ public class WorkbookWrite {
         out = new File (RDF_FILE_ROOT + doi + ".rdf");
         FileWriter writer = new FileWriter(out);
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
-        //m.write(writer, "RDF/XML", RDF_BASE_URL);
         m.write(writer, "RDF/XML");
         System.out.println("Done writing rdf file to "+ out.getAbsolutePath());
     }

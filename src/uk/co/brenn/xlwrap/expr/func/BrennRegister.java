@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.co.brenn.xlwrap.expr.func;
 
 import at.jku.xlwrap.map.expr.func.FunctionRegistry;
@@ -24,8 +19,6 @@ public class BrennRegister {
         functionClass = E_FuncOTHER_CELL_URI.class;
         FunctionRegistry.register(functionClass);
         functionClass = E_FuncOTHER_ID_URI.class;
-        FunctionRegistry.register(functionClass);
-        functionClass = E_FuncSHEET_REFERENCE.class;
         FunctionRegistry.register(functionClass);
     }
 }
