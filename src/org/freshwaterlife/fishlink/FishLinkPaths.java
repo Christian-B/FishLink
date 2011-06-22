@@ -17,4 +17,6 @@ public class FishLinkPaths {
 
    public static String RDF_BASE_URL = "http://rdf.fba.org.uk/";
 
+   public static String MAIN_ROOT = "c:/Dropbox/FishLink XLWrap data/";
+
 }

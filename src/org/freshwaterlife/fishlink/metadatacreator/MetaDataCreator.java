@@ -13,6 +13,7 @@ import java.util.Date;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
+import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.POI_Utils;
 
@@ -22,7 +23,6 @@ import org.freshwaterlife.fishlink.POI_Utils;
  */
 public class MetaDataCreator {
 
-    static private String MAIN_ROOT = "c:/Dropbox/FishLink XLWrap data/";
 
     private String metaRoot;
     
@@ -225,11 +225,11 @@ public class MetaDataCreator {
 
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
            XLWrapException, XLWrapEOFException{
-        MetaDataCreator creator = new MetaDataCreator(MAIN_ROOT + "Meta Data/");
+        MetaDataCreator creator = new MetaDataCreator(FishLinkPaths.MAIN_ROOT + "Meta Data/");
 
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
-        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
+        creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
     }
 }
