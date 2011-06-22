@@ -246,14 +246,23 @@ public class MetaDataCreator {
         }
     }
 
+    private boolean containsData (Sheet dataSheet){
+        if (dataSheet.getColumns() < 1) return false;
+        if (dataSheet.getRows() < 1) return false;
+        return true;
+    }
     private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
             throws JavaToExcelException, XLWrapException, XLWrapEOFException{
         Sheet masterSheet = getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
             Sheet dataSheet = dataWorkbook.getSheet(dataSheets[i]);
-            CYAB_Sheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
-            prepareSheet(masterSheet, metaSheet, dataSheet);
+            if (containsData(dataSheet)){
+                CYAB_Sheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
+                prepareSheet(masterSheet, metaSheet, dataSheet);
+            } else  {
+                System.out.println("Skipping empty " + dataSheet.getSheetInfo());
+            }
         }
     }
 
@@ -290,7 +299,7 @@ public class MetaDataCreator {
 
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
         //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
-        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
-        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
+        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
+        creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
     }
 }

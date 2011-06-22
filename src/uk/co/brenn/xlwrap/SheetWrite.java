@@ -154,7 +154,8 @@ public class SheetWrite extends AbstractSheet{
             throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException {
         if(category.toLowerCase().equals("observation")) {
             writelUriCell(writer, category, field, idType, dataColumn, ignoreZeros);
-        } else if (idType == null || idType.isEmpty() || idType.equalsIgnoreCase("n/a")){
+        } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
+                idType.equalsIgnoreCase("automatic")){
             writeUri(writer, category, field, dataColumn, ignoreZeros);
         } else {
             //There is an Id reference to another column.
