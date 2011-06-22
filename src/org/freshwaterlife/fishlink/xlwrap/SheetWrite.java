@@ -1,4 +1,4 @@
-package uk.co.brenn.xlwrap;
+package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Sheet;
@@ -8,8 +8,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import uk.co.brenn.metadata.MetaDataCreator;
-import uk.co.brenn.metadata.POI_Utils;
+import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
+import org.freshwaterlife.fishlink.metadatacreator.POI_Utils;
 
 /**
  *

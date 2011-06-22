@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.brenn.xlwrap.expr.func.spreadsheet;
+package org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet;
 
 import at.jku.xlwrap.common.Utils;
 import at.jku.xlwrap.common.XLWrapException;

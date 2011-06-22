@@ -1,4 +1,4 @@
-package uk.co.brenn.xlwrap;
+package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.XLWrapMaterializer;
@@ -13,7 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import uk.co.brenn.metadata.MetaDataCreator;
+import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
 
 /**
  *

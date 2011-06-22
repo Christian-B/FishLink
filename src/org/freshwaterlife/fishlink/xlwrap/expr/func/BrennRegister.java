@@ -1,7 +1,7 @@
-package uk.co.brenn.xlwrap.expr.func;
+package org.freshwaterlife.fishlink.xlwrap.expr.func;
 
 import at.jku.xlwrap.map.expr.func.FunctionRegistry;
-import uk.co.brenn.xlwrap.expr.func.spreadsheet.*;
+import org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet.*;
 
 /**
  *

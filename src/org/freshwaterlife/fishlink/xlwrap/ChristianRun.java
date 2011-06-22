@@ -1,9 +1,9 @@
-package uk.co.brenn.xlwrap;
+package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.IOException;
-import uk.co.brenn.xlwrap.expr.func.BrennRegister;
+import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
 
 /**
  *

@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.brenn.xlwrap.expr.func.spreadsheet;
+package org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
+import at.jku.xlwrap.map.expr.E_RangeRef;
 import at.jku.xlwrap.map.expr.XLExpr;
+import at.jku.xlwrap.map.expr.func.FunctionRegistry;
 import at.jku.xlwrap.map.expr.func.XLExprFunction;
 import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
+import at.jku.xlwrap.map.range.CellRange;
+import at.jku.xlwrap.map.range.Range;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 
 /**
@@ -29,33 +33,37 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  * @author Christian
  *
  */
-public class E_FuncOTHER_ID_URI extends XLExprFunction {
+public class E_FuncROW_URI extends XLExprFunction {
 
 	/**
 	 * default constructor
 	 */
-	public E_FuncOTHER_ID_URI() {
+	public E_FuncROW_URI() {
 	}
 
 	/**
 	 * single argument (a range)
 	 */
-	public E_FuncOTHER_ID_URI(XLExpr arg) {
+	public E_FuncROW_URI(XLExpr arg) {
 		args.add(arg);
 	}
 
 	@Override
 	public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
-        String prefix = getArg(0).eval(context).getValue().toString();
-        XLExprValue<?> value1 = getArg(1).eval(context);
-        if (value1 == null){
-            return null;
-        }
-        XLExprValue<?> value2 = getArg(2).eval(context);
-        if (value2 == null){
-            return null;
-        }
-		return new E_String(prefix + value1);
+		// ignores actual cell value, just use the range reference to determine row
+
+		if (!(args.get(1) instanceof E_RangeRef))
+			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
+		Range absolute = ((E_RangeRef) args.get(1)).getRange().getAbsoluteRange(context);
+		if (!(absolute instanceof CellRange))
+			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
+                String prefix = getArg(0).eval(context).getValue().toString();
+                XLExprValue<?> value1 = getArg(1).eval(context);
+                if (value1 == null){
+                    return null;
+                }
+		int row = ((CellRange) absolute).getRow() + 1;
+		return new E_String(prefix + row);
 	}
 	
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.brenn.xlwrap.expr.func.spreadsheet;
+package org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
@@ -29,18 +29,18 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  * @author Christian
  *
  */
-public class E_FuncID_URI extends XLExprFunction {
+public class E_FuncOTHER_ID_URI extends XLExprFunction {
 
 	/**
 	 * default constructor
 	 */
-	public E_FuncID_URI() {
+	public E_FuncOTHER_ID_URI() {
 	}
 
 	/**
 	 * single argument (a range)
 	 */
-	public E_FuncID_URI(XLExpr arg) {
+	public E_FuncOTHER_ID_URI(XLExpr arg) {
 		args.add(arg);
 	}
 
@@ -49,6 +49,10 @@ public class E_FuncID_URI extends XLExprFunction {
         String prefix = getArg(0).eval(context).getValue().toString();
         XLExprValue<?> value1 = getArg(1).eval(context);
         if (value1 == null){
+            return null;
+        }
+        XLExprValue<?> value2 = getArg(2).eval(context);
+        if (value2 == null){
             return null;
         }
 		return new E_String(prefix + value1);

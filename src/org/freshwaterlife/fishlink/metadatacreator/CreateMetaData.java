@@ -1,4 +1,4 @@
-package uk.co.brenn.metadata;
+package org.freshwaterlife.fishlink.metadatacreator;
 
 /**
  *

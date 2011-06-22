@@ -1,4 +1,4 @@
-package uk.co.brenn.xlwrap;
+package org.freshwaterlife.fishlink.xlwrap;
 
 /**
  *

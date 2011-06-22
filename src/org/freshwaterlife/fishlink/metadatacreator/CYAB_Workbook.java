@@ -1,4 +1,4 @@
-package uk.co.brenn.metadata;
+package org.freshwaterlife.fishlink.metadatacreator;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

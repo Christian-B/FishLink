@@ -3,14 +3,14 @@
  * and open the template in the editor.
  */
 
-package uk.co.brenn.xlwrap;
+package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import uk.co.brenn.metadata.MetaDataCreator;
+import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
 
 /**
  *
