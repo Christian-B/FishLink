@@ -2,7 +2,7 @@ package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
+import org.freshwaterlife.fishlink.MasterFactory;
 
 /**
  *
@@ -12,7 +12,7 @@ public class MasterReader extends AbstractSheet {
 
     public MasterReader ()
             throws XLWrapException, XLWrapEOFException, XLWrapMapException {
-       super(MetaDataCreator.getMasterDropdownSheet());
+       super(MasterFactory.getMasterDropdownSheet());
     }
 
     private void checkName (SheetWrite sheet, String otherName, int firstRow, int lastRow)

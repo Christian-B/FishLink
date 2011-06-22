@@ -10,7 +10,7 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
+import org.freshwaterlife.fishlink.MasterFactory;
 
 /**
  *
@@ -21,22 +21,22 @@ public class NameChecker {
      private HashMap<String,ArrayList<String>> categories;
 
      NameChecker() throws XLWrapException, XLWrapEOFException{
-        Sheet masterSheet =  MetaDataCreator.getMasterListSheet();
+        Sheet masterSheet =  MasterFactory.getMasterListSheet();
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = 0;
-        String rangeName =  MetaDataCreator.getTextZeroBased(masterSheet, zeroColumn, 0);
+        String rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
         while (!rangeName.isEmpty()) {
             int zeroRow = 1;
-            String fieldName = MetaDataCreator.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+            String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             ArrayList<String> feilds = new ArrayList<String>();
             while (!fieldName.isEmpty()) {
                 zeroRow++;
                 feilds.add(fieldName);
-                fieldName = MetaDataCreator.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+                fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             } while (!fieldName.isEmpty());
             categories.put(rangeName, feilds);
             zeroColumn++;
-            rangeName = MetaDataCreator.getTextZeroBased(masterSheet, zeroColumn, 0);
+            rangeName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
         }
      }
 

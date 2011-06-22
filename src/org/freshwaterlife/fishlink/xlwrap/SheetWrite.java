@@ -8,7 +8,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
+import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
@@ -38,7 +38,7 @@ public class SheetWrite extends AbstractSheet{
         super(metaWorkbook.getSheet(sheetName));
         this.doi = doi;
         dataPath = dataURL;
-        Workbook dataWorkbook = MetaDataCreator.getExecutionContext().getWorkbook(dataPath);
+        Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataPath);
         String[] sheetNames = dataWorkbook.getSheetNames();
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equalsIgnoreCase(sheetName)){

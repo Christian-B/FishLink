@@ -13,7 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
+import org.freshwaterlife.fishlink.MasterFactory;
 
 /**
  *
@@ -41,7 +41,7 @@ public class WorkbookWrite {
     }
 
     public WorkbookWrite (String metaFileName) throws XLWrapException, XLWrapEOFException, XLWrapMapException{
-        Workbook workbook = MetaDataCreator.getExecutionContext().getWorkbook(metaRoot + metaFileName);
+        Workbook workbook = MasterFactory.getExecutionContext().getWorkbook(metaRoot + metaFileName);
         Sheet metaData = workbook.getSheet("MetaData");
         Cell cell;
         try{
@@ -50,7 +50,7 @@ public class WorkbookWrite {
             throw new XLWrapMapException("Workbook: " + metaFileName + " does not have a \"MetaData\" sheet.");
         }
         String dataFileName = cell.getText();
-        Workbook dataWorkbook = MetaDataCreator.getExecutionContext().getWorkbook(dataRoot + dataFileName);
+        Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataRoot + dataFileName);
 
         cell = metaData.getCell(1, 1);
         doi = cell.getText();
