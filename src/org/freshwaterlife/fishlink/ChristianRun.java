@@ -1,9 +1,14 @@
-package org.freshwaterlife.fishlink.xlwrap;
+package org.freshwaterlife.fishlink;
+
+
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.IOException;
+import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
+import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
 /**
  *
@@ -18,8 +23,8 @@ public class ChristianRun {
         //Adjust this file to the your local path
         WorkbookWrite.setRoots(DROPBOX + "Meta Data/",DROPBOX + "Raw Data/");
         WorkbookWrite mapWrite = new WorkbookWrite(name);
-        mapWrite.writeMap();
-        mapWrite.runMap();
+        String doi = mapWrite.writeMap();
+        MapRun.runMap(doi);
     }
     public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
         BrennRegister.register();

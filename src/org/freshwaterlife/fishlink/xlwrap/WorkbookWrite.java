@@ -1,18 +1,15 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
 import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.exec.XLWrapMaterializer;
-import at.jku.xlwrap.map.MappingParser;
-import at.jku.xlwrap.map.XLWrapMapping;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import com.hp.hpl.jena.rdf.model.Model;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.MasterFactory;
 
 /**
@@ -20,12 +17,6 @@ import org.freshwaterlife.fishlink.MasterFactory;
  * @author Christian
  */
 public class WorkbookWrite {
-
-    private static String MAP_FILE_ROOT = "output/mappings/";
-
-    private static String RDF_FILE_ROOT = "output/rdf/";
-
-    private static String RDF_BASE_URL = "http://rdf.fba.org.uk/";
 
     private String doi;
 
@@ -81,9 +72,9 @@ public class WorkbookWrite {
         writer.newLine();
         writer.write("@prefix foaf:	<http://xmlns.com/foaf/0.1/> .");
         writer.newLine();
-        writer.write("@prefix ex:	<" + RDF_BASE_URL + "resource/> .");
+        writer.write("@prefix ex:	<" + FishLinkPaths.RDF_BASE_URL + "resource/> .");
         writer.newLine();
-        writer.write("@prefix vocab:	<" + RDF_BASE_URL + "vocab/resource/> .");
+        writer.write("@prefix vocab:	<" + FishLinkPaths.RDF_BASE_URL + "vocab/resource/> .");
         writer.newLine();
         writer.write("@prefix dc:     <http://purl.org/dc/elements/1.1/> .");
         writer.newLine();
@@ -96,13 +87,13 @@ public class WorkbookWrite {
         writer.newLine();
     }
 
-     public void writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
+     public String writeMap() throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException{
         System.out.println("write map");
-        File mapFile = new File(MAP_FILE_ROOT);
+        File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
-            throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + MAP_FILE_ROOT + " Please create it.");
+            throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
         }
-        mapFile = new File(MAP_FILE_ROOT + doi + ".trig");
+        mapFile = new File(FishLinkPaths.MAP_FILE_ROOT + doi + ".trig");
         BufferedWriter mapWriter = new BufferedWriter(new FileWriter(mapFile));
         writePrefix(mapWriter);
 
@@ -122,25 +113,7 @@ public class WorkbookWrite {
          }
         mapWriter.close();
         System.out.println("Done writing map file");
-    }
-
-    public void runMap() throws XLWrapException, IOException, XLWrapMapException{
-        System.out.println("Running map");
-        XLWrapMapping map = MappingParser.parse(MAP_FILE_ROOT + doi + ".trig");
-
-        XLWrapMaterializer mat = new XLWrapMaterializer();
-        Model m = mat.generateModel(map);
-        m.setNsPrefix("ex", RDF_BASE_URL);
-
-        File out = new File (RDF_FILE_ROOT);
-        if (!out.exists()){
-            throw new XLWrapMapException("Unable to find RDF_FILE_ROOT. " + RDF_FILE_ROOT + " Please create it.");
-        }
-        out = new File (RDF_FILE_ROOT + doi + ".rdf");
-        FileWriter writer = new FileWriter(out);
-                //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
-        m.write(writer, "RDF/XML");
-        System.out.println("Done writing rdf file to "+ out.getAbsolutePath());
+        return doi;
     }
 
 }
