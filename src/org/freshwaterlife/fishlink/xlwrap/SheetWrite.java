@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
-import org.freshwaterlife.fishlink.metadatacreator.POI_Utils;
+import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
  *

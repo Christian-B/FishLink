@@ -6,7 +6,7 @@ import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import org.freshwaterlife.fishlink.metadatacreator.POI_Utils;
+import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
  *

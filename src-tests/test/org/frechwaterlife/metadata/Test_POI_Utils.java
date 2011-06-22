@@ -2,9 +2,8 @@
 package test.org.frechwaterlife.metadata;
 
 import junit.framework.TestCase;
-import org.freshwaterlife.fishlink.metadatacreator.POI_Utils;
+import org.freshwaterlife.fishlink.POI_Utils;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 /**
  *

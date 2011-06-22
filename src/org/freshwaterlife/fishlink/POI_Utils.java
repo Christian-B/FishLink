@@ -1,4 +1,4 @@
-package org.freshwaterlife.fishlink.metadatacreator;
+package org.freshwaterlife.fishlink;
 
 /**
  *
