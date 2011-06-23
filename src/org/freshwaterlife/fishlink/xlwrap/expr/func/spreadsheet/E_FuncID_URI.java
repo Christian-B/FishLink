@@ -20,9 +20,11 @@ import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.map.expr.XLExpr;
 import at.jku.xlwrap.map.expr.func.XLExprFunction;
+import at.jku.xlwrap.map.expr.val.E_Boolean;
 import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.util.Date;
 
 /**
  * @author dorgon
@@ -37,11 +39,52 @@ public class E_FuncID_URI extends XLExprFunction {
 	public E_FuncID_URI() {
 	}
 
-	/**
-	 * single argument (a range)
-	 */
-	public E_FuncID_URI(XLExpr arg) {
-		args.add(arg);
+    private boolean ignore(XLExprValue<?> expression, XLExprValue<?> ignoreZeros) throws XLWrapException{
+        if (expression == null){
+            return true;
+        }
+        Object value = expression.getValue();
+        if (value == null){
+            return true;
+        }
+        if (((E_Boolean)ignoreZeros).getValue().booleanValue()){
+            if (value instanceof Number){
+                int i = ((Number)value).intValue();
+                return i == 0;
+            }
+            if (value instanceof String){
+                return value.toString().equals("0");
+            }
+            if (value instanceof Boolean){
+                return false;
+            }
+            if (value instanceof Date){
+                return (((Date)value).getTime() == 0);
+            }
+            throw new XLWrapException("Expected type in Cell_URI " + value.getClass());
+        } else {
+            return false;
+        }
+    }
+
+	protected final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
+		// ignores actual cell value, just use the range reference to determine row
+        String url = getArg(0).eval(context).getValue().toString();
+
+        if (args.size() == 3){
+            if (ignore (getArg(1).eval(context), getArg(2).eval(context))){
+                return null;
+            }
+        }
+        if (args.size() == 4){
+            if (ignore (getArg(1).eval(context), getArg(3).eval(context))){
+                return null;
+            }
+            if (ignore (getArg(2).eval(context), getArg(3).eval(context))){
+                return null;
+            }
+        }
+		return new E_String(url + specific);
 	}
 
 	@Override
@@ -51,7 +94,7 @@ public class E_FuncID_URI extends XLExprFunction {
         if (value1 == null){
             return null;
         }
-		return new E_String(prefix + value1);
+		return doEval(context, value1.toString());
 	}
 	
 }

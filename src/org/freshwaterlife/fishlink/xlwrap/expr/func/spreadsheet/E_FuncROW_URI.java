@@ -33,7 +33,7 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  * @author Christian
  *
  */
-public class E_FuncROW_URI extends XLExprFunction {
+public class E_FuncROW_URI extends E_FuncID_URI {
 
 	/**
 	 * default constructor
@@ -57,13 +57,15 @@ public class E_FuncROW_URI extends XLExprFunction {
 		Range absolute = ((E_RangeRef) args.get(1)).getRange().getAbsoluteRange(context);
 		if (!(absolute instanceof CellRange))
 			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
-                String prefix = getArg(0).eval(context).getValue().toString();
-                XLExprValue<?> value1 = getArg(1).eval(context);
-                if (value1 == null){
-                    return null;
-                }
+        //String prefix = getArg(0).eval(context).getValue().toString();
+        // XLExprValue<?> value1 = getArg(1).eval(context);
+        //     if (value1 == null){
+        //            return null;
+        //        }
 		int row = ((CellRange) absolute).getRow() + 1;
-		return new E_String(prefix + row);
+   		return doEval(context, "" + row);
+
+		//return new E_String(prefix + row);
 	}
 	
 }

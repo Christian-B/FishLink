@@ -144,7 +144,9 @@ public class SheetWrite extends AbstractSheet{
             throw new XLWrapMapException("Data Column " + dataColumn + " with category " + category + " and field " +
                     field + " needs an id Type");
         }
-        writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idColumn + firstData + ","
+//        writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idColumn + firstData + ","
+//            + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
+        writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idColumn + firstData + ","
             + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
     }
 
@@ -154,7 +156,9 @@ public class SheetWrite extends AbstractSheet{
             writer.write("[ xl:uri \"ROW_URI('" + uri + "row', " + dataColumn + firstData + "," +
                     ignoreZeros + ")\"^^xl:Expr ] ");
         } else {
-            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idColumn + firstData + "," +
+//            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idColumn + firstData + "," +
+//                    dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
+            writer.write("[ xl:uri \"ID_URI('" + uri + "', " + idColumn + firstData + "," +
                     dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
         }
     }
@@ -312,10 +316,10 @@ public class SheetWrite extends AbstractSheet{
             writeConstant(writer, metaColumn, row);
         }
 
-        if (external.isEmpty()){
-            writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
-            writer.newLine();
-        }
+        //if (external.isEmpty()){
+        //    writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
+        //    writer.newLine();
+        //}
 
         writer.write(".");
         writer.newLine();

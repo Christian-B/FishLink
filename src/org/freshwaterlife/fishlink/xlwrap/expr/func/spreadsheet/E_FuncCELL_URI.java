@@ -22,8 +22,6 @@ import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.map.expr.E_RangeRef;
 import at.jku.xlwrap.map.expr.XLExpr;
 import at.jku.xlwrap.map.expr.func.FunctionRegistry;
-import at.jku.xlwrap.map.expr.func.XLExprFunction;
-import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.map.range.CellRange;
 import at.jku.xlwrap.map.range.Range;
@@ -34,7 +32,7 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  * @athour Christian
  *
  */
-public class E_FuncCELL_URI extends XLExprFunction {
+public class E_FuncCELL_URI extends E_FuncID_URI {
 
 	/**
 	 * default constructor
@@ -42,14 +40,7 @@ public class E_FuncCELL_URI extends XLExprFunction {
 	public E_FuncCELL_URI() {
 	}
 
-	/**
-	 * single argument (a range)
-	 */
-	public E_FuncCELL_URI(XLExpr arg) {
-		args.add(arg);
-	}
-
-	@Override
+    @Override
 	public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
 		// ignores actual cell value, just use the range reference to determine row
 
@@ -58,14 +49,9 @@ public class E_FuncCELL_URI extends XLExprFunction {
 		Range absolute = ((E_RangeRef) args.get(1)).getRange().getAbsoluteRange(context);
 		if (!(absolute instanceof CellRange))
 			throw new XLWrapException("Argument " + args.get(1) + " of " + FunctionRegistry.getFunctionName(this.getClass()) + " must be a cell range reference.");
-                XLExprValue<?> value0 = getArg(0).eval(context);
-                 XLExprValue<?> value1 = getArg(1).eval(context);
-                if (value1 == null){
-                    return null;
-                }
-		int row = ((CellRange) absolute).getRow() + 1;
-                String column = Utils.indexToAlpha(((CellRange) absolute).getColumn());
-		return new E_String(value0.getValue() + column + row);
+ 		int row = ((CellRange) absolute).getRow() + 1;
+        String column = Utils.indexToAlpha(((CellRange) absolute).getColumn());
+		return doEval(context, column + row);
 	}
 	
 }
