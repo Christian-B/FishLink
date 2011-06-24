@@ -132,7 +132,7 @@ public class MetaDataCreator {
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
-        metaSheet.setBackgroundAqua(metaColumn, letterRow);
+        metaSheet.setForegroundAqua(metaColumn, letterRow);
         int maxRow = dataSheet.getRows();
         if (maxRow > 100){
             maxRow = 100;
@@ -164,6 +164,7 @@ public class MetaDataCreator {
                     throw new XLWrapException("Unexpected Cell Type");
             }
         }
+        metaSheet.autoSizeColumn(zeroColumn);
     }
 
     private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) 

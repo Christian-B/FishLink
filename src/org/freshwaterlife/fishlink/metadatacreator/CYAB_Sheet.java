@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -196,18 +197,21 @@ public class CYAB_Sheet {
      * @param row Using Excel counting
      * @param column Using Excel names
      */
-    public void setBackgroundAqua (String column, int row){
+    public void setForegroundAqua (String column, int row){
         Cell cell = getCell(column, row);
         // Aqua background
         CellStyle style = poiSheet.getWorkbook().createCellStyle();
-        style.setFillBackgroundColor(IndexedColors.AQUA.getIndex());
+        style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        Font font = poiSheet.getWorkbook().createFont();
+        font.setBoldweight(font.BOLDWEIGHT_BOLD);
+        style.setFont(font);
         cell.setCellStyle(style);
     }
 
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) {
-        rule = rule.replaceAll("\\$"+replaceColum, column);
+        rule = rule.replaceAll("\\$"+replaceColum, "\\$" + column);
         addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
