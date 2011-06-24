@@ -132,6 +132,7 @@ public class MetaDataCreator {
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
+        metaSheet.setBackgroundAqua(metaColumn, letterRow);
         int maxRow = dataSheet.getRows();
         if (maxRow > 100){
             maxRow = 100;
@@ -169,6 +170,7 @@ public class MetaDataCreator {
             throws XLWrapException, XLWrapEOFException{
         int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
+        metaSheet.createFreezePane("B", lastMetaRow + 2);
         for ( int zeroDataColumn = 0;  zeroDataColumn < lastColumn; zeroDataColumn++){
             String metaColumn = POI_Utils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
             prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
@@ -227,9 +229,13 @@ public class MetaDataCreator {
            XLWrapException, XLWrapEOFException{
         MetaDataCreator creator = new MetaDataCreator(FishLinkPaths.MAIN_ROOT + "Meta Data/");
 
-        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
-        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
-        //creator.prepareMetaDataOnDoi (MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
-        creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
+        //creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "CumbriaTarnsPart1.xls", "CTP1");
+        //creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
+        creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Records.xls", "rec12564");
+     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
+     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
+     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
+     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "TarnschemFinal.xls", "TSF1234");
+     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
     }
 }

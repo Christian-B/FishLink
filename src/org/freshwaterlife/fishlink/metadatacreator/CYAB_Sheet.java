@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -187,6 +188,23 @@ public class CYAB_Sheet {
         cell.setCellStyle(cellStyle);
     }
 
+    /**
+     * Sets the background of the cell to Aqua.
+     *
+     * Creates the row and or cell if required.
+     *
+     * @param row Using Excel counting
+     * @param column Using Excel names
+     */
+    public void setBackgroundAqua (String column, int row){
+        Cell cell = getCell(column, row);
+        // Aqua background
+        CellStyle style = poiSheet.getWorkbook().createCellStyle();
+        style.setFillBackgroundColor(IndexedColors.AQUA.getIndex());
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        cell.setCellStyle(style);
+    }
+
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) {
         rule = rule.replaceAll("\\$"+replaceColum, column);
@@ -228,6 +246,19 @@ public class CYAB_Sheet {
             dataValidation.createErrorBox(errorTitle, errorMessage);
         }
         poiSheet.addValidationData(dataValidation);
+    }
+
+    /**
+     * Sets the background of the cell to Aqua.
+     *
+     * Creates the row and or cell if required.
+     *
+     * @param row Using Excel counting
+     * @param column Using Excel names
+     */
+    public void createFreezePane (String column, int row){
+        int columnNumber = POI_Utils.alphaToIndex(column);
+        poiSheet.createFreezePane(columnNumber, row, columnNumber, row);
     }
 
     /* Pass through methods */
