@@ -64,47 +64,44 @@ public class OwlimTester {
     private static final String DATA_DIR = "./output/rdf/";
 
 
-	// From repository.getConnection() - the connection through which we will
-	// use the repository
+    // From repository.getConnection() - the connection through which we will
+    // use the repository
     private RepositoryConnection repositoryConnection;
 
-	// From repositoryManager.getRepository(...) - the actual repository we will
-	// work with
-	private Repository repository;
+    // From repositoryManager.getRepository(...) - the actual repository we will
+    // work with
+    private Repository repository;
 
     // The repository manager
-	private RepositoryManager repositoryManager;
+    private RepositoryManager repositoryManager;
 
     // A map of namespace-to-prefix
-	private Map<String, String> namespacePrefixes = new HashMap<String, String>();
+    private Map<String, String> namespacePrefixes = new HashMap<String, String>();
 
     OwlimTester() throws RepositoryConfigException, RepositoryException, Exception{
-
         repositoryManager = new LocalRepositoryManager(new File("."));
-
         // Initialise the repository manager
         repositoryManager.initialize();
-
     }
 
-   private void newRepository() throws RepositoryException, RepositoryConfigException, Exception{
+    private void newRepository() throws RepositoryException, RepositoryConfigException, Exception{
         repositoryManager.removeRepositoryConfig(REPOSITORY_ID);
-		// The configuration file
-		File configFile = new File(TTL_FILE);
-		System.out.println("Using configuration file: " + configFile.getAbsolutePath());
+        // The configuration file
+        File configFile = new File(TTL_FILE);
+        System.out.println("Using configuration file: " + configFile.getAbsolutePath());
 
-		// Parse the configuration file, assuming it is in Turtle format
-		final Graph graph = parseFile(configFile, RDFFormat.TURTLE, "http://rdf.freshwaterlife.org#");
+        // Parse the configuration file, assuming it is in Turtle format
+        final Graph graph = parseFile(configFile, RDFFormat.TURTLE, "http://rdf.freshwaterlife.org#");
 
-		// Look for the subject of the first matching statement for
-		// "?s type Repository"
-		Iterator<Statement> iter = graph.match(null, RDF.TYPE, new URIImpl(
-				"http://www.openrdf.org/config/repository#Repository"));
-		Resource repositoryNode = null;
-		if (iter.hasNext()) {
-			Statement st = iter.next();
-			repositoryNode = st.getSubject();
-		}
+        // Look for the subject of the first matching statement for
+        // "?s type Repository"
+        Iterator<Statement> iter = graph.match(null, RDF.TYPE, new URIImpl(
+                "http://www.openrdf.org/config/repository#Repository"));
+        Resource repositoryNode = null;
+        if (iter.hasNext()) {
+            Statement st = iter.next();
+            repositoryNode = st.getSubject();
+        }
         System.out.println(repositoryNode);
         System.out.println(repositoryNode.stringValue());
         // Create a configuration object from the configuration file and add
@@ -124,19 +121,19 @@ public class OwlimTester {
             int error = 1/0;
         }
         // Open a connection to this repository
-		repositoryConnection = repository.getConnection();
-		repositoryConnection.setAutoCommit(false);
+        repositoryConnection = repository.getConnection();
+        repositoryConnection.setAutoCommit(false);
     }
 
    /**
-	 * Parse the given RDF file and return the contents as a Graph
-	 *
-	 * @param configurationFile
-	 *            The file containing the RDF data
-	 * @return The contents of the file as an RDF graph
-	 */
-	private Graph parseFile(File configurationFile, RDFFormat format, String defaultNamespace) throws Exception {
-		final Graph graph = new GraphImpl();
+     * Parse the given RDF file and return the contents as a Graph
+     *
+     * @param configurationFile
+     *            The file containing the RDF data
+     * @return The contents of the file as an RDF graph
+     */
+    private Graph parseFile(File configurationFile, RDFFormat format, String defaultNamespace) throws Exception {
+            final Graph graph = new GraphImpl();
 		RDFParser parser = Rio.createParser(format);
 		RDFHandler handler = new RDFHandler() {
 			public void endRDF() throws RDFHandlerException {
@@ -599,11 +596,11 @@ public class OwlimTester {
     public static void main(String[] args) throws RepositoryConfigException, RepositoryException, IOException, Exception {
         OwlimTester tester = new OwlimTester();
 	    long initializationStart = System.currentTimeMillis();
-        //tester.openRepository();
-        tester.newRepository();
-        File file = new File(DATA_DIR);
-        tester.loadFiles(file);
-        tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
+        tester.openRepository();
+        //tester.newRepository();
+        //File file = new File(DATA_DIR);
+        //tester.loadFiles(file);
+        // tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
         tester.iterateNamespaces();
         tester.evaluateQueries();
         tester.shutdown();
