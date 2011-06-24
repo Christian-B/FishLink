@@ -17,7 +17,7 @@ import org.freshwaterlife.fishlink.POI_Utils;
  */
 public class SheetWrite extends AbstractSheet{
 
-    private static String RDF_BASE_URL = "http://rdf.fba.org.uk/";
+    private static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
 
     private String sheet;
     private int sheetNumber;
@@ -153,7 +153,7 @@ public class SheetWrite extends AbstractSheet{
     private void writeUriOther(BufferedWriter writer, String uri, String idColumn, String dataColumn, boolean ignoreZeros)
             throws IOException {
         if (idColumn.equalsIgnoreCase("row")){
-            writer.write("[ xl:uri \"ROW_URI('" + uri + "row', " + dataColumn + firstData + "," +
+            writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + "," +
                     ignoreZeros + ")\"^^xl:Expr ] ");
         } else {
 //            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idColumn + firstData + "," +
@@ -316,10 +316,11 @@ public class SheetWrite extends AbstractSheet{
             writeConstant(writer, metaColumn, row);
         }
 
-        //if (external.isEmpty()){
-        //    writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + category+ "'\"^^xl:Expr ] ;");
-        //    writer.newLine();
-        //}
+        if (external.isEmpty()){
+            writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + "/" + sheet + "/" 
+                    + category + "/'\"^^xl:Expr ] ;");
+            writer.newLine();
+        }
 
         writer.write(".");
         writer.newLine();
