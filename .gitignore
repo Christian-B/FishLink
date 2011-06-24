@@ -11,5 +11,7 @@ build/
 dist/
 #Output 
 output/
+#repositories data folders
+/repositories
 #Christian Personal folder
 cyab/
