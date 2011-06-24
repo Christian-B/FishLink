@@ -15,8 +15,11 @@ public class FishLinkPaths {
 
    public static String RDF_FILE_ROOT = "output/rdf/";
 
-   public static String RDF_BASE_URL = "http://rdf.fba.org.uk/";
+   public static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
 
    public static String MAIN_ROOT = "c:/Dropbox/FishLink XLWrap data/";
+
+   //The file: bit is required by xlwrap whiuch can alos handle http urls.
+   static public String  DROPBOX = "file:c:/Dropbox/FishLink XLWrap data/";
 
 }
