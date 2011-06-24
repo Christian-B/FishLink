@@ -1,0 +1,12 @@
+^[Zero]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX j.1:  <http://rdf.fba.org.uk/vocab/resource/>
+PREFIX j.0:  <http://rdf.fba.org.uk/resource/>
+
+SELECT DISTINCT ?element ?value{
+       ?element rdf:type j.0:Observation .
+       ?element j.1:hasValue  ?value .
+       FILTER (?value = 0)
+}
+

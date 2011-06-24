@@ -1,0 +1,53 @@
+^[All Instances]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?s ?o ?p WHERE {
+       ?s ?o ?p .
+} LIMIT 10
+
+^[Types]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT DISTINCT ?type WHERE {
+       [] rdf:type ?type .
+} 
+
+^[Types Count]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?graph ?type (COUNT (DISTINCT ?element) AS ?frequency)
+{
+    GRAPH ?graph 
+    {
+        ?element rdf:type ?type
+    }
+}
+group by ?graph ?type
+order by ?type
+
+^[Types predicates]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX vocab:  <http://rdf.fba.org.uk/vocab/resource/>
+PREFIX item:  <http://rdf.fba.org.uk/resource/>
+SELECT DISTINCT ?type ?predicate (COUNT (?value) AS ?frequency)
+(COUNT (DISTINCT ?value) AS ?occurrences) {
+       ?element rdf:type ?type .
+       ?element ?predicate ?value .
+}
+group by ?type ?predicate
+order by ?type ?predicate
+
+^[Observation Values]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX j.1:  <http://rdf.fba.org.uk/vocab/resource/>
+PREFIX j.0:  <http://rdf.fba.org.uk/resource/>
+
+SELECT DISTINCT ?value  (COUNT (DISTINCT ?element) AS ?occurrences) {
+       ?element rdf:type j.0:Observation .
+       ?element j.1:hasValue  ?value  .
+}
+GROUP BY ?value
+ORDER BY ?value
+
