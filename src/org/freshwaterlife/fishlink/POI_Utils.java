@@ -10,7 +10,7 @@ public class POI_Utils {
      * @param alpha index
      * @return zero-based numerical index
      */
-    public static int alphaToIndex(String alpha) {
+    public static final int alphaToIndex(String alpha) {
 	char[] letters = alpha.toUpperCase().toCharArray();
 	int index = 0;
 	for (int i = 0; i < letters.length; i++)
@@ -23,7 +23,7 @@ public class POI_Utils {
      * @param index zero-based numerical index
      * @return alpha index
      */
-    public static String indexToAlpha(int index){
+    public static final String indexToAlpha(int index){
         String reply = "";
         if (index < 26){
            char first = (char)( index + 65);
