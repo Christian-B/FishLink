@@ -23,7 +23,10 @@ public class MapRun {
 
         XLWrapMaterializer mat = new XLWrapMaterializer();
         Model m = mat.generateModel(map);
-        m.setNsPrefix("ex", FishLinkPaths.RDF_BASE_URL);
+        m.setNsPrefix("constant", FishLinkPaths.RDF_BASE_URL + "constant/");
+        m.setNsPrefix("type", FishLinkPaths.RDF_BASE_URL + "type/");        
+        m.setNsPrefix("vocab", FishLinkPaths.RDF_BASE_URL + "vocab/");
+        m.setNsPrefix("resource", FishLinkPaths.RDF_BASE_URL + "resource/");
 
         File out = new File (FishLinkPaths.RDF_FILE_ROOT);
         if (!out.exists()){

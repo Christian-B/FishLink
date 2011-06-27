@@ -178,7 +178,7 @@ public class SheetWrite extends AbstractSheet{
         if (!value.endsWith("'")){
             value = value + "'";
         }
-        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "resource/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
+        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
     }
 
     private void writeConstant (BufferedWriter writer, String metaColumn, int row)
@@ -305,7 +305,7 @@ public class SheetWrite extends AbstractSheet{
         }
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
         writeUri(writer, category, field, idType, dataColumn, ignoreZeros);
-        writer.write (" a ex:");
+        writer.write (" a type:");
         writer.write (category);
         writer.write (" ;");
         writer.newLine();
@@ -317,8 +317,9 @@ public class SheetWrite extends AbstractSheet{
         }
 
         if (external.isEmpty()){
-            writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + "/" + sheet + "/" 
-                    + category + "/'\"^^xl:Expr ] ;");
+     //       writer.write("	rdf:type [ xl:uri \"'" + RDF_BASE_URL + "resource/" + doi + "/" + sheet + "/" 
+     //               + category + "/'\"^^xl:Expr ] ;");
+            writer.write ("     rdf:type type:" + doi + "_" + sheet + "_" + category);
             writer.newLine();
         }
 
@@ -340,7 +341,7 @@ public class SheetWrite extends AbstractSheet{
    }
 
    private String getCatgerogyUri(String category){
-       return  RDF_BASE_URL + category + "/" + doi + "/" + sheet + "/";
+       return  RDF_BASE_URL + "resource/" + category + "_" + doi + "_" + sheet + "/";
    }
 
    private String getUri(String metaColumn , String category)
@@ -358,7 +359,7 @@ public class SheetWrite extends AbstractSheet{
             externalDoi = doi;
             externalSheet = externalField;
         }
-        return  RDF_BASE_URL + category + "/" + externalDoi + "/" + externalSheet + "/";
+        return  RDF_BASE_URL + "resource/" + category + "_" + externalDoi + "_" + externalSheet + "/";
     }
 
    private String metaToDataColumn(String metaColumn){
