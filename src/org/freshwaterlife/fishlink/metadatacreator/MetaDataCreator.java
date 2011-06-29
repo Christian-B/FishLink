@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
@@ -44,7 +45,7 @@ public class MetaDataCreator {
     }
 
     private void createNamedRanges (CYAB_Workbook metaWorkbook)
-            throws XLWrapException, XLWrapEOFException {
+            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
         Sheet masterSheet =  MasterFactory.getMasterListSheet();
         CYAB_Sheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
         int zeroColumn = 0;
@@ -179,7 +180,7 @@ public class MetaDataCreator {
     }
 
     private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
-            throws XLWrapException, XLWrapEOFException{
+            throws XLWrapException, XLWrapEOFException, XLWrapMapException{
         Sheet masterSheet = MasterFactory.getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
@@ -194,7 +195,7 @@ public class MetaDataCreator {
     }
 
     public void prepareMetaDataOnDoi(String dataFile, String doi) throws FileNotFoundException,
-            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException{
+            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException, XLWrapMapException{
         System.out.println("Preparing meta data collector for " + dataFile);
         Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + FishLinkPaths.RAW_DIR +dataFile);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
@@ -205,7 +206,7 @@ public class MetaDataCreator {
     }
 
     public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws FileNotFoundException,
-            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException{
+            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException, XLWrapMapException{
         Workbook dataWorkbook;
         try {
             dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataPath);
@@ -220,7 +221,7 @@ public class MetaDataCreator {
     }
 
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
-           XLWrapException, XLWrapEOFException{
+           XLWrapException, XLWrapEOFException, XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
 
         creator.prepareMetaDataOnDoi ("CumbriaTarnsPart1.xls", "CTP1");

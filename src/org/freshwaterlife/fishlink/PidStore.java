@@ -7,11 +7,9 @@ package org.freshwaterlife.fishlink;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.rmi.server.UID;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -28,8 +26,6 @@ public class PidStore implements PidRegister{
     
     static final String pidPath =  "data/padRegisrty.csv";
     
-    static final String masterPid = "ff19868d-5b12-846f-81ef-e47468c85068";
-
     HashMap<String,String> filesMap;
     
     public static synchronized PidStore padStoreFactory() throws IOException, XLWrapMapException{
@@ -78,18 +74,23 @@ public class PidStore implements PidRegister{
      }
        
     public String retreiveFile(String pid) throws XLWrapMapException {
-        String path = filesMap.get(pid);
+        String path = retreiveFileOrNull(pid);
         if (path == null){
             throw new XLWrapMapException("Pid " + pid + "does not mapp to any know path");
         }
         return path;
     }
     
+    public String retreiveFileOrNull(String pid) throws XLWrapMapException {
+        return filesMap.get(pid);
+    }
+
     public static void main(String[] args) throws IOException, XLWrapMapException{
         //File file = new File(FishLinkPaths.MASTER_FILE);
         PidStore pidstore = padStoreFactory();
         //String pid = pidstore.registerFile(file);
         //System.out.println(pidstore.registerFile(file));
-        System.out.println(pidstore.retreiveFile(masterPid));
+        System.out.println(pidstore.retreiveFile(MasterFactory.masterPid));
     }
+
 }

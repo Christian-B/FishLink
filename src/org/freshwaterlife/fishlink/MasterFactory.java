@@ -6,6 +6,10 @@ import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
@@ -15,13 +19,28 @@ public class MasterFactory {
 
     public static final String LIST_SHEET = "Lists";
 
+    static final String masterPid = "ff19868d-5b12-846f-81ef-e47468c85068";
+
     private static ExecutionContext context1;
 
     private static Workbook masterWorkbook;
 
-    private static Workbook getMasterWorkbook() throws XLWrapException{
+    private static Workbook getMasterWorkbook() throws XLWrapMapException{
         if (masterWorkbook == null){
-            masterWorkbook = getExecutionContext().getWorkbook("file:" + FishLinkPaths.MASTER_FILE);
+            PidRegister pidRegister;
+            try {
+                pidRegister = PidStore.padStoreFactory();
+                String path = pidRegister.retreiveFileOrNull(masterPid);
+                if (path == null){
+                    path = "file:" + FishLinkPaths.MASTER_FILE;
+                }
+                masterWorkbook = getExecutionContext().getWorkbook(path);
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException("Unable to find the MetaMaster file", ex);
+            } catch (IOException ex) {
+                throw new XLWrapMapException("Unable to find the MetaMaster file", ex);
+            }
+    
         }
         return masterWorkbook;
     }
@@ -33,12 +52,20 @@ public class MasterFactory {
         return context1;
     }
 
-    public static Sheet getMasterDropdownSheet() throws XLWrapException{
-        return getMasterWorkbook().getSheet("Sheet1");
+    public static Sheet getMasterDropdownSheet() throws XLWrapMapException{
+        try {
+            return getMasterWorkbook().getSheet("Sheet1");
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to find dropdown Sheet in MetaMaster file", ex);
+        }
     }
 
-    public static Sheet getMasterListSheet() throws XLWrapException{
-        return getMasterWorkbook().getSheet(LIST_SHEET);
+    public static Sheet getMasterListSheet() throws XLWrapMapException{
+        try {
+            return getMasterWorkbook().getSheet(LIST_SHEET);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to find list Sheet in MetaMaster file", ex);
+        }
     }
 
     public static String getTextZeroBased(Sheet sheet, int column, int row)

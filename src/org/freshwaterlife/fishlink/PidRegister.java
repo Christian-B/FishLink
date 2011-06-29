@@ -9,4 +9,6 @@ public interface PidRegister {
     public String registerFile(File file) throws IOException;
     
     public String retreiveFile(String pid) throws XLWrapMapException;
+
+    public String retreiveFileOrNull(String pid) throws XLWrapMapException;
 }
