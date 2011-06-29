@@ -6,10 +6,9 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
@@ -39,13 +38,12 @@ public class MetaDataCreator {
         sheet.setValue("B", 2, doi);
     }
 
-    private void writeMeta(CYAB_Workbook metaWorkbook, String dataName) throws FileNotFoundException, IOException{
+    private void writeMeta(CYAB_Workbook metaWorkbook, String dataName) throws XLWrapMapException {
         String fileFront = dataName.substring(0, dataName.lastIndexOf("."));
         metaWorkbook.write(FishLinkPaths.META_DIR + fileFront + "MetaData.xls");
     }
 
-    private void createNamedRanges (CYAB_Workbook metaWorkbook)
-            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
+    private void createNamedRanges (CYAB_Workbook metaWorkbook) throws XLWrapMapException {
         Sheet masterSheet =  MasterFactory.getMasterListSheet();
         CYAB_Sheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
         int zeroColumn = 0;
@@ -79,7 +77,7 @@ public class MetaDataCreator {
         range.setRefersToFormula("'" + MasterFactory.LIST_SHEET + "'!$A1:$" + columnName + "$1");
     }
 
-    private int prepareColumnA(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) throws XLWrapException, XLWrapEOFException{
+    private int prepareColumnA(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
         int zeroRow = 0;
         String value;
         do {
@@ -100,8 +98,8 @@ public class MetaDataCreator {
         return zeroRow - 1;
     }
 
-    private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, CYAB_Sheet metaSheet, String column)
-            throws XLWrapException, XLWrapEOFException{
+    private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, CYAB_Sheet metaSheet, String column) 
+            throws XLWrapMapException {
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String list = MasterFactory.getTextZeroBased(masterSheet, 2, zeroRow);
             String popupTitle = MasterFactory.getTextZeroBased(masterSheet, 3, zeroRow);
@@ -121,8 +119,7 @@ public class MetaDataCreator {
         }
     }
 
-    private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String metaColumn)
-            throws XLWrapException, XLWrapEOFException{
+    private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String metaColumn) throws XLWrapMapException {
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
@@ -132,37 +129,73 @@ public class MetaDataCreator {
             maxRow = 100;
         }
         for (int zeroRow = 0; zeroRow < maxRow; zeroRow++){
-            Cell cell = dataSheet.getCell(zeroColumn, zeroRow);
-            TypeAnnotation typeAnnotation = cell.getType();
+            Cell cell;
+            try {
+                cell = dataSheet.getCell(zeroColumn, zeroRow);
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException("Error getting Cell", ex);
+            } catch (XLWrapEOFException ex) {
+                throw new XLWrapMapException("Error getting Cell", ex);
+            }
+            TypeAnnotation typeAnnotation;
+            try {
+                typeAnnotation = cell.getType();
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException("Error getting annotation type", ex);
+            }
             switch (typeAnnotation){
                 case BOOLEAN:
-                    boolean booleanValue = cell.getBoolean();
+                    boolean booleanValue;
+                    try {
+                        booleanValue = cell.getBoolean();
+                    } catch (XLWrapException ex) {
+                        throw new XLWrapMapException("Error getting boolean value", ex);
+                    }
                     metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, booleanValue);
                     break;
                 case NUMBER:
-                    double doubleValue = cell.getNumber();
+                    double doubleValue;
+                    try {
+                        doubleValue = cell.getNumber();
+                    } catch (XLWrapException ex) {
+                        throw new XLWrapMapException("Error getting double value", ex);
+                    }
                     metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, doubleValue);
                     break;
                 case TEXT:
-                    String textValue = cell.getText();
+                    String textValue;
+                    try {
+                        textValue = cell.getText();
+                    } catch (XLWrapException ex) {
+                        throw new XLWrapMapException("Error getting text value", ex);
+                    }
                     metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, textValue);
                     break;
                 case DATE:
-                    Date dateValue = cell.getDate();
-                    String format = cell.getDateFormat();
+                    Date dateValue;
+                    try {
+                        dateValue = cell.getDate();
+                    } catch (XLWrapException ex) {
+                        throw new XLWrapMapException("Error getting date text value", ex);
+                    }
+                    String format;
+                    try {
+                        format = cell.getDateFormat();
+                    } catch (XLWrapException ex) {
+                        throw new XLWrapMapException("Error getting date format", ex);
+                    }
                     metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, dateValue, format);
                     break;
                 case NULL:
                     break;
                 default:
-                    throw new XLWrapException("Unexpected Cell Type");
+                    throw new XLWrapMapException("Unexpected Cell Type");
             }
         }
         metaSheet.autoSizeColumn(zeroColumn);
     }
 
-    private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) 
-            throws XLWrapException, XLWrapEOFException{
+    private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
         int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
         metaSheet.createFreezePane("B", lastMetaRow + 2);
@@ -179,12 +212,16 @@ public class MetaDataCreator {
         return true;
     }
 
-    private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) 
-            throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+    private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) throws XLWrapMapException{
         Sheet masterSheet = MasterFactory.getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
-            Sheet dataSheet = dataWorkbook.getSheet(dataSheets[i]);
+            Sheet  dataSheet;
+            try {
+                dataSheet = dataWorkbook.getSheet(dataSheets[i]);
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException("Unable to get sheet " + dataSheets[i], ex);
+            }
             if (containsData(dataSheet)){
                 CYAB_Sheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
                 prepareSheet(masterSheet, metaSheet, dataSheet);
@@ -194,10 +231,14 @@ public class MetaDataCreator {
         }
     }
 
-    public void prepareMetaDataOnDoi(String dataFile, String doi) throws FileNotFoundException,
-            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException, XLWrapMapException{
+    public void prepareMetaDataOnDoi(String dataFile, String doi) throws XLWrapMapException{
         System.out.println("Preparing meta data collector for " + dataFile);
-        Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + FishLinkPaths.RAW_DIR +dataFile);
+        Workbook dataWorkbook;
+        try {
+            dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + FishLinkPaths.RAW_DIR +dataFile);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to create file " + dataFile, ex);
+        }
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
@@ -205,14 +246,17 @@ public class MetaDataCreator {
         writeMeta(metaWorkbook, dataFile);
     }
 
-    public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws FileNotFoundException,
-            IOException, InvalidFormatException, XLWrapException, XLWrapEOFException, XLWrapMapException{
+    public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws XLWrapMapException{
         Workbook dataWorkbook;
         try {
             dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataPath);
         } catch (Exception e){
-            //assume the "file:" bit is missing
-            dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + dataPath);
+            try {
+                //assume the "file:" bit is missing
+                dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + dataPath);
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException("Unable to create file " + dataPath, ex);
+            }
         }
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         createNamedRanges(metaWorkbook);
@@ -220,8 +264,7 @@ public class MetaDataCreator {
         metaWorkbook.write(targetPath);
     }
 
-    public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
-           XLWrapException, XLWrapEOFException, XLWrapMapException{
+    public static void main(String[] args) throws XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
 
         creator.prepareMetaDataOnDoi ("CumbriaTarnsPart1.xls", "CTP1");

@@ -28,32 +28,36 @@ public class PidStore implements PidRegister{
     
     HashMap<String,String> filesMap;
     
-    public static synchronized PidStore padStoreFactory() throws IOException, XLWrapMapException{
+    public static synchronized PidStore padStoreFactory() throws XLWrapMapException{
         if (pidstore == null){
             return pidstore = new PidStore();
         }
         return pidstore;
     }
     
-    private PidStore() throws IOException, XLWrapMapException{
+    private PidStore() throws XLWrapMapException{
         filesMap = new HashMap<String,String>();
         File file = new File(pidPath);
         if (file.exists()){
-            FileReader reader = new FileReader(file);
-            BufferedReader buffer = new BufferedReader(reader);
-            String line = buffer.readLine();
-            while (line != null) {
-                String[] tokens = line.split (",");
-                if (tokens.length != 2){
-                    throw new XLWrapMapException("Pad register error! Found line " + line);
+            try {
+                FileReader reader = new FileReader(file);
+                BufferedReader buffer = new BufferedReader(reader);
+                String line = buffer.readLine();
+                while (line != null) {
+                    String[] tokens = line.split (",");
+                    if (tokens.length != 2){
+                        throw new XLWrapMapException("Pid register error! Found line " + line);
+                    }
+                    filesMap.put(tokens[0], tokens[1]);
+                    line = buffer.readLine();
                 }
-                filesMap.put(tokens[0], tokens[1]);
-                line = buffer.readLine();
+            } catch (IOException ex) {
+                throw new XLWrapMapException("Pid register error!", ex);
             }
         } 
     }
     
-    public synchronized String registerFile(File file) throws IOException{
+    public synchronized String registerFile(File file) throws XLWrapMapException{
         String path = file.getAbsolutePath();
         //UID uid = new UID();
         Random random = new Random();
@@ -61,15 +65,19 @@ public class PidStore implements PidRegister{
         String pid = uid.toString();
         filesMap.put(pid, file.getAbsolutePath());
         File padFile = new File(pidPath);
-        FileWriter writer = new FileWriter(padFile);
-        BufferedWriter buffer = new BufferedWriter(writer);
-        for(Entry<String, String> e: filesMap.entrySet()){
-            buffer.write(e.getKey());
-            buffer.write(",");
-            buffer.write(e.getValue());
-            buffer.newLine();
+        try {
+            FileWriter writer = new FileWriter(padFile);
+            BufferedWriter buffer = new BufferedWriter(writer);
+            for(Entry<String, String> e: filesMap.entrySet()){
+                buffer.write(e.getKey());
+                buffer.write(",");
+                buffer.write(e.getValue());
+                buffer.newLine();
+            }
+            buffer.close();
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Pid register error!", ex);
         }
-        buffer.close();
         return pid;
      }
        
@@ -85,7 +93,7 @@ public class PidStore implements PidRegister{
         return filesMap.get(pid);
     }
 
-    public static void main(String[] args) throws IOException, XLWrapMapException{
+    public static void main(String[] args) throws XLWrapMapException{
         //File file = new File(FishLinkPaths.MASTER_FILE);
         PidStore pidstore = padStoreFactory();
         //String pid = pidstore.registerFile(file);

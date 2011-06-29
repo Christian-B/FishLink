@@ -5,7 +5,10 @@ import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
+import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
@@ -28,8 +31,16 @@ public class AbstractSheet {
     protected int lastConstant = -1;
     protected String lastDataColumn;
 
-    public AbstractSheet (Sheet theSheet)
-            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
+    public AbstractSheet (Workbook metaWorkbook, String sheetName) throws XLWrapMapException {
+        try {
+            metaSheet = metaWorkbook.getSheet(sheetName);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to find sheet " + sheetName, ex);
+        }
+        findAndCheckMetaSplits();    
+    }
+
+    public AbstractSheet (Sheet theSheet) throws XLWrapMapException {
         metaSheet = theSheet;
         findAndCheckMetaSplits();
     }
@@ -47,7 +58,7 @@ public class AbstractSheet {
         }
     }
 
-    private void findMetaSplits() throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+    private void findMetaSplits() throws XLWrapMapException{
         int row = 1;
         SplitType splitType = SplitType.NONE;
         do {
@@ -91,23 +102,35 @@ public class AbstractSheet {
         } while (true); //will return out when finished
     }
 
-    private void findAndCheckMetaSplits() throws XLWrapException, XLWrapEOFException, XLWrapMapException{
+    private void findAndCheckMetaSplits() throws XLWrapMapException{
         lastDataColumn = POI_Utils.indexToAlpha(metaSheet.getColumns() -1);
         findMetaSplits();
         if (categoryRow == -1) {
-            throw new XLWrapException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
+            throw new XLWrapMapException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
         }
         if (fieldRow == -1) {
-            throw new XLWrapException("Unable to find \"" + Constants.FIELD_LABEL + "\" in column A.");
+            throw new XLWrapMapException("Unable to find \"" + Constants.FIELD_LABEL + "\" in column A.");
         }
         if (idTypeRow == -1) {
-            throw new XLWrapException("Unable to find \"" + Constants.ID_VALUE_LABEL + "\" in column A.");
+            throw new XLWrapMapException("Unable to find \"" + Constants.ID_VALUE_LABEL + "\" in column A.");
         }
     }
 
-   private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapException, XLWrapEOFException{
-        Cell cell = metaSheet.getCell(col, actualRow);
-        XLExprValue<?> value = Utils.getXLExprValue(cell);
+   private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapMapException{
+        Cell cell;
+        try {
+            cell = metaSheet.getCell(col, actualRow);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to get cell. ", ex);
+        } catch (XLWrapEOFException ex) {
+            throw new XLWrapMapException("Unable to get cell. ", ex);
+        }
+        XLExprValue<?> value;
+        try {
+            value = Utils.getXLExprValue(cell);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to get value from cell. ", ex);
+        }
         if (value == null){
             return null;
         }
@@ -115,13 +138,13 @@ public class AbstractSheet {
         return value.toString().replace("\"","");
     }
 
-    protected String getCellValue (String column, int row) throws XLWrapException, XLWrapEOFException{
+    protected String getCellValue (String column, int row) throws XLWrapMapException{
         int col = Utils.alphaToIndex(column);
         int actualRow = row - 1;
         return getZeroBasedCellValue (col, actualRow);
     }
 
-    protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws XLWrapException, XLWrapEOFException{
+    protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws XLWrapMapException{
         int col = Utils.alphaToIndex(dataColumn) + 1;
         int actualRow = row - 1;
         return getZeroBasedCellValue (col, actualRow);

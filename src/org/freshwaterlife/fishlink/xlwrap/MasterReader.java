@@ -15,8 +15,7 @@ public class MasterReader extends AbstractSheet {
        super(MasterFactory.getMasterDropdownSheet());
     }
 
-    private void checkName (SheetWrite sheet, String otherName, int firstRow, int lastRow)
-            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
+    private void checkName (SheetWrite sheet, String otherName, int firstRow, int lastRow) throws XLWrapMapException {
         for (int i = firstRow; i<= lastRow; i++){
             if (this.getCellValue("A", i).equalsIgnoreCase(otherName)){
                 return;
@@ -25,7 +24,7 @@ public class MasterReader extends AbstractSheet {
         throw new XLWrapMapException ("In " + sheet.getSheetInfo() + " Map contains " + otherName + " in the master does not in the same place");
     }
 
-    void check (SheetWrite other) throws XLWrapMapException, XLWrapException, XLWrapEOFException{
+    void check (SheetWrite other) throws XLWrapMapException {
        if (other.externalSheetRow > 0){
            if (this.externalSheetRow == -1){
                 throw new XLWrapMapException("Map contains \"external sheet\" but master does not.");

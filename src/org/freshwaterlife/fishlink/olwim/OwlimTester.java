@@ -58,7 +58,7 @@ import org.openrdf.sail.memory.MemoryStore;
  */
 public class OwlimTester {
 
-    private static final String QUERYFILE = "./queries/cyabTest.sparql";
+    private static final String QUERYFILE = "./queries/cyabTest_1.sparql";
     private static final String TTL_FILE = "./data/fishlink.ttl";
     private static final String REPOSITORY_ID = "fishlink";
     private static final String DATA_DIR = "./output/rdf/";
@@ -600,7 +600,7 @@ public class OwlimTester {
         //tester.newRepository();
         //File file = new File(DATA_DIR);
         //tester.loadFiles(file);
-        // tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
+        //tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
         tester.iterateNamespaces();
         tester.evaluateQueries();
         tester.shutdown();

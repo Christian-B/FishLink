@@ -7,8 +7,6 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
@@ -37,10 +35,7 @@ public class MasterFactory {
                 masterWorkbook = getExecutionContext().getWorkbook(path);
             } catch (XLWrapException ex) {
                 throw new XLWrapMapException("Unable to find the MetaMaster file", ex);
-            } catch (IOException ex) {
-                throw new XLWrapMapException("Unable to find the MetaMaster file", ex);
             }
-    
         }
         return masterWorkbook;
     }
@@ -68,16 +63,23 @@ public class MasterFactory {
         }
     }
 
-    public static String getTextZeroBased(Sheet sheet, int column, int row)
-            throws XLWrapException, XLWrapEOFException{
+    public static String getTextZeroBased(Sheet sheet, int column, int row) throws XLWrapMapException {
         if (column >= sheet.getColumns()){
             return "";
         }
         if (row >= sheet.getRows()){
             return "";
         }
-        Cell cell = sheet.getCell(column, row);
-        return cell.getText();
+        try {
+            Cell cell = sheet.getCell(column, row);
+            return cell.getText();
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+                    sheet.getSheetInfo(), ex);
+        } catch (XLWrapEOFException ex) {
+            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+                    sheet.getSheetInfo(), ex);
+        }
     }
 
 

@@ -20,7 +20,6 @@ import at.jku.xlwrap.common.Utils;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.map.expr.E_RangeRef;
-import at.jku.xlwrap.map.expr.XLExpr;
 import at.jku.xlwrap.map.expr.func.FunctionRegistry;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.map.range.CellRange;

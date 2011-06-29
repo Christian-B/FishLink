@@ -2,9 +2,6 @@ package org.freshwaterlife.fishlink;
 
 
 
-import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import java.io.IOException;
 import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
@@ -16,7 +13,7 @@ import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
  */
 public class ChristianRun {
 
-    private static void loadXLS(String name) throws XLWrapException, XLWrapEOFException, XLWrapMapException, IOException{
+    private static void loadXLS(String name) throws XLWrapMapException{
         //Adjust this file to the your local path
         WorkbookWrite.setRoots(FishLinkPaths.DROPBOX + "xMeta Data/",FishLinkPaths.DROPBOX + "Raw Data/");
         WorkbookWrite mapWrite = new WorkbookWrite(name);
@@ -37,7 +34,7 @@ public class ChristianRun {
 
     //}
 
-    public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
+    public static void main(String[] args) throws XLWrapMapException {
         BrennRegister.register();
         loadXLS("xTarnschemFinalMetaData.xls");
         loadXLS("xCumbriaTarnsPart1MetaData.xls");

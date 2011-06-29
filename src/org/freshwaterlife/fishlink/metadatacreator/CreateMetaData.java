@@ -1,5 +1,7 @@
 package org.freshwaterlife.fishlink.metadatacreator;
 
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+
 /**
  *
  * @author Christian
@@ -13,7 +15,7 @@ public class CreateMetaData {
         System.out.println("Second if the location (path and file name) of the MetaData file.");
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws XLWrapMapException{
         if (args.length != 2){
             usage();
             System.exit(2);
