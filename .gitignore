@@ -2,6 +2,8 @@
 #netbeans files
 build.xml
 manifest.mf
+#local pid repository
+data/padRegisrty.csv
 
 #Ignore directories
 #netbeans files
