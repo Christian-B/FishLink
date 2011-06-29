@@ -13,7 +13,6 @@ import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
  */
 public class MasterFactory {
 
-    static private String MASTER_FILE = "data/MetaMaster.xlsx";
     public static final String LIST_SHEET = "Lists";
 
     private static ExecutionContext context1;
@@ -22,7 +21,7 @@ public class MasterFactory {
 
     private static Workbook getMasterWorkbook() throws XLWrapException{
         if (masterWorkbook == null){
-            masterWorkbook = getExecutionContext().getWorkbook("file:" + MASTER_FILE);
+            masterWorkbook = getExecutionContext().getWorkbook("file:" + FishLinkPaths.MASTER_FILE);
         }
         return masterWorkbook;
     }

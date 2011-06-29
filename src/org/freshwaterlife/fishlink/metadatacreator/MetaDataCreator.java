@@ -1,7 +1,6 @@
 package org.freshwaterlife.fishlink.metadatacreator;
 
 import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
@@ -24,15 +23,9 @@ import org.freshwaterlife.fishlink.POI_Utils;
 public class MetaDataCreator {
 
 
-    private String metaRoot;
-    
-    static private int CATEGORY_ROW = 1;
-    static private int FIELD_ROW = 2;
-    private Sheet Sheet;
-
-    public MetaDataCreator(String metaDir){
-        metaRoot = metaDir;
-    }
+//    static private int CATEGORY_ROW = 1;
+ //   static private int FIELD_ROW = 2;
+   // private Sheet Sheet;
 
     public MetaDataCreator(){
     }
@@ -47,7 +40,7 @@ public class MetaDataCreator {
 
     private void writeMeta(CYAB_Workbook metaWorkbook, String dataName) throws FileNotFoundException, IOException{
         String fileFront = dataName.substring(0, dataName.lastIndexOf("."));
-        metaWorkbook.write(metaRoot + fileFront + "MetaData.xls");
+        metaWorkbook.write(FishLinkPaths.META_DIR + fileFront + "MetaData.xls");
     }
 
     private void createNamedRanges (CYAB_Workbook metaWorkbook)
@@ -200,10 +193,10 @@ public class MetaDataCreator {
         }
     }
 
-    public void prepareMetaDataOnDoi(String dataRoot, String dataFile, String doi) throws FileNotFoundException,
+    public void prepareMetaDataOnDoi(String dataFile, String doi) throws FileNotFoundException,
             IOException, InvalidFormatException, XLWrapException, XLWrapEOFException{
         System.out.println("Preparing meta data collector for " + dataFile);
-        Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + dataRoot +dataFile);
+        Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + FishLinkPaths.RAW_DIR +dataFile);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
@@ -228,15 +221,15 @@ public class MetaDataCreator {
 
     public static void main(String[] args) throws IOException, FileNotFoundException, InvalidFormatException, 
            XLWrapException, XLWrapEOFException{
-        MetaDataCreator creator = new MetaDataCreator(FishLinkPaths.MAIN_ROOT + "Meta Data/");
+        MetaDataCreator creator = new MetaDataCreator();
 
-        //creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "CumbriaTarnsPart1.xls", "CTP1");
-        //creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "FBA_Tarns.xls", "FBA345");
-        creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Records.xls", "rec12564");
-     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Species.xls", "spec564");
-     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Stokoe.xls", "stokoe32433232");
-     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "Tarns.xls", "tarns33exdw2");
-     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "TarnschemFinal.xls", "TSF1234");
-     //   creator.prepareMetaDataOnDoi (FishLinkPaths.MAIN_ROOT + "Raw Data/", "WillbyGroups.xls", "wbgROUPS8734");
+        creator.prepareMetaDataOnDoi ("CumbriaTarnsPart1.xls", "CTP1");
+        creator.prepareMetaDataOnDoi ("FBA_Tarns.xls", "FBA345");
+        creator.prepareMetaDataOnDoi ("Records.xls", "rec12564");
+        creator.prepareMetaDataOnDoi ("Species.xls", "spec564");
+        creator.prepareMetaDataOnDoi ("Stokoe.xls", "stokoe32433232");
+        creator.prepareMetaDataOnDoi ("Tarns.xls", "tarns33exdw2");
+        creator.prepareMetaDataOnDoi ("TarnschemFinal.xls", "TSF1234");
+        creator.prepareMetaDataOnDoi ("WillbyGroups.xls", "wbgROUPS8734");
     }
 }

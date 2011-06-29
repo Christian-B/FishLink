@@ -17,8 +17,6 @@ import org.freshwaterlife.fishlink.POI_Utils;
  */
 public class SheetWrite extends AbstractSheet{
 
-    private static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
-
     private String sheet;
     private int sheetNumber;
 
@@ -101,17 +99,17 @@ public class SheetWrite extends AbstractSheet{
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
             String dataColumn, boolean ignoreZeros)
             throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException {
-        if(category.toLowerCase().equals("observation")) {
+        if(category.toLowerCase().equals(Constants.OBSERVATION_LABEL)) {
             writelUriCell(writer, category, field, idType, dataColumn, ignoreZeros);
         } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
-                idType.equalsIgnoreCase("automatic")){
+                idType.equalsIgnoreCase(Constants.AUTOMATIC_LABEL)){
             writeUri(writer, category, field, dataColumn, ignoreZeros);
         } else {
             //There is an Id reference to another column.
             if (idType.equalsIgnoreCase("row")){
                 throw new XLWrapMapException("IDType row not longer supported. Foun in sheet " + metaSheet.getName());
-            } else if (idType.equalsIgnoreCase("all")){
-                throw new XLWrapMapException("Unexpected IDType all");
+            } else if (idType.equalsIgnoreCase(Constants.ALL_LABEL)){
+                throw new XLWrapMapException("Unexpected IDType " + Constants.ALL_LABEL);
             } else {
                 String idCategory = getMetaCellValueOnDataColumn(idType, categoryRow);
                 String idColumn = idColumns.get(idCategory);
@@ -123,7 +121,7 @@ public class SheetWrite extends AbstractSheet{
     private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, boolean ignoreZeros)
             throws IOException, XLWrapMapException {
         String uri = categoryUris.get(category);
-        if (field.toLowerCase().equals("id")){
+        if (field.toLowerCase().equals(Constants.ID_LABEL)){
             writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ","
                     + ignoreZeros + ")\"^^xl:Expr ] ");
             return;
@@ -135,7 +133,7 @@ public class SheetWrite extends AbstractSheet{
     private void writelUriCell(BufferedWriter writer, String category, String field, String idColumn, String dataColumn,
             boolean ignoreZeros) throws IOException, XLWrapMapException, XLWrapException, XLWrapEOFException {
         String uri = categoryUris.get(category);
-        if(field.toLowerCase().equals("value")) {
+        if(field.toLowerCase().equals(Constants.VALUE_LABEL)) {
             writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ","
                     + ignoreZeros + ")\"^^xl:Expr ] ");
             return;
@@ -152,6 +150,7 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeUriOther(BufferedWriter writer, String uri, String idColumn, String dataColumn, boolean ignoreZeros)
             throws IOException {
+        //"row" is added for automatic ones where no id column found.
         if (idColumn.equalsIgnoreCase("row")){
             writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + "," +
                     ignoreZeros + ")\"^^xl:Expr ] ");
@@ -178,7 +177,7 @@ public class SheetWrite extends AbstractSheet{
         if (!value.endsWith("'")){
             value = value + "'";
         }
-        writer.write("[ xl:uri \"'" + RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
+        writer.write("[ xl:uri \"'" + Constants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
     }
 
     private void writeConstant (BufferedWriter writer, String metaColumn, int row)
@@ -341,7 +340,7 @@ public class SheetWrite extends AbstractSheet{
    }
 
    private String getCatgerogyUri(String category){
-       return  RDF_BASE_URL + "resource/" + category + "_" + doi + "_" + sheet + "/";
+       return  Constants.RDF_BASE_URL + "resource/" + category + "_" + doi + "_" + sheet + "/";
    }
 
    private String getUri(String metaColumn , String category)
@@ -359,7 +358,7 @@ public class SheetWrite extends AbstractSheet{
             externalDoi = doi;
             externalSheet = externalField;
         }
-        return  RDF_BASE_URL + "resource/" + category + "_" + externalDoi + "_" + externalSheet + "/";
+        return  Constants.RDF_BASE_URL + "resource/" + category + "_" + externalDoi + "_" + externalSheet + "/";
     }
 
    private String metaToDataColumn(String metaColumn){

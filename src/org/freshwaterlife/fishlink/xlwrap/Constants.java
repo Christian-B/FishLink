@@ -6,6 +6,17 @@ package org.freshwaterlife.fishlink.xlwrap;
  */
 public class Constants {
 
+    public static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
+
+
+    //Column A texts
+    public static final String CATEGORY_LABEL = "Category";
+    public static final String FIELD_LABEL = "Field";
+    public static final String ID_VALUE_LABEL = "Id/Value Column"; //Id/Value Column (or "All")  //Old ones may have row
+    public static final String EXTERNAL_LABEL = "external sheet";
+    public static final String IGNORE_ZEROS_LABEL = "Ignore Zeros";
+    public static final String CONSTANTS_DIVIDER = "Constants"; //-- Constants --
+    public static final String HEADER_LABEL = "Header";
     //categeries
     private static final String LOCATION_LABEL = "Location";
     public static final String OBSERVATION_LABEL = "Observation";
@@ -16,7 +27,10 @@ public class Constants {
     //fields
     private static final String CONTIBUTOR_LABEL = "Contributor";
     private static final String OWNER_LABEL = "Owner";
+    public static final String ID_LABEL = "Id"; 
+    public static final String VALUE_LABEL = "Value"; 
 
+    public static final String AUTOMATIC_LABEL = "automatic";
     public static final String ALL_LABEL = "all";
 
     public static String autoRelatedCategory(String category){

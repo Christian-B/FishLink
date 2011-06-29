@@ -53,35 +53,34 @@ public class AbstractSheet {
         do {
             String columnA = getCellValue("A",row);
             if (columnA != null){
-                String columnALower = columnA.toLowerCase();
-                if (columnALower.equals("category")){
+                if (columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
                     categoryRow = row;
-                } else if (columnALower.equals("field")){
+                } else if (columnA.equalsIgnoreCase(Constants.FIELD_LABEL)){
                     fieldRow = row;
-                } else if (columnALower.startsWith("id/value column")){
+                } else if (columnA.startsWith(Constants.ID_VALUE_LABEL)){
                     idTypeRow = row;
-                } else if (columnALower.equals("external sheet")){
+                } else if (columnA.equalsIgnoreCase(Constants.EXTERNAL_LABEL)){
                     externalSheetRow = row;
-                } else if (columnALower.equals("ignore zeros")){
+                } else if (columnA.equalsIgnoreCase(Constants.EXTERNAL_LABEL)){
                     ignoreZerosRow = row;
-                } else if (columnALower.contains("links")){
+                } else if (columnA.contains("links")){
                     throw new XLWrapMapException ("Links not currently supproted");
-                } else if (columnALower.contains("constant")){
+                } else if (columnA.contains(Constants.CONSTANTS_DIVIDER)){
                     firstConstant = row + 1;
                     endMataSplit(row, splitType);
                     splitType = SplitType.CONSTANT;
-                } else if (columnALower.equals("header")) {
+                } else if (columnA.equalsIgnoreCase(Constants.HEADER_LABEL)) {
                     endMataSplit(row, splitType);
                     splitType = SplitType.HEADER;
-                } else if (columnALower.isEmpty()){
+                } else if (columnA.isEmpty()){
                     endMataSplit(row, splitType);
                     splitType = SplitType.NONE;
                 } else if (splitType == SplitType.HEADER){
                     try{
-                        firstData = Integer.parseInt(columnALower);
+                        firstData = Integer.parseInt(columnA);
                         return;
                     } catch (Exception e){
-                        System.err.println("Expected a number after \"header\" but found " + columnALower);
+                        System.err.println("Expected a number after \"header\" but found " + columnA);
                     }
                 } 
             } else {
@@ -96,13 +95,13 @@ public class AbstractSheet {
         lastDataColumn = POI_Utils.indexToAlpha(metaSheet.getColumns() -1);
         findMetaSplits();
         if (categoryRow == -1) {
-            throw new XLWrapException("Unable to find \"category\" in column A.");
+            throw new XLWrapException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
         }
         if (fieldRow == -1) {
-            throw new XLWrapException("Unable to find \"field\" in column A.");
+            throw new XLWrapException("Unable to find \"" + Constants.FIELD_LABEL + "\" in column A.");
         }
         if (idTypeRow == -1) {
-            throw new XLWrapException("Unable to find \"Id/Value column\" in column A.");
+            throw new XLWrapException("Unable to find \"" + Constants.ID_VALUE_LABEL + "\" in column A.");
         }
     }
 
