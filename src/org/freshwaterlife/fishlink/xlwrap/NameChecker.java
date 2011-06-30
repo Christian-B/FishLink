@@ -17,13 +17,25 @@ import org.freshwaterlife.fishlink.MasterFactory;
 public class NameChecker {
 
      private HashMap<String,ArrayList<String>> categories;
+     private HashMap<String,ArrayList<String>> subcategories;
+     private HashMap<String,ArrayList<String>> constants;
 
      NameChecker() throws XLWrapMapException{
         Sheet masterSheet =  MasterFactory.getMasterListSheet();
         categories = new HashMap<String,ArrayList<String>>();
-        int zeroColumn = 0;
-        String rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
-        while (!rangeName.isEmpty()) {
+        int zeroColumn = -1; //-1 as getnames starts by increasing it.
+        zeroColumn = getNames(masterSheet, categories, zeroColumn);
+        subcategories = new HashMap<String,ArrayList<String>>();
+        zeroColumn = getNames(masterSheet, subcategories, zeroColumn);
+        constants = new HashMap<String,ArrayList<String>>();
+        zeroColumn = getNames(masterSheet, constants, zeroColumn);
+     }
+
+     private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws XLWrapMapException{
+         String rangeName;
+         do {
+            zeroColumn++;
+            rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
             int zeroRow = 1;
             String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             ArrayList<String> feilds = new ArrayList<String>();
@@ -32,11 +44,10 @@ public class NameChecker {
                 feilds.add(fieldName);
                 fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             } while (!fieldName.isEmpty());
-            categories.put(rangeName, feilds);
-            zeroColumn++;
-            rangeName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
-        }
-     }
+            hashMap.put(rangeName, feilds);
+         } while (!rangeName.isEmpty());
+         return zeroColumn;
+    }
 
     boolean isCategory (String field) {
         return categories.containsKey(field);

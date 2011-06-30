@@ -7,8 +7,6 @@ import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
@@ -22,7 +20,9 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  */
 public class MetaDataCreator {
 
-
+    //Limits the number of rows copied in
+    static private int MAX_DATA_ROW = Integer.MAX_VALUE;
+    
 //    static private int CATEGORY_ROW = 1;
  //   static private int FIELD_ROW = 2;
    // private Sheet Sheet;
@@ -43,38 +43,54 @@ public class MetaDataCreator {
         metaWorkbook.write(FishLinkPaths.META_DIR + fileFront + "MetaData.xls");
     }
 
+    private String createNamedRange (CYAB_Workbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
+        Sheet masterSheet = MasterFactory.getMasterListSheet();
+        CYAB_Sheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
+        String rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
+        if (rangeName == null || rangeName.isEmpty()){
+            return "";
+        }
+        String columnName = POI_Utils.indexToAlpha(zeroColumn);
+        metaSheet.setValueZeroBased(zeroColumn, 0, rangeName);
+        int zeroRow = 1;
+        String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+        while (!fieldName.isEmpty()) {
+            metaSheet.setValueZeroBased(zeroColumn, zeroRow, fieldName);
+            zeroRow++;
+            fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+        } while (!fieldName.isEmpty());
+        Name range = metaWorkbook.createName();
+        range.setNameName(rangeName);
+        String rangeDef = "'" + MasterFactory.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
+        range.setRefersToFormula(rangeDef);
+        return rangeName;
+    }
+
     private void createNamedRanges (CYAB_Workbook metaWorkbook) throws XLWrapMapException {
         Sheet masterSheet =  MasterFactory.getMasterListSheet();
         CYAB_Sheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
+        //Get the categories
         int zeroColumn = 0;
-        String rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
-        int categories = -1;
+        String rangeName =  createNamedRange(metaWorkbook, zeroColumn);
         while (!rangeName.isEmpty()) {
-            String columnName = POI_Utils.indexToAlpha(zeroColumn);
-            metaSheet.setValueZeroBased(zeroColumn, 0, rangeName);
-            int zeroRow = 1;
-            String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
-            while (!fieldName.isEmpty()) {
-                metaSheet.setValueZeroBased(zeroColumn, zeroRow, fieldName);
-                zeroRow++;
-                fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
-            } while (!fieldName.isEmpty());
-            Name range = metaWorkbook.createName();
-            range.setNameName(rangeName);
-            String rangeDef = "'" + MasterFactory.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
-            range.setRefersToFormula(rangeDef);
             zeroColumn++;
-            rangeName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
-            if (rangeName.isEmpty() && categories == -1){
-                categories = zeroColumn -1;
-                zeroColumn++;
-                rangeName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
-            }
+            rangeName = createNamedRange(metaWorkbook, zeroColumn);
         }
+        //first space splits the categories from the rest
         Name range = metaWorkbook.createName();
         range.setNameName("Category");
-        String columnName = POI_Utils.indexToAlpha(categories);
+        String columnName = POI_Utils.indexToAlpha(zeroColumn -1);
         range.setRefersToFormula("'" + MasterFactory.LIST_SHEET + "'!$A1:$" + columnName + "$1");
+        //Now get the subTypes
+        do {
+            zeroColumn++;
+            rangeName = createNamedRange(metaWorkbook, zeroColumn);
+        } while (!rangeName.isEmpty());
+        //Now the renaming ranges
+        do {
+            zeroColumn++;
+            rangeName = createNamedRange(metaWorkbook, zeroColumn);
+        } while (!rangeName.isEmpty());
     }
 
     private int prepareColumnA(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
@@ -125,8 +141,8 @@ public class MetaDataCreator {
         metaSheet.setValue(metaColumn, letterRow, dataColumn);
         metaSheet.setForegroundAqua(metaColumn, letterRow);
         int maxRow = dataSheet.getRows();
-        if (maxRow > 100){
-            maxRow = 100;
+        if (maxRow > MAX_DATA_ROW){
+            maxRow = MAX_DATA_ROW;
         }
         for (int zeroRow = 0; zeroRow < maxRow; zeroRow++){
             Cell cell;
