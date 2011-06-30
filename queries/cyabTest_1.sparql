@@ -1,6 +1,9 @@
 ^[All Instances]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 SELECT ?s ?o ?p WHERE {
        ?s ?o ?p .
 } LIMIT 10
@@ -8,13 +11,19 @@ SELECT ?s ?o ?p WHERE {
 ^[Types]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 SELECT DISTINCT ?type WHERE {
        [] rdf:type ?type .
-} 
+} LIMIT 10
 
 ^[Types Count]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 SELECT ?graph ?type (COUNT (DISTINCT ?element) AS ?frequency)
 {
     GRAPH ?graph 
@@ -24,12 +33,14 @@ SELECT ?graph ?type (COUNT (DISTINCT ?element) AS ?frequency)
 }
 group by ?graph ?type
 order by ?type
+LIMIT 10
 
 ^[Types predicates]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX vocab:  <http://rdf.fba.org.uk/vocab/resource/>
-PREFIX item:  <http://rdf.fba.org.uk/resource/>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 SELECT DISTINCT ?type ?predicate (COUNT (?value) AS ?frequency)
 (COUNT (DISTINCT ?value) AS ?occurrences) {
        ?element rdf:type ?type .
@@ -37,17 +48,67 @@ SELECT DISTINCT ?type ?predicate (COUNT (?value) AS ?frequency)
 }
 group by ?type ?predicate
 order by ?type ?predicate
+LIMIT 10
 
 ^[Observation Values]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX j.1:  <http://rdf.fba.org.uk/vocab/resource/>
-PREFIX j.0:  <http://rdf.fba.org.uk/resource/>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 
-SELECT DISTINCT ?value  (COUNT (DISTINCT ?element) AS ?occurrences) {
-       ?element rdf:type j.0:Observation .
-       ?element j.1:hasValue  ?value  .
+SELECT ?value  (COUNT (DISTINCT ?element) AS ?occurrences) {
+       ?element rdf:type type:Observation .
+       ?element vocab:hasValue  ?value  .
 }
 GROUP BY ?value
 ORDER BY ?value
+LIMIT 10
 
+^[Zero]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
+
+SELECT DISTINCT ?element ?value{
+       ?element rdf:type type:Observation .
+       ?element vocab:hasValue  ?value .
+       FILTER (?value = 0)
+}
+LIMIT 10
+
+^[Factors]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
+
+SELECT DISTINCT ?factor 
+{
+#    GRAPH ?graph 
+#    {
+       ?observation vocab:hasFactor ?factor .
+#    }
+}
+order by ?factor
+LIMIT 10
+
+^[Factors by graph]
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
+
+SELECT DISTINCT ?factor ?graph
+{
+    GRAPH ?graph 
+    {
+       ?observation vocab:hasFactor ?factor .
+    }
+}
+order by ?factor
+LIMIT 10

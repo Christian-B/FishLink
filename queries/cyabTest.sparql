@@ -1,12 +1,19 @@
-^[Zero]
+^[Factors by type]
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX j.1:  <http://rdf.fba.org.uk/vocab/resource/>
-PREFIX j.0:  <http://rdf.fba.org.uk/resource/>
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
 
-SELECT DISTINCT ?element ?value{
-       ?element rdf:type j.0:Observation .
-       ?element j.1:hasValue  ?value .
-       FILTER (?value = 0)
+SELECT DISTINCT ?type ?graph
+{
+    GRAPH ?graph 
+    {
+       ?observation vocab:hasFactor ?factor .
+       ?observation vocab:hasSite ?site.
+       ?site rdf:type ?type.
+      # FILTER (?type != type:site)
+    }
 }
+order by ?type ?factor
 
