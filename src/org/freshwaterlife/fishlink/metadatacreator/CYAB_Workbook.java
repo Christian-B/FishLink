@@ -35,17 +35,17 @@ public class CYAB_Workbook {
         try {
             fileOut = new FileOutputStream(filePath);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to find + filePath", ex);
+            throw new XLWrapMapException("Unable to open "+ filePath, ex);
         }
         try {
             poiWorkbook.write(fileOut);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write + filePath", ex);
+            throw new XLWrapMapException("Unable to write "+ filePath, ex);
         }
         try {
             fileOut.close();
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to close + filePath", ex);
+            throw new XLWrapMapException("Unable to close "+ filePath, ex);
         }
 
     }
