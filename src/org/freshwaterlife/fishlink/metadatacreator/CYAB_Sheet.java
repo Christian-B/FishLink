@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
@@ -210,12 +211,29 @@ public class CYAB_Sheet {
     }
 
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
-            int errorStyle, String errorTitle, String errorMessage) {
+            int errorStyle, String errorTitle, String errorMessage) throws XLWrapMapException {
         rule = rule.replaceAll("\\$"+replaceColum, "\\$" + column);
+        //ystem.out.println(rule);
         addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
     private void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
+            int errorStyle, String errorTitle, String errorMessage) throws XLWrapMapException {
+        if (rule.length() > 255) {
+            throw new XLWrapMapException("Validation rule can not be longer than 255 for " + column + row);
+        }
+        if (popupMessage.length() > 255) {
+            throw new XLWrapMapException("Validation popupMessage can not be longer than 255 for " + column + row);
+        }
+        if (errorMessage.length() > 255) {
+            System.err.println(errorMessage);
+            System.err.println(errorMessage.length());
+            throw new XLWrapMapException("Validation errorMessage can not be longer than 255 for " + column + row);
+        }
+        addCheckedValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
+    }
+    
+    private void addCheckedValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) {
         int columnNumber = POI_Utils.alphaToIndex(column);
         CellRangeAddressList addressList = new CellRangeAddressList(row - 1, row -1, columnNumber,  columnNumber);
