@@ -17,6 +17,8 @@ public class MasterFactory {
 
     public static final String LIST_SHEET = "Lists";
 
+    public static final String DROP_DOWN_SHEET = "DropDowns";
+
     static final String masterPid = "ff19868d-5b12-846f-81ef-e47468c85068";
 
     private static ExecutionContext context1;
@@ -49,9 +51,10 @@ public class MasterFactory {
 
     public static Sheet getMasterDropdownSheet() throws XLWrapMapException{
         try {
-            return getMasterWorkbook().getSheet("Sheet1");
+            return getMasterWorkbook().getSheet(DROP_DOWN_SHEET);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to find dropdown Sheet in MetaMaster file", ex);
+            throw new XLWrapMapException("Unable to find dropdown Sheet " + DROP_DOWN_SHEET + " in MetaMaster file " + 
+                    getMasterWorkbook().getWorkbookInfo(), ex);
         }
     }
 
