@@ -7,6 +7,8 @@ public interface PidRegister {
     
     public String registerFile(File file) throws XLWrapMapException;
     
+    public void registerFile(String path, String pid) throws XLWrapMapException;
+
     public String retreiveFile(String pid) throws XLWrapMapException;
 
     public String retreiveFileOrNull(String pid) throws XLWrapMapException;

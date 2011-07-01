@@ -57,13 +57,25 @@ public class PidStore implements PidRegister{
         } 
     }
     
-    public synchronized String registerFile(File file) throws XLWrapMapException{
+    public String registerFile(File file) throws XLWrapMapException{
         String path = file.getAbsolutePath();
-        //UID uid = new UID();
         Random random = new Random();
         UUID uid = new UUID(random.nextLong(), random.nextLong());
         String pid = uid.toString();
-        filesMap.put(pid, file.getAbsolutePath());
+        registerFile(path, pid);
+        return pid;
+     }
+       
+    public synchronized void registerFile(String path, String pid) throws XLWrapMapException{
+        String check = filesMap.get(pid);
+        if (check != null) {
+            if (check.equals(path)){
+                return; //Already there so do nothing
+            } else {
+                throw new XLWrapMapException ("Pid " + pid + " is already assigned to a different file");
+            }
+        }
+        filesMap.put(pid, path);
         File padFile = new File(pidPath);
         try {
             FileWriter writer = new FileWriter(padFile);
@@ -78,10 +90,9 @@ public class PidStore implements PidRegister{
         } catch (IOException ex) {
             throw new XLWrapMapException("Pid register error!", ex);
         }
-        return pid;
      }
        
-    public String retreiveFile(String pid) throws XLWrapMapException {
+   public String retreiveFile(String pid) throws XLWrapMapException {
         String path = retreiveFileOrNull(pid);
         if (path == null){
             throw new XLWrapMapException("Pid " + pid + "does not mapp to any know path");
@@ -92,13 +103,17 @@ public class PidStore implements PidRegister{
     public String retreiveFileOrNull(String pid) throws XLWrapMapException {
         return filesMap.get(pid);
     }
-
+    
     public static void main(String[] args) throws XLWrapMapException{
-        //File file = new File(FishLinkPaths.MASTER_FILE);
-        PidStore pidstore = padStoreFactory();
-        //String pid = pidstore.registerFile(file);
-        //System.out.println(pidstore.registerFile(file));
-        System.out.println(pidstore.retreiveFile(MasterFactory.masterPid));
+        PidStore thePidstore = PidStore.padStoreFactory();
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "CumbriaTarnsPart1MetaData.xls", "OLDMETA_CTP1");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "FBA_Tarns.xlsMetaData", "OLDMETA_FBA345");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Records.xlsMetaData", "OLDMETA_rec12564");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Species.xlsMetaData", "OLDMETA_spec564");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Stokoe.xlsMetaData", "OLDMETA_stokoe32433232");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Tarns.xlsMetaData", "OLDMETA_tarns33exdw2");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "TarnschemFinalMetaData.xls", "OLDMETA_TSF1234");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "WillbyGroupsMetaData.xls", "OLDMETA_wbgROUPS8734");
     }
 
 }

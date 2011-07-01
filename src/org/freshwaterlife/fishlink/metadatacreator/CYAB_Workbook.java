@@ -1,5 +1,6 @@
 package org.freshwaterlife.fishlink.metadatacreator;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -46,6 +47,26 @@ public class CYAB_Workbook {
             fileOut.close();
         } catch (IOException ex) {
             throw new XLWrapMapException("Unable to close "+ filePath, ex);
+        }
+
+    }
+
+    void write(File file) throws XLWrapMapException {
+        FileOutputStream fileOut;
+        try {
+            fileOut = new FileOutputStream(file);
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Unable to open "+ file.getAbsolutePath(), ex);
+        }
+        try {
+            poiWorkbook.write(fileOut);
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Unable to write "+ file.getAbsolutePath(), ex);
+        }
+        try {
+            fileOut.close();
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Unable to close "+ file.getAbsolutePath(), ex);
         }
 
     }

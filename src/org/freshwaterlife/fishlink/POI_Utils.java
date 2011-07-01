@@ -49,6 +49,12 @@ public class POI_Utils {
         return reply;
     }
 
+    public static final Workbook getWorkbookOnPid (String pid) throws XLWrapMapException{
+        PidRegister pidRegister = PidStore.padStoreFactory();
+        String dataFile = pidRegister.retreiveFile(pid);
+        return getWorkbook(dataFile);
+    }
+
     public static final Workbook getWorkbook (String path) throws XLWrapMapException{
         try {
             return MasterFactory.getExecutionContext().getWorkbook(path);
