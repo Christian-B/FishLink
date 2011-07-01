@@ -15,7 +15,7 @@ public class ChristianRun {
 
     private static void loadXLS(String name) throws XLWrapMapException{
         //Adjust this file to the your local path
-        WorkbookWrite.setRoots(FishLinkPaths.DROPBOX + "xMeta Data/",FishLinkPaths.DROPBOX + "Raw Data/");
+        WorkbookWrite.setRoots(FishLinkPaths.META_DIR,FishLinkPaths.RAW_DIR);
         WorkbookWrite mapWrite = new WorkbookWrite(name);
         String doi = mapWrite.writeMap();
         MapRun.runMap(doi);
@@ -36,14 +36,14 @@ public class ChristianRun {
 
     public static void main(String[] args) throws XLWrapMapException {
         BrennRegister.register();
-        loadXLS("xTarnschemFinalMetaData.xls");
-        loadXLS("xCumbriaTarnsPart1MetaData.xls");
-        loadXLS("xFBA_TarnsMetaData.xls");
-        loadXLS("xRecordsMetaData.xls");
-        loadXLS("xSpeciesMetaData.xls");
-        loadXLS("xStokoeMetaData.xls");
-        loadXLS("xTarnsMetaData.xls");
-        loadXLS("xWillbyGroupsMetaData.xls");
+        loadXLS("TarnschemFinalMetaData.xls");
+        loadXLS("CumbriaTarnsPart1MetaData.xls");
+        loadXLS("FBA_TarnsMetaData.xls");
+        loadXLS("RecordsMetaData.xls");
+        loadXLS("SpeciesMetaData.xls");
+        loadXLS("StokoeMetaData.xls");
+        loadXLS("TarnsMetaData.xls");
+        loadXLS("WillbyGroupsMetaData.xls");
 
     }
 }

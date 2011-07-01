@@ -117,14 +117,7 @@ public class AbstractSheet {
     }
 
    private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapMapException{
-        Cell cell;
-        try {
-            cell = metaSheet.getCell(col, actualRow);
-        } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to get cell. ", ex);
-        } catch (XLWrapEOFException ex) {
-            throw new XLWrapMapException("Unable to get cell. ", ex);
-        }
+        Cell cell = POI_Utils.getCell(metaSheet, col, actualRow);
         XLExprValue<?> value;
         try {
             value = Utils.getXLExprValue(cell);

@@ -39,11 +39,7 @@ public class SheetWrite extends AbstractSheet{
         this.doi = doi;
         dataPath = dataURL;
         Workbook dataWorkbook;
-        try {
-            dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataPath);
-        } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to get workbook " + dataPath, ex);
-        }
+        dataWorkbook = POI_Utils.getWorkbook(dataPath);
         String[] sheetNames = dataWorkbook.getSheetNames();
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equalsIgnoreCase(sheetName)){

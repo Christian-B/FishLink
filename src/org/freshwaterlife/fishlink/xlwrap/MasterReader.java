@@ -10,8 +10,7 @@ import org.freshwaterlife.fishlink.MasterFactory;
  */
 public class MasterReader extends AbstractSheet {
 
-    public MasterReader ()
-            throws XLWrapException, XLWrapEOFException, XLWrapMapException {
+    public MasterReader () throws XLWrapMapException {
        super(MasterFactory.getMasterDropdownSheet());
     }
 

@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.MasterFactory;
+import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
  *
@@ -34,36 +35,25 @@ public class WorkbookWrite {
     public WorkbookWrite (String metaFileName) throws XLWrapMapException{
         Workbook workbook;
         Sheet metaData;
-        try {
-            workbook = MasterFactory.getExecutionContext().getWorkbook(metaRoot + metaFileName);
-            metaData = workbook.getSheet("MetaData");
-            Cell cell;
-            try{
-                cell = metaData.getCell(1, 0);
-            } catch (NullPointerException e) {
-                throw new XLWrapMapException("Workbook: " + metaFileName + " does not have a \"MetaData\" sheet.");
+        workbook = POI_Utils.getWorkbook("file:" + metaRoot + metaFileName);
+        metaData = POI_Utils.getSheet(workbook, "MetaData");
+        Cell cell = POI_Utils.getCell (metaData, 1, 0);
+        String dataFileName = POI_Utils.getText(cell);
+        Workbook dataWorkbook = POI_Utils.getWorkbook("file:" + dataRoot + dataFileName);
+        cell = POI_Utils.getCell(metaData, 1, 1);
+        doi = POI_Utils.getText(cell);
+        String[] sheetNames = workbook.getSheetNames();
+        sheetWrites = new SheetWrite[sheetNames.length - 2];
+        int j = 0;
+        for (int i = 0; i< sheetNames.length; i++ ){
+            if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
+                //do nothing
+            } else {
+                sheetWrites[j] = new SheetWrite(workbook, "file:" + dataRoot + dataFileName, doi, sheetNames[i]);
+                MasterReader masterReader = new MasterReader ();
+                masterReader.check(sheetWrites[j]);
+                j++;
             }
-            String dataFileName = cell.getText();
-            Workbook dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataRoot + dataFileName);
-            cell = metaData.getCell(1, 1);
-            doi = cell.getText();
-            String[] sheetNames = workbook.getSheetNames();
-            sheetWrites = new SheetWrite[sheetNames.length - 2];
-            int j = 0;
-            for (int i = 0; i< sheetNames.length; i++ ){
-                if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
-                    //do nothing
-                } else {
-                    sheetWrites[j] = new SheetWrite(workbook, dataRoot + dataFileName, doi, sheetNames[i]);
-                    MasterReader masterReader = new MasterReader ();
-                    masterReader.check(sheetWrites[j]);
-                    j++;
-                }
-            }
-        } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Unable to create workbook", ex);
-        } catch (XLWrapEOFException ex) {
-            throw new XLWrapMapException ("Unable to create workbook", ex);
         }
     }
 

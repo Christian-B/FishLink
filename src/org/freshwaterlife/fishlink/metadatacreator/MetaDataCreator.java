@@ -6,6 +6,7 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.io.File;
 import java.util.Date;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
@@ -135,6 +136,28 @@ public class MetaDataCreator {
         }
     }
 
+    private void copyMetaData(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet copySheet, int lastMetaRow, int lastColumn) 
+            throws XLWrapMapException{
+        System.out.println(copySheet.getSheetInfo());
+        for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
+            String masterColumnA = MasterFactory.getTextZeroBased(masterSheet, 0, zeroRow);
+            int copyRow = -1;
+            for (int tryRow = 0; tryRow <= lastMetaRow; tryRow ++) {
+                 String tryColumnA = MasterFactory.getTextZeroBased(copySheet, 0, tryRow);
+                 if (tryColumnA.equalsIgnoreCase(masterColumnA)){
+                     copyRow = tryRow;
+                 }
+            }
+            System.out.println(masterColumnA + ": " + copyRow);
+            if (copyRow >= 0){
+                for ( int zeroColumn = 0;  zeroColumn <= lastColumn; zeroColumn++){
+                    String copyMeta = MasterFactory.getTextZeroBased(copySheet, zeroColumn, copyRow);
+                    metaSheet.setValueZeroBased(zeroColumn, zeroRow, copyMeta);
+                }
+            }
+        }
+    }
+            
     private void copyData(int letterRow, CYAB_Sheet metaSheet, Sheet dataSheet, String metaColumn) throws XLWrapMapException {
         int zeroColumn = POI_Utils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
         String dataColumn = POI_Utils.indexToAlpha(zeroColumn);
@@ -211,7 +234,7 @@ public class MetaDataCreator {
         metaSheet.autoSizeColumn(zeroColumn);
     }
 
-    private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
+    private void prepareSheet(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet dataSheet, Sheet copySheet) throws XLWrapMapException {
         int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
         metaSheet.createFreezePane("B", lastMetaRow + 2);
@@ -219,6 +242,11 @@ public class MetaDataCreator {
             String metaColumn = POI_Utils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
             prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
             copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
+        }
+        System.out.println(dataSheet.getSheetInfo());
+        System.out.println(copySheet);
+        if (copySheet != null){
+            copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow + 2, lastColumn); 
         }
     }
 
@@ -228,7 +256,7 @@ public class MetaDataCreator {
         return true;
     }
 
-    private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook) throws XLWrapMapException{
+    private void prepareSheets(CYAB_Workbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) throws XLWrapMapException{
         Sheet masterSheet = MasterFactory.getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
@@ -238,9 +266,18 @@ public class MetaDataCreator {
             } catch (XLWrapException ex) {
                 throw new XLWrapMapException("Unable to get sheet " + dataSheets[i], ex);
             }
+            Sheet copySheet = null;
+            if (copyWorkbook != null){
+                try {
+                    copySheet = copyWorkbook.getSheet(dataSheet.getName());
+                } catch (XLWrapException ex) {
+                    System.err.println(ex);
+                    copySheet = null;
+                }
+            }
             if (containsData(dataSheet)){
                 CYAB_Sheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
-                prepareSheet(masterSheet, metaSheet, dataSheet);
+                prepareSheet(masterSheet, metaSheet, dataSheet, copySheet);
             } else  {
                 System.out.println("Skipping empty " + dataSheet.getSheetInfo());
             }
@@ -253,12 +290,22 @@ public class MetaDataCreator {
         try {
             dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + FishLinkPaths.RAW_DIR +dataFile);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to create file " + dataFile, ex);
+            throw new XLWrapMapException("Unable to open file " + dataFile, ex);
+        }
+        Workbook copyWorkbook;
+        try {
+           String fileFront = dataFile.substring(0, dataFile.lastIndexOf("."));
+           String copyName = FishLinkPaths.OLD_META_DIR + fileFront + "MetaData.xls";
+           copyWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + copyName);
+        } catch (XLWrapException ex) {
+            System.err.println(ex);
+            System.out.println("No old data for " + FishLinkPaths.OLD_META_DIR + dataFile);
+            copyWorkbook = null;
         }
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook,dataWorkbook);
+        prepareSheets(metaWorkbook,dataWorkbook, copyWorkbook);
         writeMeta(metaWorkbook, dataFile);
     }
 
@@ -276,20 +323,20 @@ public class MetaDataCreator {
         }
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook,dataWorkbook);
+        prepareSheets(metaWorkbook,dataWorkbook, null);
         metaWorkbook.write(targetPath);
     }
 
     public static void main(String[] args) throws XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
 
-        creator.prepareMetaDataOnDoi ("CumbriaTarnsPart1.xls", "CTP1");
-        creator.prepareMetaDataOnDoi ("FBA_Tarns.xls", "FBA345");
-        creator.prepareMetaDataOnDoi ("Records.xls", "rec12564");
-        creator.prepareMetaDataOnDoi ("Species.xls", "spec564");
-        creator.prepareMetaDataOnDoi ("Stokoe.xls", "stokoe32433232");
-        creator.prepareMetaDataOnDoi ("Tarns.xls", "tarns33exdw2");
-        creator.prepareMetaDataOnDoi ("TarnschemFinal.xls", "TSF1234");
+        //creator.prepareMetaDataOnDoi ("CumbriaTarnsPart1.xls", "CTP1");
+        //creator.prepareMetaDataOnDoi ("FBA_Tarns.xls", "FBA345");
+        //creator.prepareMetaDataOnDoi ("Records.xls", "rec12564");
+        //creator.prepareMetaDataOnDoi ("Species.xls", "spec564");
+        //creator.prepareMetaDataOnDoi ("Stokoe.xls", "stokoe32433232");
+        //creator.prepareMetaDataOnDoi ("Tarns.xls", "tarns33exdw2");
+        //creator.prepareMetaDataOnDoi ("TarnschemFinal.xls", "TSF1234");
         creator.prepareMetaDataOnDoi ("WillbyGroups.xls", "wbgROUPS8734");
     }
 }

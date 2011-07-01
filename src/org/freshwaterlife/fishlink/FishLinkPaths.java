@@ -21,6 +21,9 @@ public class FishLinkPaths {
 
    public static final String META_DIR = MAIN_ROOT + "Meta Data/";
    
+   //Old Meta data is optional - will not throw an error if missing
+   public static final String OLD_META_DIR = MAIN_ROOT + "Old Meta Data/";
+   
    public static final String RAW_DIR = MAIN_ROOT + "Raw Data/";
 
    //The file: bit is required by xlwrap whiuch can alos handle http urls.
