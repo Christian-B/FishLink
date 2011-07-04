@@ -1,16 +1,12 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
-import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
-import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
-import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.POI_Utils;
 
 /**
@@ -19,20 +15,31 @@ import org.freshwaterlife.fishlink.POI_Utils;
  */
 public class WorkbookWrite {
 
-    private String doi;
+    private String pid;
 
     private SheetWrite[] sheetWrites;
 
-    private static String dataRoot;
-
-    private static String metaRoot;
-
-    public static void setRoots(String metaRoot, String dataRoot){
-        WorkbookWrite.dataRoot = dataRoot;
-        WorkbookWrite.metaRoot = metaRoot;
+    public WorkbookWrite (String metaPid, String dataPid) throws XLWrapMapException{
+        Workbook workbook = POI_Utils.getWorkbookOnPid(metaPid);
+        Workbook dataWorkbook = POI_Utils.getWorkbookOnPid(dataPid);
+        pid = dataPid;
+        String[] sheetNames = workbook.getSheetNames();
+        sheetWrites = new SheetWrite[sheetNames.length - 1];
+        int j = 0;
+        for (int i = 0; i< sheetNames.length; i++ ){
+            if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
+                //do nothing
+            } else {
+                //ystem.out.println("  " + i + " " + sheetNames.length);
+                sheetWrites[j] = new SheetWrite(workbook, dataPid, sheetNames[i]);
+                MasterReader masterReader = new MasterReader ();
+                masterReader.check(sheetWrites[j]);
+                j++;
+            }
+        }
     }
 
-    public WorkbookWrite (String metaFileName) throws XLWrapMapException{
+    /*public WorkbookWrite (String metaFileName) throws XLWrapMapException{
         Workbook workbook;
         Sheet metaData;
         workbook = POI_Utils.getWorkbook("file:" + metaRoot + metaFileName);
@@ -55,7 +62,7 @@ public class WorkbookWrite {
                 j++;
             }
         }
-    }
+    }*/
 
     private void writePrefix (BufferedWriter writer) throws XLWrapMapException {
         try {
@@ -91,13 +98,13 @@ public class WorkbookWrite {
         }
     }
 
-     public String writeMap() throws XLWrapMapException {
+     public void writeMap() throws XLWrapMapException {
         System.out.println("write map");
         File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
             throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
         }
-        mapFile = new File(FishLinkPaths.MAP_FILE_ROOT + doi + ".trig");
+        mapFile = new File(FishLinkPaths.MAP_FILE_ROOT + pid + ".trig");
         BufferedWriter mapWriter;
         try {
             mapWriter = new BufferedWriter(new FileWriter(mapFile));
@@ -122,7 +129,6 @@ public class WorkbookWrite {
             throw new XLWrapMapException ("Unable to write mapping file.", ex);
         }
         System.out.println("Done writing map file");
-        return doi;
     }
 
 }

@@ -8,10 +8,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.PidStore;
 
 /**
  *
@@ -23,7 +21,7 @@ public class SheetWrite extends AbstractSheet{
     private int sheetNumber;
 
     private String dataPath;
-    private String doi;
+    private String pid;
 
     private String sheetInfo;
 
@@ -33,13 +31,13 @@ public class SheetWrite extends AbstractSheet{
     private HashMap<String,String> categoryUris;
     private ArrayList<String> allColumns;
 
-    public SheetWrite (Workbook metaWorkbook, String dataURL, String doi, String sheetName)
+    public SheetWrite (Workbook metaWorkbook, String pid, String sheetName)
             throws XLWrapMapException{
         super(metaWorkbook, sheetName);
-        this.doi = doi;
-        dataPath = dataURL;
+        this.pid = pid;
+        dataPath = PidStore.padStoreFactory().retreiveFile(pid);
         Workbook dataWorkbook;
-        dataWorkbook = POI_Utils.getWorkbook(dataPath);
+        dataWorkbook = POI_Utils.getWorkbookOnPid(pid);
         String[] sheetNames = dataWorkbook.getSheetNames();
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equalsIgnoreCase(sheetName)){
@@ -322,6 +320,7 @@ public class SheetWrite extends AbstractSheet{
     private boolean writeTemplateColumn(BufferedWriter writer, String metaColumn, String dataColumn)
             throws XLWrapMapException{
         String category = getCellValue (metaColumn, categoryRow);
+        System.out.println(category + " " + metaColumn + " " + categoryRow);
         String field = getCellValue (metaColumn, fieldRow);
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
@@ -361,7 +360,7 @@ public class SheetWrite extends AbstractSheet{
 
         try {
             if (external.isEmpty()){
-               writer.write ("     rdf:type type:" + doi + "_" + sheet + "_" + category);
+               writer.write ("     rdf:type type:" + pid + "_" + sheet + "_" + category);
                 writer.newLine();
             }
 
@@ -386,7 +385,7 @@ public class SheetWrite extends AbstractSheet{
    }
 
    private String getCatgerogyUri(String category){
-       return  Constants.RDF_BASE_URL + "resource/" + category + "_" + doi + "_" + sheet + "/";
+       return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet + "/";
    }
 
    private String getUri(String metaColumn , String category) throws XLWrapMapException {
@@ -394,16 +393,16 @@ public class SheetWrite extends AbstractSheet{
         if (externalField.isEmpty()){
             return getCatgerogyUri(category);
         }
-        String externalDoi;
+        String externalPid;
         String externalSheet;
         if (externalField.startsWith("[")){
-            externalDoi = externalField.substring(1, externalField.indexOf(']'));
+            externalPid = externalField.substring(1, externalField.indexOf(']'));
             externalSheet = externalField.substring( externalField.indexOf(']')+1);
         } else {
-            externalDoi = doi;
+            externalPid = pid;
             externalSheet = externalField;
         }
-        return  Constants.RDF_BASE_URL + "resource/" + category + "_" + externalDoi + "_" + externalSheet + "/";
+        return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + externalSheet + "/";
     }
 
    private String metaToDataColumn(String metaColumn){

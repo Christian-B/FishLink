@@ -13,12 +13,11 @@ import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
  */
 public class ChristianRun {
 
-    private static void loadXLS(String name) throws XLWrapMapException{
+    private static void mapAndRdf(String metaPid, String dataPid) throws XLWrapMapException{
         //Adjust this file to the your local path
-        WorkbookWrite.setRoots(FishLinkPaths.META_DIR,FishLinkPaths.RAW_DIR);
-        WorkbookWrite mapWrite = new WorkbookWrite(name);
-        String doi = mapWrite.writeMap();
-        MapRun.runMap(doi);
+        WorkbookWrite mapWrite = new WorkbookWrite(metaPid, dataPid);
+        mapWrite.writeMap();
+        MapRun.runMap(dataPid);
     }
     
     //public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
@@ -36,14 +35,13 @@ public class ChristianRun {
 
     public static void main(String[] args) throws XLWrapMapException {
         BrennRegister.register();
-        loadXLS("TarnschemFinalMetaData.xls");
-        loadXLS("CumbriaTarnsPart1MetaData.xls");
-        loadXLS("FBA_TarnsMetaData.xls");
-        loadXLS("RecordsMetaData.xls");
-        loadXLS("SpeciesMetaData.xls");
-        loadXLS("StokoeMetaData.xls");
-        loadXLS("TarnsMetaData.xls");
-        loadXLS("WillbyGroupsMetaData.xls");
-
+       // mapAndRdf("META_CTP1", "CTP1");
+      //  mapAndRdf("META_FBA345", "FBA345");
+      //  mapAndRdf("META_rec12564", "rec12564");
+      //  mapAndRdf("META_spec564", "spec564");
+      //  mapAndRdf("META_stokoe32433232", "stokoe32433232");
+        mapAndRdf("META_tarns33exdw2", "tarns33exdw2");
+        mapAndRdf("META_TSF1234", "TSF1234");
+        mapAndRdf("META_wbgROUPS8734", "wbgROUPS8734");
     }
 }

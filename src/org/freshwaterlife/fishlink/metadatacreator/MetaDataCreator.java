@@ -140,7 +140,7 @@ public class MetaDataCreator {
 
     private void copyMetaData(Sheet masterSheet, CYAB_Sheet metaSheet, Sheet copySheet, int lastMetaRow, int lastColumn) 
             throws XLWrapMapException{
-        System.out.println(copySheet.getSheetInfo());
+        //ystem.out.println(copySheet.getSheetInfo());
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String masterColumnA = MasterFactory.getTextZeroBased(masterSheet, 0, zeroRow);
             int copyRow = -1;
@@ -150,7 +150,7 @@ public class MetaDataCreator {
                      copyRow = tryRow;
                  }
             }
-            System.out.println(masterColumnA + ": " + copyRow);
+            //ystem.out.println(masterColumnA + ": " + copyRow);
             if (copyRow >= 0){
                 for ( int zeroColumn = 0;  zeroColumn <= lastColumn; zeroColumn++){
                     String copyMeta = MasterFactory.getTextZeroBased(copySheet, zeroColumn, copyRow);
@@ -245,8 +245,8 @@ public class MetaDataCreator {
             prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
             copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
         }
-        System.out.println(dataSheet.getSheetInfo());
-        System.out.println(copySheet);
+        //ystem.out.println(dataSheet.getSheetInfo());
+        //ystem.out.println(copySheet);
         if (copySheet != null){
             copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow + 2, lastColumn); 
         }
@@ -286,48 +286,45 @@ public class MetaDataCreator {
         }
     }
 
-    public void prepareMetaDataOnPid(String pid, String oldMetaPid, String metaPid) throws XLWrapMapException{
+    public void prepareMetaDataOnPid(String metaPid, String pid, String oldMetaPid) throws XLWrapMapException{
         PidRegister pids = PidStore.padStoreFactory();
         File file = getMetaDataOnPid(pid, oldMetaPid);
-        pids.registerFile("file: " + file.getAbsolutePath(), metaPid); 
+        pids.registerFile("file:" + file.getAbsolutePath(), metaPid); 
     }
     
-    public void prepareMetaDataOnPid(String pid, String metaPid) throws XLWrapMapException{
+    public void prepareMetaDataOnPid(String metaPid, String pid) throws XLWrapMapException{
         PidRegister pids = PidStore.padStoreFactory();
         File file = getMetaDataOnPid(pid);
-        pids.registerFile("file: " + file.getAbsolutePath(), metaPid); 
+        pids.registerFile("file:" + file.getAbsolutePath(), metaPid); 
     }
 
     public File getMetaDataOnPid(String pid, String oldMetaPid) throws XLWrapMapException{
         File metaFile = createMetaData(pid);
-        prepareMetaDataOnPid(pid, oldMetaPid, metaFile);
+        prepareMetaDataOnPid(metaFile, pid, oldMetaPid);
         return metaFile;
     }
     
-    public void prepareMetaDataOnPid(String pid, String oldMetaPid, File metaFile) throws XLWrapMapException{
+    public void prepareMetaDataOnPid(File metaFile, String pid, String oldMetaPid) throws XLWrapMapException{
         Workbook copyWorkbook = POI_Utils.getWorkbookOnPid(oldMetaPid);
-        prepareMetaData(pid, copyWorkbook, metaFile);
+        prepareMetaData(metaFile, pid, copyWorkbook);
     }
     
     public File getMetaDataOnPid(String pid) throws XLWrapMapException{
         File metaFile = createMetaData(pid);
-        prepareMetaData(pid, null, metaFile);        
+        prepareMetaData(metaFile, pid, null);        
         return metaFile;
     }
     
-    public void prepareMetaDataOnPid(String pid, File metaFile) throws XLWrapMapException{
-        prepareMetaData(pid, null, metaFile);
+    public void prepareMetaDataOnPid(File metaFile, String pid) throws XLWrapMapException{
+        prepareMetaData(metaFile, pid, null);
     }
 
-    private void prepareMetaData(String pid, Workbook copyWorkbook, File metaFile) throws XLWrapMapException{
-        //PidRegister pidRegister = PidStore.padStoreFactory();
-        //String dataFile = pidRegister.retreiveFile(pid);
-        //System.out.println("Preparing meta data collector for " + dataFile);
+    private void prepareMetaData(File metaFile, String pid, Workbook copyWorkbook) throws XLWrapMapException{
         Workbook dataWorkbook = POI_Utils.getWorkbookOnPid(pid);
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         //addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook,dataWorkbook, copyWorkbook);
+        prepareSheets(metaWorkbook, dataWorkbook, copyWorkbook);
         metaWorkbook.write(metaFile);
     }
 
@@ -345,7 +342,7 @@ public class MetaDataCreator {
         }
         CYAB_Workbook metaWorkbook = new CYAB_Workbook();
         createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook,dataWorkbook, null);
+        prepareSheets(metaWorkbook, dataWorkbook, null);
         metaWorkbook.write(targetPath);
     }
     
@@ -361,20 +358,13 @@ public class MetaDataCreator {
 
     public static void main(String[] args) throws XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
-        creator.prepareMetaDataOnPid("CTP1", "OLDMETA_CTP1", "META_CTP1");
-        //creator.prepareMetaDataOnPid ("FBA345", "FBA_Tarns.xls");
-        creator.prepareMetaDataOnPid("FBA345", "OLDMETA_FBA345", "META_");
-        //creator.prepareMetaDataOnPid ("rec12564", "Records.xls", );
-        creator.prepareMetaDataOnPid("rec12564", "OLDMETA_rec12564", "META_rec12564");
-        //creator.prepareMetaDataOnPid ("spec564", "Species.xls");
-        creator.prepareMetaDataOnPid("spec564", "OLDMETA_spec564", "META_spec564");
-        //creator.prepareMetaDataOnPid ("stokoe32433232", "Stokoe.xls");
-        creator.prepareMetaDataOnPid("stokoe32433232", "OLDMETA_stokoe32433232", "META_stokoe32433232");
-        // creator.prepareMetaDataOnPid ("tarns33exdw2", "Tarns.xls");
-        creator.prepareMetaDataOnPid("tarns33exdw2", "OLDMETA_tarns33exdw2", "META_tarns33exdw2");
-        //creator.prepareMetaDataOnPid ("TSF1234", "TarnschemFinal.xls");
-        creator.prepareMetaDataOnPid("TSF1234", "OLDMETA_TSF1234", "META_TSF1234");
-        //creator.prepareMetaDataOnPid ("wbgROUPS8734", "TarnschemFinal.xls");
-        creator.prepareMetaDataOnPid("wbgROUPS8734", "OLDMETA_wbgROUPS8734", "META_wbgROUPS8734");
+        creator.prepareMetaDataOnPid("META_CTP1", "CTP1", "OLDMETA_CTP1");
+        creator.prepareMetaDataOnPid("META_FBA345", "FBA345", "OLDMETA_FBA345");
+        creator.prepareMetaDataOnPid("META_rec12564", "rec12564", "OLDMETA_rec12564");
+        creator.prepareMetaDataOnPid("META_spec564", "spec564", "OLDMETA_spec564");
+        creator.prepareMetaDataOnPid("META_stokoe32433232", "stokoe32433232", "OLDMETA_stokoe32433232");
+        creator.prepareMetaDataOnPid("META_tarns33exdw2", "tarns33exdw2", "OLDMETA_tarns33exdw2");
+        creator.prepareMetaDataOnPid("META_TSF1234", "TSF1234", "OLDMETA_TSF1234");
+        creator.prepareMetaDataOnPid("META_wbgROUPS8734", "wbgROUPS8734", "OLDMETA_wbgROUPS8734");
     }
 }
