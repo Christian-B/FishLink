@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
+import org.freshwaterlife.fishlink.POI_Utils;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
@@ -18,7 +19,7 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 public class MapRun {
 
     public static void runMap(String pid) throws XLWrapMapException{
-        System.out.println("Running map");     
+        POI_Utils.report("Running map");     
         XLWrapMapping map;
         try {
             map = MappingParser.parse(FishLinkPaths.MAP_FILE_ROOT + pid + ".trig");
@@ -51,7 +52,7 @@ public class MapRun {
         }
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         m.write(writer, "RDF/XML");
-        System.out.println("Done writing rdf file to "+ out.getAbsolutePath());
+        POI_Utils.report("Done writing rdf file to "+ out.getAbsolutePath());
     }
 
 }

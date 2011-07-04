@@ -99,7 +99,7 @@ public class WorkbookWrite {
     }
 
      public void writeMap() throws XLWrapMapException {
-        System.out.println("write map");
+        POI_Utils.report("write map");
         File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
             throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
@@ -128,7 +128,7 @@ public class WorkbookWrite {
         } catch (IOException ex) {
             throw new XLWrapMapException ("Unable to write mapping file.", ex);
         }
-        System.out.println("Done writing map file");
+        POI_Utils.report("Done writing map file");
     }
 
 }

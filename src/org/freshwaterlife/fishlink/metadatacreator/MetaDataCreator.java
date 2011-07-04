@@ -281,7 +281,7 @@ public class MetaDataCreator {
                 CYAB_Sheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
                 prepareSheet(masterSheet, metaSheet, dataSheet, copySheet);
             } else  {
-                System.out.println("Skipping empty " + dataSheet.getSheetInfo());
+                POI_Utils.report("Skipping empty " + dataSheet.getSheetInfo());
             }
         }
     }

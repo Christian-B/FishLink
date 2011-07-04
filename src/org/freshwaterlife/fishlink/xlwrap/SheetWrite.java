@@ -320,25 +320,25 @@ public class SheetWrite extends AbstractSheet{
     private boolean writeTemplateColumn(BufferedWriter writer, String metaColumn, String dataColumn)
             throws XLWrapMapException{
         String category = getCellValue (metaColumn, categoryRow);
-        System.out.println(category + " " + metaColumn + " " + categoryRow);
+        //ystem.out.println(category + " " + metaColumn + " " + categoryRow);
         String field = getCellValue (metaColumn, fieldRow);
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
         if (category == null || category.toLowerCase().equals("undefined")) {
-            System.out.println("Skippig column " + metaColumn + " as no Category provided");
+            POI_Utils.report("Skippig column " + metaColumn + " as no Category provided");
             return false;
         }
         if (field == null){
-            System.out.println("Skippig column " + metaColumn + " as no Feild provided");
+            POI_Utils.report("Skippig column " + metaColumn + " as no Feild provided");
             return false;
         }
         checkName(category, field);
         if (field.equalsIgnoreCase("id") && !external.isEmpty()){
-            System.out.println("Skipping column " + metaColumn + " as it is an external id");
+            POI_Utils.report("Skipping column " + metaColumn + " as it is an external id");
             return false;
         }
         if (idType != null && idType.equals(Constants.ALL_LABEL)){
-            System.out.println("Skipping column " + metaColumn + " as it is an all column.");
+            POI_Utils.report("Skipping column " + metaColumn + " as it is an all column.");
             return false;
         }
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
@@ -462,7 +462,7 @@ public class SheetWrite extends AbstractSheet{
      }
 
     protected void writeTemplate(BufferedWriter writer) throws XLWrapMapException{
-        System.out.println("Writing template for "+sheet);
+        POI_Utils.report("Writing template for "+sheet);
         findIds();
         try {
             writer.write(":");

@@ -98,6 +98,15 @@ public class POI_Utils {
         }        
     }
     
+    /**
+     * Reports any message in a standard way.
+     * 
+     * Current implementation is just to System.out but logging can be added here!
+     * @param messages 
+     */
+    public static void report (String message){
+        System.out.println(message);
+    }
 
     public static void main(String[] args) {
         String test = indexToAlpha(48);
