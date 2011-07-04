@@ -15,20 +15,20 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  *
  * @author Christian
  */
-public class CYAB_Workbook {
+public class FishLinkWorkbook {
 
     Workbook poiWorkbook;
 
-    public CYAB_Workbook(){
+    public FishLinkWorkbook(){
         poiWorkbook = new HSSFWorkbook();
     }
     
-    CYAB_Sheet getSheet(String name) {
+    FishLinkSheet getSheet(String name) {
         Sheet sheet = poiWorkbook.getSheet(name);
         if (sheet == null) {
             sheet = poiWorkbook.createSheet(name);
         }
-        return new CYAB_Sheet(sheet);
+        return new FishLinkSheet(sheet);
     }
 
     void write(String filePath) throws XLWrapMapException {

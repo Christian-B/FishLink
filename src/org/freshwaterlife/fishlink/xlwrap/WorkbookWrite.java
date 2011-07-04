@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
-import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
  *
@@ -20,8 +20,8 @@ public class WorkbookWrite {
     private SheetWrite[] sheetWrites;
 
     public WorkbookWrite (String metaPid, String dataPid) throws XLWrapMapException{
-        Workbook workbook = POI_Utils.getWorkbookOnPid(metaPid);
-        Workbook dataWorkbook = POI_Utils.getWorkbookOnPid(dataPid);
+        Workbook workbook = FishLinkUtils.getWorkbookOnPid(metaPid);
+        Workbook dataWorkbook = FishLinkUtils.getWorkbookOnPid(dataPid);
         pid = dataPid;
         String[] sheetNames = workbook.getSheetNames();
         sheetWrites = new SheetWrite[sheetNames.length - 1];
@@ -42,13 +42,13 @@ public class WorkbookWrite {
     /*public WorkbookWrite (String metaFileName) throws XLWrapMapException{
         Workbook workbook;
         Sheet metaData;
-        workbook = POI_Utils.getWorkbook("file:" + metaRoot + metaFileName);
-        metaData = POI_Utils.getSheet(workbook, "MetaData");
-        Cell cell = POI_Utils.getCell (metaData, 1, 0);
-        String dataFileName = POI_Utils.getText(cell);
-        Workbook dataWorkbook = POI_Utils.getWorkbook("file:" + dataRoot + dataFileName);
-        cell = POI_Utils.getCell(metaData, 1, 1);
-        doi = POI_Utils.getText(cell);
+        workbook = FishLinkUtils.getWorkbook("file:" + metaRoot + metaFileName);
+        metaData = FishLinkUtils.getSheet(workbook, "MetaData");
+        Cell cell = FishLinkUtils.getCell (metaData, 1, 0);
+        String dataFileName = FishLinkUtils.getText(cell);
+        Workbook dataWorkbook = FishLinkUtils.getWorkbook("file:" + dataRoot + dataFileName);
+        cell = FishLinkUtils.getCell(metaData, 1, 1);
+        doi = FishLinkUtils.getText(cell);
         String[] sheetNames = workbook.getSheetNames();
         sheetWrites = new SheetWrite[sheetNames.length - 2];
         int j = 0;
@@ -99,7 +99,7 @@ public class WorkbookWrite {
     }
 
      public void writeMap() throws XLWrapMapException {
-        POI_Utils.report("write map");
+        FishLinkUtils.report("write map");
         File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
             throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
@@ -128,7 +128,7 @@ public class WorkbookWrite {
         } catch (IOException ex) {
             throw new XLWrapMapException ("Unable to write mapping file.", ex);
         }
-        POI_Utils.report("Done writing map file");
+        FishLinkUtils.report("Done writing map file");
     }
 
 }

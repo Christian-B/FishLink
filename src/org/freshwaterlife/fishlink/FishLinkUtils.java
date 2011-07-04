@@ -11,7 +11,7 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  *
  * @author Christian
  */
-public class POI_Utils {
+public class FishLinkUtils {
 
     /**
      * @param alpha index

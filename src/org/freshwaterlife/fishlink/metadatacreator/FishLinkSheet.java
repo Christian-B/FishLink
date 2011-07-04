@@ -14,14 +14,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
  * @author Christian
  */
-public class CYAB_Sheet {
+public class FishLinkSheet {
 
     private Sheet poiSheet;
 
@@ -29,7 +29,7 @@ public class CYAB_Sheet {
 
     private CellStyle dateAndTimeStyle;
 
-    CYAB_Sheet(Sheet sheet) {
+    FishLinkSheet(Sheet sheet) {
         poiSheet = sheet;
         Workbook wb = sheet.getWorkbook();
         CreationHelper createHelper = wb.getCreationHelper();
@@ -54,7 +54,7 @@ public class CYAB_Sheet {
 
     private Cell getCell(String column, int row){
        Row poiRow = getRow(row);
-        int columnNumber = POI_Utils.alphaToIndex(column);
+        int columnNumber = FishLinkUtils.alphaToIndex(column);
         Cell cell = poiRow.getCell(columnNumber);
         if (cell == null){
            cell = poiRow.createCell(columnNumber);
@@ -235,7 +235,7 @@ public class CYAB_Sheet {
     
     private void addCheckedValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) {
-        int columnNumber = POI_Utils.alphaToIndex(column);
+        int columnNumber = FishLinkUtils.alphaToIndex(column);
         CellRangeAddressList addressList = new CellRangeAddressList(row - 1, row -1, columnNumber,  columnNumber);
         DataValidationHelper dataValidationHelper = poiSheet.getDataValidationHelper();
         DataValidationConstraint constraint;
@@ -279,7 +279,7 @@ public class CYAB_Sheet {
      * @param column Using Excel names
      */
     public void createFreezePane (String column, int row){
-        int columnNumber = POI_Utils.alphaToIndex(column);
+        int columnNumber = FishLinkUtils.alphaToIndex(column);
         poiSheet.createFreezePane(columnNumber, row, columnNumber, row);
     }
 

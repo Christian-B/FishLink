@@ -9,7 +9,7 @@ import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
  *
@@ -103,7 +103,7 @@ public class AbstractSheet {
     }
 
     private void findAndCheckMetaSplits() throws XLWrapMapException{
-        lastDataColumn = POI_Utils.indexToAlpha(metaSheet.getColumns() -1);
+        lastDataColumn = FishLinkUtils.indexToAlpha(metaSheet.getColumns() -1);
         findMetaSplits();
         if (categoryRow == -1) {
             throw new XLWrapMapException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
@@ -117,7 +117,7 @@ public class AbstractSheet {
     }
 
    private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapMapException{
-        Cell cell = POI_Utils.getCell(metaSheet, col, actualRow);
+        Cell cell = FishLinkUtils.getCell(metaSheet, col, actualRow);
         XLExprValue<?> value;
         try {
             value = Utils.getXLExprValue(cell);

@@ -8,7 +8,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.PidStore;
 
 /**
@@ -37,7 +37,7 @@ public class SheetWrite extends AbstractSheet{
         this.pid = pid;
         dataPath = PidStore.padStoreFactory().retreiveFile(pid);
         Workbook dataWorkbook;
-        dataWorkbook = POI_Utils.getWorkbookOnPid(pid);
+        dataWorkbook = FishLinkUtils.getWorkbookOnPid(pid);
         String[] sheetNames = dataWorkbook.getSheetNames();
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equalsIgnoreCase(sheetName)){
@@ -325,20 +325,20 @@ public class SheetWrite extends AbstractSheet{
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
         if (category == null || category.toLowerCase().equals("undefined")) {
-            POI_Utils.report("Skippig column " + metaColumn + " as no Category provided");
+            FishLinkUtils.report("Skippig column " + metaColumn + " as no Category provided");
             return false;
         }
         if (field == null){
-            POI_Utils.report("Skippig column " + metaColumn + " as no Feild provided");
+            FishLinkUtils.report("Skippig column " + metaColumn + " as no Feild provided");
             return false;
         }
         checkName(category, field);
         if (field.equalsIgnoreCase("id") && !external.isEmpty()){
-            POI_Utils.report("Skipping column " + metaColumn + " as it is an external id");
+            FishLinkUtils.report("Skipping column " + metaColumn + " as it is an external id");
             return false;
         }
         if (idType != null && idType.equals(Constants.ALL_LABEL)){
-            POI_Utils.report("Skipping column " + metaColumn + " as it is an all column.");
+            FishLinkUtils.report("Skipping column " + metaColumn + " as it is an all column.");
             return false;
         }
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
@@ -406,7 +406,7 @@ public class SheetWrite extends AbstractSheet{
     }
 
    private String metaToDataColumn(String metaColumn){
-       return POI_Utils.indexToAlpha(POI_Utils.alphaToIndex(metaColumn)-1);
+       return FishLinkUtils.indexToAlpha(FishLinkUtils.alphaToIndex(metaColumn)-1);
    }
 
    private void findId(String category, String metaColumn) throws XLWrapMapException{
@@ -448,9 +448,9 @@ public class SheetWrite extends AbstractSheet{
     }
 
    private void findIds() throws XLWrapMapException{
-        int maxColumn = POI_Utils.alphaToIndex(lastDataColumn);
+        int maxColumn = FishLinkUtils.alphaToIndex(lastDataColumn);
         for (int i = 0; i < maxColumn; i++){
-            String metaColumn = POI_Utils.indexToAlpha(i);
+            String metaColumn = FishLinkUtils.indexToAlpha(i);
             String category = getCellValue (metaColumn, categoryRow);
             if (category == null || category.isEmpty()){
                 //do nothing
@@ -462,7 +462,7 @@ public class SheetWrite extends AbstractSheet{
      }
 
     protected void writeTemplate(BufferedWriter writer) throws XLWrapMapException{
-        POI_Utils.report("Writing template for "+sheet);
+        FishLinkUtils.report("Writing template for "+sheet);
         findIds();
         try {
             writer.write(":");
@@ -472,11 +472,11 @@ public class SheetWrite extends AbstractSheet{
         }  catch (IOException ex) {
             throw new XLWrapMapException("Unable to write template ", ex);
         }            
-        int maxColumn = POI_Utils.alphaToIndex(lastDataColumn);
+        int maxColumn = FishLinkUtils.alphaToIndex(lastDataColumn);
         boolean foundColumn = false;
         for (int i = 0; i < maxColumn; i++){
-            String data = POI_Utils.indexToAlpha(i);
-            String meta = POI_Utils.indexToAlpha(i+1);
+            String data = FishLinkUtils.indexToAlpha(i);
+            String meta = FishLinkUtils.indexToAlpha(i+1);
             if (writeTemplateColumn(writer, meta, data)){
                 foundColumn = true;
             }

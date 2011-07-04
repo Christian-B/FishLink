@@ -1,6 +1,6 @@
 package org.freshwaterlife.fishlink.metadatacreator;
 
-import org.freshwaterlife.fishlink.POI_Utils;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
@@ -10,10 +10,10 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 public class CreateMetaData {
 
     public static void usage(){
-        POI_Utils.report("Creates a Meta Data collection file based on input.");
-        POI_Utils.report("Requires two paramters.");
-        POI_Utils.report("First is the raw data to be described.");
-        POI_Utils.report("Second if the location (path and file name) of the MetaData file.");
+        FishLinkUtils.report("Creates a Meta Data collection file based on input.");
+        FishLinkUtils.report("Requires two paramters.");
+        FishLinkUtils.report("First is the raw data to be described.");
+        FishLinkUtils.report("Second if the location (path and file name) of the MetaData file.");
     }
 
     public static void main(String[] args) throws XLWrapMapException{
