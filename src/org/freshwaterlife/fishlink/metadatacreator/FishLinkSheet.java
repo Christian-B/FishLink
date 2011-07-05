@@ -222,8 +222,20 @@ public class FishLinkSheet {
         if (rule.length() > 255) {
             throw new XLWrapMapException("Validation rule can not be longer than 255 for " + column + row);
         }
+        if (popupTitle.length() > 31) {
+            System.err.println(popupTitle);
+            System.err.println(popupTitle.length());
+            throw new XLWrapMapException("Validation popupTitle can not be longer than 31 for " + column + row);
+        }
         if (popupMessage.length() > 255) {
+            System.err.println(popupMessage);
+            System.err.println(popupMessage.length());
             throw new XLWrapMapException("Validation popupMessage can not be longer than 255 for " + column + row);
+        }
+        if (errorTitle.length() > 31) {
+            System.err.println(errorTitle);
+            System.err.println(errorTitle.length());
+            throw new XLWrapMapException("Validation errorTitle can not be longer than 31 for " + column + row);
         }
         if (errorMessage.length() > 255) {
             System.err.println(errorMessage);
