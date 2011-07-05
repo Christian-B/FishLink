@@ -233,9 +233,10 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
-    private void writeConstant (BufferedWriter writer, String metaColumn, int row) throws XLWrapMapException{
-        String feild = getCellValue ("A", row);
-        if (feild == null){
+    private void writeConstant (BufferedWriter writer, String category, String metaColumn, int row) 
+            throws XLWrapMapException{
+        String field = getCellValue ("A", row);
+        if (field == null){
             return;
         }
         String value = getCellValue (metaColumn, row);
@@ -245,10 +246,11 @@ public class SheetWrite extends AbstractSheet{
         if (value.equalsIgnoreCase("n/a")){
             return;
         }
-        if (Constants.isRdfTypeField(feild)){
+        if (Constants.isRdfTypeField(field)){
+            checkSubType(category, value);
             writeRdfType(writer, value);
         } else {
-            writeVocab (writer, feild);
+            writeVocab (writer, field);
             writeValue(writer, value);
         }
     }
@@ -298,6 +300,13 @@ public class SheetWrite extends AbstractSheet{
             masterNameChecker = new NameChecker();
         }
         masterNameChecker.checkName(sheetInfo, categery, field);
+    }
+
+    private void checkSubType(String categery, String subType) throws XLWrapMapException{
+        if (masterNameChecker == null){
+            masterNameChecker = new NameChecker();
+        }
+        masterNameChecker.checkSubType(sheetInfo, categery, subType);
     }
 
     private boolean isCategory(String field) throws XLWrapMapException {
@@ -375,7 +384,7 @@ public class SheetWrite extends AbstractSheet{
         writeAutoRelated(writer, category, dataColumn, ignoreZeros);
         writeAllRelated(writer, category, dataColumn, ignoreZeros);
         for (int row = firstConstant; row <= lastConstant; row++){
-            writeConstant(writer, metaColumn, row);
+            writeConstant(writer,  category, metaColumn, row);
         }
 
         try {

@@ -63,4 +63,19 @@ public class NameChecker {
                     " which is not in the Master");
         }
     }
+
+    void checkSubType (String sheetInfo, String category, String subType) throws XLWrapMapException{
+        ArrayList<String> subTypes = subcategories.get(category + "SubType");
+        if (subTypes == null){
+            for (String key: subcategories.keySet()) {
+                System.out.println (key);
+            }
+            throw new XLWrapMapException("Map used catagory "+ category + 
+                    " which does not have a subtype in the Master");
+        }
+        if (!subTypes.contains(subType)){
+            throw new XLWrapMapException(sheetInfo + " used subtype " + subType + " for catagory "+ category +
+                    " which is not in the Master");
+        }
+    }
 }
