@@ -67,14 +67,26 @@ public class NameChecker {
     void checkSubType (String sheetInfo, String category, String subType) throws XLWrapMapException{
         ArrayList<String> subTypes = subcategories.get(category + "SubType");
         if (subTypes == null){
-            for (String key: subcategories.keySet()) {
-                System.out.println (key);
-            }
             throw new XLWrapMapException("Map used catagory "+ category + 
                     " which does not have a subtype in the Master");
         }
         if (!subTypes.contains(subType)){
             throw new XLWrapMapException(sheetInfo + " used subtype " + subType + " for catagory "+ category +
+                    " which is not in the Master");
+        }
+    }
+
+    void checkConstant (String sheetInfo, String constant, String value) throws XLWrapMapException{
+        ArrayList<String> values = constants.get(constant);
+        if (values == null){
+            for (String valuex : constants.keySet()){
+                System.out.println(valuex);
+            }
+            throw new XLWrapMapException("Map used constant field "+ constant + 
+                    " which is not in the Master");
+        }
+        if (!values.contains(value)){
+            throw new XLWrapMapException(sheetInfo + " used value " + value + " for constant "+ constant +
                     " which is not in the Master");
         }
     }

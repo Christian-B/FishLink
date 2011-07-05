@@ -108,7 +108,7 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
             String dataColumn, boolean ignoreZeros) throws XLWrapMapException {
-        if(category.toLowerCase().equals(Constants.OBSERVATION_LABEL)) {
+        if(category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)) {
             writelUriCell(writer, category, field, idType, dataColumn, ignoreZeros);
         } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
                 idType.equalsIgnoreCase(Constants.AUTOMATIC_LABEL)){
@@ -146,7 +146,7 @@ public class SheetWrite extends AbstractSheet{
     private void writelUriCell(BufferedWriter writer, String category, String field, String idColumn, String dataColumn,
             boolean ignoreZeros) throws XLWrapMapException {
         String uri = categoryUris.get(category);
-        if(field.toLowerCase().equals(Constants.VALUE_LABEL)) {
+        if(field.equalsIgnoreCase(Constants.VALUE_LABEL)) {
             try {
                 writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ","
                         + ignoreZeros + ")\"^^xl:Expr ] ");
@@ -156,8 +156,8 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         if (idColumn == null || idColumn.isEmpty()){
-            throw new XLWrapMapException("Data Column " + dataColumn + " with category " + category + " and field " +
-                    field + " needs an id Type");
+            throw new XLWrapMapException(metaSheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
+                    category + " and field " + field + " needs an id Type");
         }
 //        writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idColumn + firstData + ","
 //            + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
@@ -250,6 +250,7 @@ public class SheetWrite extends AbstractSheet{
             checkSubType(category, value);
             writeRdfType(writer, value);
         } else {
+            checkCheckConstant(field, value);
             writeVocab (writer, field);
             writeValue(writer, value);
         }
@@ -299,15 +300,23 @@ public class SheetWrite extends AbstractSheet{
         if (masterNameChecker == null){
             masterNameChecker = new NameChecker();
         }
-        masterNameChecker.checkName(sheetInfo, categery, field);
+        masterNameChecker.checkName(metaSheet.getSheetInfo(), categery, field);
     }
 
     private void checkSubType(String categery, String subType) throws XLWrapMapException{
         if (masterNameChecker == null){
             masterNameChecker = new NameChecker();
         }
-        masterNameChecker.checkSubType(sheetInfo, categery, subType);
+        masterNameChecker.checkSubType(metaSheet.getSheetInfo(), categery, subType);
     }
+    
+    private void checkCheckConstant(String constant, String value) throws XLWrapMapException{
+        if (masterNameChecker == null){
+            masterNameChecker = new NameChecker();
+        }
+        masterNameChecker.checkConstant(metaSheet.getSheetInfo(), constant, value);
+    }
+
 
     private boolean isCategory(String field) throws XLWrapMapException {
         if (masterNameChecker == null){
