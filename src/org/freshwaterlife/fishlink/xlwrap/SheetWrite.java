@@ -199,6 +199,25 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
+    private void writeRdfType (BufferedWriter writer, String type) throws XLWrapMapException {
+        try {
+           writer.write ("	rdf:type");
+           writeType(writer, type);
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Unable to write vocab", ex);
+        }            
+    }
+
+    private void writeType (BufferedWriter writer, String type) throws XLWrapMapException {
+        try {
+           writer.write (" type:" + type);
+           writer.write (" ;");
+           writer.newLine();
+        } catch (IOException ex) {
+            throw new XLWrapMapException("Unable to write vocab", ex);
+        }            
+    }
+
     private void writeValue(BufferedWriter writer, String value) throws XLWrapMapException{
         if (!value.startsWith("'")){
             value = "'" + value ;
@@ -226,8 +245,12 @@ public class SheetWrite extends AbstractSheet{
         if (value.equalsIgnoreCase("n/a")){
             return;
         }
-        writeVocab (writer, feild);
-        writeValue(writer, value);
+        if (Constants.isRdfTypeField(feild)){
+            writeRdfType(writer, value);
+        } else {
+            writeVocab (writer, feild);
+            writeValue(writer, value);
+        }
     }
 
     private boolean getIgnoreZeros (String metaColumn) throws XLWrapMapException {
@@ -271,17 +294,18 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void checkName(String categery, String field) throws XLWrapMapException{
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        masterNameChecker.checkName(sheetInfo, categery, field);
+  //      if (masterNameChecker == null){
+  //          masterNameChecker = new NameChecker();
+  //      }
+  //      masterNameChecker.checkName(sheetInfo, categery, field);
     }
 
     private boolean isCategory(String field) throws XLWrapMapException {
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        return masterNameChecker.isCategory(field);
+        return true;
+  //      if (masterNameChecker == null){
+  //          masterNameChecker = new NameChecker();
+  //      }
+  //      return masterNameChecker.isCategory(field);
     }
 
     private void writeAutoRelated(BufferedWriter writer, String category, String dataColumn, boolean ignoreZeros)
@@ -320,13 +344,12 @@ public class SheetWrite extends AbstractSheet{
     private boolean writeTemplateColumn(BufferedWriter writer, String metaColumn, String dataColumn)
             throws XLWrapMapException{
         String category = getCellValue (metaColumn, categoryRow);
-        //ystem.out.println(category + " " + metaColumn + " " + categoryRow);
+        System.out.println(category + " " + metaColumn + " " + categoryRow);
         String field = getCellValue (metaColumn, fieldRow);
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
         if (category == null || category.toLowerCase().equals("undefined")) {
             FishLinkUtils.report("Skippig column " + metaColumn + " as no Category provided");
-            return false;
         }
         if (field == null){
             FishLinkUtils.report("Skippig column " + metaColumn + " as no Feild provided");
@@ -344,10 +367,8 @@ public class SheetWrite extends AbstractSheet{
         boolean ignoreZeros  = getIgnoreZeros(metaColumn);
         writeUri(writer, category, field, idType, dataColumn, ignoreZeros);
         try {
-            writer.write (" a type:");
-            writer.write (category);
-            writer.write (" ;");
-            writer.newLine();
+            writer.write (" a ");
+            writeType (writer, category);
         }  catch (IOException ex) {
             throw new XLWrapMapException("Unable to write a type", ex);
         }            
@@ -360,9 +381,8 @@ public class SheetWrite extends AbstractSheet{
 
         try {
             if (external.isEmpty()){
-               writer.write ("     rdf:type type:" + pid + "_" + sheet + "_" + category);
-                writer.newLine();
-            }
+               writeRdfType (writer, pid + "_" + sheet + "_" + category);
+             }
 
             writer.write(".");
             writer.newLine();
@@ -490,6 +510,11 @@ public class SheetWrite extends AbstractSheet{
         }  catch (IOException ex) {
             throw new XLWrapMapException("Unable to write template end ", ex);
         }            
+    }
+
+    void test() {
+       System.out.println(this.metaSheet.getSheetInfo());
+       System.out.println(this.metaSheet.getColumns());
     }
 
 }

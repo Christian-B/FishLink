@@ -32,6 +32,7 @@ public class Constants {
 
     public static final String AUTOMATIC_LABEL = "automatic";
     public static final String ALL_LABEL = "all";
+    private static final String SUB_TYPE_LABEL = "SubType";
 
     public static String autoRelatedCategory(String category){
         if (category.equalsIgnoreCase(SITE_LABEL)){
@@ -55,5 +56,9 @@ public class Constants {
             return SITE_LABEL;
         }
         return null;
+    }
+    
+    public static boolean isRdfTypeField(String field){
+        return SUB_TYPE_LABEL.equalsIgnoreCase(field);
     }
 }
