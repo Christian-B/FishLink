@@ -294,18 +294,17 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void checkName(String categery, String field) throws XLWrapMapException{
-  //      if (masterNameChecker == null){
-  //          masterNameChecker = new NameChecker();
-  //      }
-  //      masterNameChecker.checkName(sheetInfo, categery, field);
+        if (masterNameChecker == null){
+            masterNameChecker = new NameChecker();
+        }
+        masterNameChecker.checkName(sheetInfo, categery, field);
     }
 
     private boolean isCategory(String field) throws XLWrapMapException {
-        return true;
-  //      if (masterNameChecker == null){
-  //          masterNameChecker = new NameChecker();
-  //      }
-  //      return masterNameChecker.isCategory(field);
+        if (masterNameChecker == null){
+            masterNameChecker = new NameChecker();
+        }
+        return masterNameChecker.isCategory(field);
     }
 
     private void writeAutoRelated(BufferedWriter writer, String category, String dataColumn, boolean ignoreZeros)
@@ -344,7 +343,7 @@ public class SheetWrite extends AbstractSheet{
     private boolean writeTemplateColumn(BufferedWriter writer, String metaColumn, String dataColumn)
             throws XLWrapMapException{
         String category = getCellValue (metaColumn, categoryRow);
-        System.out.println(category + " " + metaColumn + " " + categoryRow);
+        //ystem.out.println(category + " " + metaColumn + " " + categoryRow);
         String field = getCellValue (metaColumn, fieldRow);
         String idType = getCellValue (metaColumn, idTypeRow);
         String external = getExternal(metaColumn);
@@ -510,11 +509,6 @@ public class SheetWrite extends AbstractSheet{
         }  catch (IOException ex) {
             throw new XLWrapMapException("Unable to write template end ", ex);
         }            
-    }
-
-    void test() {
-       System.out.println(this.metaSheet.getSheetInfo());
-       System.out.println(this.metaSheet.getColumns());
     }
 
 }
