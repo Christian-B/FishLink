@@ -20,26 +20,13 @@ public class ChristianRun {
         MapRun.runMap(dataPid);
     }
     
-    //public static void main(String[] args) throws XLWrapException, XLWrapEOFException, IOException, XLWrapMapException {
-   //     BrennRegister.register();
-   //     loadXLS("TarnschemFinalMetaData.xls");
-   //     loadXLS("CumbriaTarnsPart1MetaData.xls");
-   //     loadXLS("FBA_TarnsMetaData.xls");
-   //     loadXLS("RecordsMetaData.xls");
-   //     loadXLS("SpeciesMetaData.xls");
-   //     loadXLS("StokoeMetaData.xls");
-   //     loadXLS("TarnsMetaData.xls");
-   //     loadXLS("WillbyGroupsMetaData.xls");
-
-    //}
-
     public static void main(String[] args) throws XLWrapMapException {
         BrennRegister.register();
-       // mapAndRdf("META_CTP1", "CTP1");
-      //  mapAndRdf("META_FBA345", "FBA345");
-      //  mapAndRdf("META_rec12564", "rec12564");
-      //  mapAndRdf("META_spec564", "spec564");
-      //  mapAndRdf("META_stokoe32433232", "stokoe32433232");
+        mapAndRdf("META_CTP1", "CTP1");
+        mapAndRdf("META_FBA345", "FBA345");
+        mapAndRdf("META_rec12564", "rec12564");
+        mapAndRdf("META_spec564", "spec564");
+        mapAndRdf("META_stokoe32433232", "stokoe32433232");
         mapAndRdf("META_tarns33exdw2", "tarns33exdw2");
         mapAndRdf("META_TSF1234", "TSF1234");
         mapAndRdf("META_wbgROUPS8734", "wbgROUPS8734");

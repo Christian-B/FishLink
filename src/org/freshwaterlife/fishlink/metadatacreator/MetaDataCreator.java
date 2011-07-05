@@ -140,7 +140,7 @@ public class MetaDataCreator {
 
     private void copyMetaData(Sheet masterSheet, FishLinkSheet metaSheet, Sheet copySheet, int lastMetaRow, int lastColumn) 
             throws XLWrapMapException{
-        //ystem.out.println(copySheet.getSheetInfo());
+        //ystem.out.println(lastMetaRow + " " + copySheet.getSheetInfo());
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String masterColumnA = MasterFactory.getTextZeroBased(masterSheet, 0, zeroRow);
             int copyRow = -1;
@@ -245,10 +245,8 @@ public class MetaDataCreator {
             prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
             copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
         }
-        //ystem.out.println(dataSheet.getSheetInfo());
-        //ystem.out.println(copySheet);
         if (copySheet != null){
-            copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow + 2, lastColumn); 
+            copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow, lastColumn); 
         }
     }
 
@@ -258,7 +256,8 @@ public class MetaDataCreator {
         return true;
     }
 
-    private void prepareSheets(FishLinkWorkbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) throws XLWrapMapException{
+    private void prepareSheets(FishLinkWorkbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) 
+            throws XLWrapMapException{
         Sheet masterSheet = MasterFactory.getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
@@ -321,6 +320,7 @@ public class MetaDataCreator {
 
     private void prepareMetaData(File metaFile, String pid, Workbook copyWorkbook) throws XLWrapMapException{
         Workbook dataWorkbook = FishLinkUtils.getWorkbookOnPid(pid);
+        FishLinkUtils.report("Preparing metaSheet for "+ dataWorkbook.getWorkbookInfo());
         FishLinkWorkbook metaWorkbook = new FishLinkWorkbook();
         //addMetaDataSheet(metaWorkbook, dataFile, doi);
         createNamedRanges(metaWorkbook);
