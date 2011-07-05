@@ -103,17 +103,37 @@ public class PidStore implements PidRegister{
     public String retreiveFileOrNull(String pid) throws XLWrapMapException {
         return filesMap.get(pid);
     }
-    
+
     public static void main(String[] args) throws XLWrapMapException{
+        String raw = "http://rpc466.cs.man.ac.uk:8080/Fish.Link/Raw%20Data/";
         PidStore thePidstore = PidStore.padStoreFactory();
         thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "CumbriaTarnsPart1MetaData.xls", "OLDMETA_CTP1");
-        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "FBA_Tarns.xlsMetaData", "OLDMETA_FBA345");
-        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Records.xlsMetaData", "OLDMETA_rec12564");
-        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Species.xlsMetaData", "OLDMETA_spec564");
-        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Stokoe.xlsMetaData", "OLDMETA_stokoe32433232");
-        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "Tarns.xlsMetaData", "OLDMETA_tarns33exdw2");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "FBA_TarnsMetaData.xls", "OLDMETA_FBA345");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "RecordsMetaData.xls", "OLDMETA_rec12564");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "SpeciesMetaData.xls", "OLDMETA_spec564");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "StokoeMetaData.xls", "OLDMETA_stokoe32433232");
+        thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "TarnsMetaData.xls", "OLDMETA_tarns33exdw2");
         thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "TarnschemFinalMetaData.xls", "OLDMETA_TSF1234");
         thePidstore.registerFile("file:" + FishLinkPaths.OLD_META_DIR + "WillbyGroupsMetaData.xls", "OLDMETA_wbgROUPS8734");
+        /*
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "CumbriaTarnsPart1.xls", "CTP1");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "FBA_Tarns.xls", "FBA345");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "Records.xls", "rec12564");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "Species.xls", "spec564");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "Stokoe.xls", "stokoe32433232");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "Tarns.xls", "tarns33exdw2");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "TarnschemFinal.xls", "TSF1234");
+        thePidstore.registerFile("file:" + FishLinkPaths.RAW_DIR + "WillbyGroups.xls", "wbgROUPS8734");
+         */
+        thePidstore.registerFile(raw + "CumbriaTarnsPart1.xls", "CTP1");
+        thePidstore.registerFile(raw + "FBA_Tarns.xls", "FBA345");
+        thePidstore.registerFile(raw + "Records.xls", "rec12564");
+        thePidstore.registerFile(raw + "Species.xls", "spec564");
+        thePidstore.registerFile(raw + "Stokoe.xls", "stokoe32433232");
+        thePidstore.registerFile(raw + "Tarns.xls", "tarns33exdw2");
+        thePidstore.registerFile(raw + "TarnschemFinal.xls", "TSF1234");
+        thePidstore.registerFile(raw + "WillbyGroups.xls", "wbgROUPS8734");
+
     }
 
 }
