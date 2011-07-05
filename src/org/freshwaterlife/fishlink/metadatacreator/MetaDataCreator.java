@@ -26,26 +26,9 @@ public class MetaDataCreator {
     //Limits the number of rows copied in
     static private int MAX_DATA_ROW = Integer.MAX_VALUE;
     
-//    static private int CATEGORY_ROW = 1;
- //   static private int FIELD_ROW = 2;
-   // private Sheet Sheet;
-
     public MetaDataCreator(){
     }
     
-    //private void addMetaDataSheet(FishLinkWorkbook dataWorkbook, String dataFile, String doi){
-    //    FishLinkSheet sheet = dataWorkbook.getSheet("MetaData");
-    //    sheet.setValue("A", 1, "File");
-    //    sheet.setValue("B", 1, dataFile);
-    //    sheet.setValue("A", 2, "Doi");
-    //    sheet.setValue("B", 2, doi);
-    //}
-
-    //private void writeMeta(FishLinkWorkbook metaWorkbook, String dataName) throws XLWrapMapException {
-    //    String fileFront = dataName.substring(0, dataName.lastIndexOf("."));
-    //    metaWorkbook.write(FishLinkPaths.META_DIR + fileFront + "MetaData.xls");
-    //}
-
     private String createNamedRange (FishLinkWorkbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
         Sheet masterSheet = MasterFactory.getMasterListSheet();
         FishLinkSheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
@@ -94,6 +77,8 @@ public class MetaDataCreator {
             zeroColumn++;
             rangeName = createNamedRange(metaWorkbook, zeroColumn);
         } while (!rangeName.isEmpty());
+        //Hack to avoid last column getting lost
+        metaSheet.setValueZeroBased(zeroColumn + 1, 0, "");
     }
 
     private int prepareColumnA(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
@@ -245,6 +230,8 @@ public class MetaDataCreator {
             prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
             copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
         }
+        //Hack tp avoid last column getting lost
+        metaSheet.setValueZeroBased(lastColumn + 1, lastMetaRow, "");
         if (copySheet != null){
             copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow, lastColumn); 
         }
