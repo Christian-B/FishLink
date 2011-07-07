@@ -1,0 +1,953 @@
+<header>
+<title>Column Level Meta Data Capture and Rdf Creation</title>
+</header>
+<body>
+<h1>Table of Contents</h1>
+<ul>
+	<li><a href="#Introduction">Introduction</a>
+	<ul>
+		<li><a href="#Why">Why Meta Data Capture is Required</a>
+		<li><a href="RDF">Enough RDF to understand these documents.</a>
+
+	</ul>
+	<li><a href="#ObtainData">Obtain the data</a>
+	<ul>
+		<li><a href="#DataRestriction">Restrictions on the Data</a>
+	</ul>
+	<li><a href="#MetaDataCreator">Create Meta Data Capture Spreadsheet</a>
+	<ul>
+		<li><a href="#MetaMaster">Meta Master spreadsheet</a>
+	</ul>
+	<li><a href="#Annotate">Add the column level metadata</a>
+	<li><a href="#Mapping">Generate XLwrap mapping file</a>
+	<li><a href="#rdf">Generate rdf files</a>
+	<li><a href="#sparql">Load rdf into a sparql server</a>
+	<li><a href="#query">Query the sparql endpoint</a>
+
+</ul>
+
+<h1 id=Introduction>Introduction</h1>
+This document describes the tools created to help the capture of metadata and the generation of rdf.
+
+<p>The purpose was to support the biologist who has some data to provide enough information(Meta Data) so that this data can be converted to rdf.
+
+<p>The intention was to take data in a relatively free form, add some vocabulary restricted meta data and produce rdf datasets which adhere to a predefined ontology without forcing the data provider to learn the ontology or a mapping language.
+The assumption was that the data provider would know the meaning of data. We also assume that the data provider will be comfortable with Excel but unwilling to learn a mapping language.
+
+<h2 id="Why">Why Meta Data Capture is Required</h2>
+<ul>
+	<li>Metadata capture by Fish.NET was at dataset level.
+	<li>Information about each column limited to one word header.
+	<li>Data providers have few rules they have to stick to. Impossible for metadata values to be hard coded in.
+	<ul>
+		<li>There is no finite set of allowed column names.
+		<li>Columns with identical names could mean different things/ different units/ different way of measuring
+	</ul>
+</ul>
+
+<h2 id="RDF">Enough RDF to understand these documents.</h2>
+This section does not attempt to teach rdf but only to remind the reader.
+<ul>
+	<li>RDF is triples in the format
+	<ul>
+		<li>Subject  Predicate Object
+	</ul>
+	<li>Subjects are often URIs
+	<li>Predicates typically come from a controlled vocabulary
+	<li>Objects can be either URIs or constant values.
+	<li>There will usually be several triples about a single subject
+	<li>Subjects will typically have one or more type triple(s)
+	<ul>
+		<li>Subject  rdf:type  someType
+		<li>rdf:type is the standard way of saying this subject is of this type.
+	</ul>
+	<li> There are several different rdf formats. Some of which may group the declarations about the same subject.
+</ul>
+
+<h2 id="Steps">Steps</h2>
+This section lists the steps in the process of submitting data to producing rdf.
+
+<ol>
+	<li><a href="#ObtainData">Obtain the data</a>
+	<li><a href="#MetaDataCreator">Create Meta Data Capture Spreadsheet</a>
+	<li><a href="#Annotate">Add the column level metadata</a>
+	<li><a href="#Mapping">Generate XLwrap mapping file</a>
+	<li><a href="#rdf">Generate rdf files</a>
+	<li><a href="#sparql">Load rdf into a sparql server</a>
+	<li><a href="#query">Query the sparql endpoint</a>
+</ol>
+
+<h1 id="ObtainData">Obtain the data</h1>
+This step is actually a series of steps as explain in the workflow documentation.
+The description here only adds extra information and limitation which directly effect the tools described here.
+
+<ul>
+	<li>The datasets will have to be uploaded to the FreshwaterLife website.
+	<li>Each dataset will be assigned a PID by FBA
+	<li>The tools described here only ever need read only access to this data
+	<li>The raw data may be modify after the annotation sheet was created as long as
+	<ul>
+		<li>No columns are added or removed
+		<li>The MetaData for each column recorded in the annotation sheet matches the current raw data
+	</ul>
+</ul>
+
+<h2 id="DataRestriction">Restrictions on the Data</h2>
+The restriction listed here only apply to dataset over which the tools described here are run.
+
+<ul>
+	<li>Must be in a format that XLWrap can handle
+	<ul>
+		<li> Excel spreadsheet in either the *.xls or *.xlsx format
+		<li> Open Office format (Unknown which versions XLWrap can handle)
+		<li> CSV (Comma Separated File) format
+		<ul>
+			<li> Unknown if XLWrap can handle files with commas with quotes
+		</ul>
+	</ul>
+	<li>Sheet names will become part of the <a href="#Uri">URIs</a>. So it is suggested to make them meaningful.
+	<li>Each row must be independent
+	<ul>
+		<li>Order should be irrelevant
+		<ul>
+			<li>Any order in the data must be explicitly supplied.
+			<ul>
+				<li> A time or date field
+				<li> An "order" or "sequence" variable. (Not currently in the MetaMaster but easy to add)
+			</ul>
+			<li>XLWrap only considers the results of formulas, so formulas that relate to other rows are allowed.
+			</ul>
+			<li>Never taking data from a previous row
+			<ul>
+				<li>Either copy the data manually or use a formula to repeat it.
+			</ul>
+		</ul>
+		<li>Each Columns must have the same meaning for every row.
+		<li>Nulls are allowed.
+		<ul>
+			<li>Data is assumed to be unknown.
+		</ul>
+	<li id="MaxOneSite">Maximum of one type of
+		<a href="#Location">Location</a>,
+		<a href="#Site">Site</a>,
+		<a href="#Enitity">Enitity</a>,
+		<a href="#Survey">Species</a>
+		and <a href="#Survey">Species</a> can be described per row in each table
+	<ul>
+		<li>Except for links such as
+			<a href="#Owner">Owner</a>,
+			<a href="#Contributor">Contributor</a>,
+			<a href="#SiteField">Site</a>,
+			<a href="#SurveyField">Survey</a>,
+			<a href="#SubSite">isSubsiteOf</a>,
+			<a href="#SimilarTo">isSimilarTo</a>
+		<li>Only the id field of the second
+	</ul>
+	<li>There many be one of each on the same row but they must be related.
+	<ul>
+		<li>Ex. If there is a site and a location. That site is at that location
+	</ul>
+	<li>May have multiple Observations
+	<ul>
+		<li>Observation descriptions must be for 1 or all Observations
+		<ul>
+			<li>Example Remark applies to a single observation or to all.
+		</ul>
+	</ul>
+	<li>Easting and Northings of different base and unit is an Open Issue!
+	<ul>
+		<li>Ideal is to not allow Easting and Northings but to force users to provide grid refs or Latitudes and Longitudes
+		<li>Alternative is to insist all Eastings and Northings have the same base and unit
+	</ul>
+</ul>
+
+<h1 id="MetaDataCreator">Create metadata annotation sheets</h1>
+This step creates and Excel Spreadsheet with extra header rows which will help the data uploader provide the required information required to produce rdf which complies to the ontology.
+<h2> Tool </h2>
+<ul>
+	<li>Java program
+	<li>Inputs
+	<ul>
+		<li>PID of the Raw data file
+		<li>Indirect imputs
+		<ul>
+			<li>Raw data file in a format XLWrap can read (obtained from PID)
+			<li><a href="#MetaMaster">MetaMaster Spreadsheet</a> (Obtained via a PID currently hard code in program)
+		</ul>
+	</ul>
+	<li>Output
+	<ul>
+		<li>Excel Spreadsheet <a href="#AnnotateSheet">Annotation Sheet</a>
+	</ul>
+</ul>
+
+<h1 id="Annotate">Add the column level metadata</h1>
+The <a href="#AnnotateSheet">Annotation Sheet</a> now has to be filled in by someone with Domain Knowledge.
+All information provided here will be included in the final RDF output.
+
+<h2 id="Information">Information Required</h2>
+<h3 id="Category">Category</h3>
+Type (or class) of the item being described.
+<ul>
+	<li>The category will be shown in the RDF using the rdf:type predicate.
+	<li>This is required.
+	<ul>
+		<li>If there is no "Category" row the <a href="#Mapping">Mapping stage</a> will throw an Exception
+		<li>If left blank the data in this column will not be included in the RDF
+	</ul>	.
+	<li>Category has a closed vocabulary. Additions required a significant change to the Ontology
+</ul>
+<p>
+<table border="1" id="CategoryValues">
+	<tr>
+		<th colspan="2">Values allowed in the "Category" row.</th>
+	</tr>
+	<tr>
+		<th>Category</th>
+		<th>Definition</th>
+	</tr>
+	<tr>
+		<td id="Designation">Designation</td>
+		<td>
+			<ul>
+				<li>A distinguishing Feature such as Legal Status, shared by many
+					<a href="#Site">Sites</a> or
+					<a href="#Enitity">Entities</a>.
+				<li>The fields that can be included in a Designation are described in the <a href="#DesignationsFields">Designations Fields table.</a>.
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Enitity">Enitity</td>
+		<td>
+			<ul>
+				<li>A Person, group of People or Orgaization being described.
+				<li>The kind of things that can be an Entity are descrided in <a href="#EntitySubTypes">Entity sub types</a>
+				<li>The fields that can be included in an Entity are described in the <a href="#EntityFields">Enityty Fields table.</a>.
+				<li>An Entities could be an <a href="#Owner">Owner</a> and or a <a href="#Contributor">Contributor</a>.
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Location">Location</td>
+		<td>
+			<ul>
+				<li>The physical point/ area on a map.
+				<li>Should only include information to help pinpoint.
+				<li>Says nothing about what is at that location.
+				<li>The fields that can be included in a location are described in the <a href="#LocationFields">Location Fields table.</a>.
+				<li>It the same table has both a Location and a Site the Location will be added to the Site using the vocab:hasLocation predicate.
+			<ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Observation">Observation</td>
+		<td>
+			<ul>
+				<li>Anything that can change over time. Therefor there are
+					<a href="#DateField">Date</a>,
+					<a href="#StartDateField">StartDate</a> and
+					<a href="#EndDateField">EndDate</a> fields.
+				<li>Anything that changes depending on the <a href="#MeasurmentMethodField">Measurment Method</a>.
+				<li>Anything that could be either a single value or a combination of several factors. Therefor there is a <a href="#DevriationFactor">DevriationFactor</a> field.
+				<li>Anything that has a <a href="#Unit">Unit</a>.
+				<li>Anything that be influenced by the <a href="#ContributorField">Contributor</a>.
+				<li>All the fields that can be included in a site are described in the <a href="#ObservationFields">Observation Fields table.</a>.
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Site">Site</td>
+		<td>
+			<ul>
+				<li>The Physical thing being described.
+				<li>The kind of things that can be location are descrided in <a href="#SiteSubTypes">Site sub types</a>
+				<li>The fields that can be included in a site are described in the <a href="#SiteFields">Site Fields table.</a>.
+				<li>Must values about a site will be an <a href="#Observation">Observation</a>.
+				<li>Assumed to be at the Location descrided in the same row of a table.
+				<li>A site may be a <a href="#SubSite">SubSite</a> or be <a href="#SimilarTo">SimilarTo</a> another site.
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Survey">Survey</td>
+		<td>
+			<ul>
+				<li>A formal or official examination of the particulars of something, made in order to ascertain condition, character, etc.
+				<li>Collects together characteristics of would otherwise have to be asserted for each <a href="#Observation">Observation</a>. So if an <a href="#Observation">Observation</a> is linked to a Suvery then the data about the Survey implicitly applies to the Observation.
+				<li>The fields that can be included in a survey are listed in the <a href="#SurveyFields">Survey Fields table.</a>.
+				<li>Similar to ISA's Assay Category.
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="Taxon">Taxon</td>
+		<td>
+			<ul>
+				<li>Data about a <a href="http://en.wikipedia.org/wiki/Taxon"> taxonomic unit </a>.
+				<li>The kind of things that can be a Taxon are descrided in <a href="#TaxonSubTypes">Taxon sub types</a>
+				<li>The fields that can be included in a Taxon are described in the <a href="#TaxonFields">Taxon Fields table.</a>.
+				<li>The issue of id resolution is an ongoing Msc project.
+				However the question of when two Taxon's can be considered equal may then on the usage of that assertion.
+				<ul>
+					<li>Unless an <a href="#External">External Reference</a> is provided the Taxon units in each table will be considered different in the resulting RDF.
+				</ul>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+	</tr>
+</table>
+
+<h3 id="Field">Field</h3>
+Type of value the data represents
+<ul>
+	<li>The Field will be used to create the rdf predicate.
+	<li>This is required.
+	<ul>
+		<li>If there is no "Field" row the <a href="#Mapping">Mapping stage</a> will throw an Exception.
+		<li>May only be left blank if <a href="#Category">Category</a> is also blank. Otherwise <a href="#Mapping">Mapping stage</a> will throw an Exception.
+	</ul>	.
+	<li>The legal values for field depend on the value for <a href="#Category">Category</a>. They are shown in the tables below.
+	<li>Field has a semi-closed vocabulary. Additions required a change to the Ontology
+</ul>
+<p>
+<table border="1">
+	<tr>
+		<th colspan="2">Fields shared by several Categories.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr id="AbbreviationField" >
+		<td>Abbreviation</td>
+		<td>A shortened or contracted form of the name, which is NOT used as the Id.</td>
+	</tr>
+	<tr id="AlternativeName">
+		<td>AlternativeName</td>
+		<td>A Alternative name that should be included in the RDF but not as a Subject vocab:hasName Name triple.</td>
+	</tr>
+	<tr id="DescriptionField" >
+		<td>Description</td>
+		<td>A free text value that give more information about the item is a way that humans can understand but that is not expected to be processed by any application or query.</td>
+	</tr>
+	<tr id="IdField" >
+		<td>Id</td>
+		<td>
+			<ul>
+				<li>A unique value to be used as part of <a href="#Uri">URIs</a>
+				<li>If two rows in the same column have the same Id the rows will be considered to describe the same Subject.
+				<li>If no id is provided the row number in the Raw Data will be used.
+			<ul>
+		</td>
+	</tr>
+	<tr id="NameField" >
+		<td>Name</td>
+		<td>The official or primary Name for this item. While an item can technically have two names this is discouraged, but not disallowed.</td>
+	</tr>
+	<tr id="RemarkField" >
+		<td>Remark</td>
+		<td>A free text value that covers anything not covered by any other field, in a way that humans can understand but that is not expected to be processed by any application or query.</td>
+	</tr>
+	<tr id="SubTypeField" >
+		<td>SubType</td>
+		<td>See <a href="#SubSite">SubType<a> Section. Note: There is currently no checking that the values provided in a "SubType" column adhere to the values shown in the <a href="#SubSite">SubType Section<a></td>
+	</tr>
+</table>
+<p>
+<table border="1" id="DesignationsFields">
+	<tr>
+		<th colspan="2"><a href="#Designation"> Designation</a>Fields.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr >
+		<td>Abbreviation</td>
+		<td>See <a href="#AbbreviationField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>AlternativeName</td>
+		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+</table>
+<p>
+<table border="1" id="EntityFields">
+	<tr>
+		<th colspan="2"><a href="#Entity">Entity</a>Fields.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr >
+		<td>Abbreviation</td>
+		<td>See <a href="#AbbreviationField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>AlternativeName</td>
+		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr >
+		<td>County</td>
+		<td>The Entity's County</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr >
+		<td>FirstName</td>
+		<td>A Persons First or Proper Name</td>
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr >
+		<td>Initial</td>
+		<td>A Person's middle Initials. Note: use Abbreviation for an organization acronym</td>
+	</tr>
+	<tr >
+		<td>LastName</td>
+		<td>A Persons Last or Sur Name</td>
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>SubType</td>
+		<td>See <a href="#SubTypeField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr >
+		<td>Title</td>
+		<td>A Peron's title</td>
+	</tr>
+</table>
+<p>
+These are just the fields needed for the test data sets.
+It is highly likely that additional fields will be required to propably describe an Entity.
+These could include AddressLine1, AddressLine2, City, Country, Fax, Email and PhoneNumber.
+See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to add these or other fields.
+<p>
+<table border="1" id="LocationFields">
+	<tr>
+		<th colspan="2"><a href="#Location">Location </a> Fields.</th>
+	</tr>
+	<tr>
+		<th>Category</th>
+		<th>Definition</th>
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>GridRef</td>
+		<td>See <a href="http://en.wikipedia.org/wiki/Grid_reference"> Wikipedia</td>
+	</tr>
+	<tr>
+		<td>Latitude</td>
+		<td>See <a href="http://en.wikipedia.org/wiki/Latitude"> Wikipedia</td>
+	</tr>
+	<tr>
+		<td>Longitude</td>
+		<td>See <a href="http://en.wikipedia.org/wiki/Longitude"> Wikipedia</td>
+	</tr>
+	<tr>
+		<td>Easting</td>
+		<td>See <a href="http://en.wikipedia.org/wiki/Easting_and_northing"> Wikipedia</td>
+	</tr>
+	<tr>
+		<td>Northing</td>
+		<td>See <a href="http://en.wikipedia.org/wiki/Easting_and_northing"> Wikipedia</td>
+	</tr>
+	<tr>
+		<td>FiveKm</td>
+		<td>Appears to be a reference to the 5km wide area this location is in.</td>
+	</tr>
+	<tr>
+		<td>TenKm</td>
+		<td>Appears to be a reference to the 10km wide area this location is in.</td>
+	</tr>
+	<tr>
+		<td>SubType</td>
+		<td>See <a href="#SubTypeField">Description in Shared Fields Table</a></td>
+	</tr>
+</table>
+<p>There is an open issue of which formats should be allowed in each of these fields. Without a strict definition comparision of location based on their values will be difficult.
+
+<p>There are intentional no
+	<a href="#AbbreviationField">Abbreviation</a>,
+	<a href="#AlternativeName">AlternativeName</a>,
+	<a href="#DescriptionField">Description</a>,
+	<a href="#NameField">Name</a> or
+	<a href="#RemarkField">Remark</a>
+	field in Location.
+	These should be applied to the Site at that Location and not to the map reference.
+<p>
+<table border="1" id="ObservationFields">
+	<tr>
+		<th colspan="2"><a href="#Observation">Observation</a> Fields.</th>
+	</tr>
+	<tr id="ContributorField">
+		<td>Contributor</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Enitity">Enitity<a> that made the Observation.</td>
+	</tr>
+	<tr id="DateField">
+		<td>Date</td>
+		<td>The date/time this observation was made.</td>
+	</tr>
+	<tr id="DevriationFactorField">
+		<td>DevriationFactor</td>
+		<td>See <a href="#DevriationFactor">DevriationFactor<a> Section. Note: There is currently no checking that the values provided in a "DevriationFactor" column adhere to the values shown in the <a href="#DevriationFactor">DevriationFactor Section<a></td>
+	</tr>
+	<tr id="EndDateField">
+		<td>EndDate</td>
+		<td>The end of the date/time range during which this observation was made.</td>
+	</tr>
+	<tr id="FactorField">
+		<td>Factor</td>
+		<td>See <a href="#Factor">Factor<a> Section. Note: There is currently no checking that the values provided in a "Factor" column adhere to the values discussed in the <a href="#Factor">Unit Factor<a></td>
+	</tr>
+	<tr id="MeasurmentMethodField">
+		<td>MeasurmentMethod</td>
+		<td>The method used to measure this observation. This could include things like the instrument used.</td>
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr id="SiteField">
+		<td>Site</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Site">Site<a>.
+	</tr>
+	<tr id="StartDateField">
+		<td>StartDate</td>
+		<td>The begining of the date/time range during which this observation was made.</td>
+	</tr>
+	<tr id="SurveyField">
+		<td>Survey</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Survey">Survey<a>.
+	</tr>
+	<tr id="TaxonField">
+		<td>Taxon</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Taxon">Taxon<a>.
+	</tr>
+	<tr id="UnitField">
+		<td>Unit</td>
+		<td>See <a href="#Unit">Unit<a> Section. Note: There is currently no checking that the values provided in a "Unit" column adhere to the values discussed in the <a href="#Unit">Unit Section<a></td>
+	</tr>
+	<tr id="UpdatedField">
+		<td>Updated</td>
+		<td>The date/time this observation's information was last updated. This is NOT the data/time the Observation was actually made.</td>
+	</tr>
+	<tr>
+		<td>Walue</td>
+		<td>The actual (ideally) numerical value that was observed. Avoid including Unit as this make calculation on the data more difficult.</td>
+	</tr>
+</table>
+<p>
+
+<table border="1" id="SiteFields">
+	<tr>
+		<th colspan="2"><a href="#Site">Site</a> Fields.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr >
+		<td>Abbreviation</td>
+		<td>See <a href="#AbbreviationField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>AlternativeName</td>
+		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Designation</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Designation">Designation<a>.
+	</tr>
+	<tr>
+		<td>hasSubsite</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to a Subsite. Make sure you don't mean isSubsiteOf. Only used if the referenced Site is a part of the described Site.
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr id="SimilarTo">
+		<td>isSimilarTo</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to another Site which is probably the same Site. Much like the rdf:sameAs relationship but without the explicite assigment of the values to the other Site.
+	</tr>
+	<tr id="SubSite">
+		<td>isSubsiteOf</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to another Site this Site is part of.
+	</tr>
+	<tr>
+		<td>Location</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to the Site's Location. Note: Only required for Locations described in another table. A Location in the same table/sheet will automatically be assigned.
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr id="Owner">
+		<td>Owner</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to Owner of this Site.
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>SubType</td>
+		<td>See <a href="#SubTypeField">Description in Shared Fields Table</a></td>
+	</tr>
+</table>
+<p>
+Note: If a Site is the rdf:sameAs in the strict sense that all the values described in this table should be applied to the other site, use an <a href="#External">External Reference<a> Id to the other Site and ignore the second "id".
+<p>
+<table border="1" id="SurveyFields">
+	<tr>
+		<th colspan="2"><a href="#Survey">Survey</a> Fields.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr >
+		<td>Abbreviation</td>
+		<td>See <a href="#AbbreviationField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>AlternativeName</td>
+		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Contributor</td>
+		<td>See <a href="#ContributorField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Date</td>
+		<td>See <a href="#DateField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>DevriationFactor</td>
+		<td>See <a href="#DevriationFactorField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>EndDate</td>
+		<td>See <a href="#EndDateField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr id="FactorField">
+		<td>Factor</td>
+		<td>See <a href="#FactorField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>MeasurmentMethod</td>
+		<td>See <a href="#MeasurmentMethodField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Site</td>
+		<td>See <a href="#SiteField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>StartDate</td>
+		<td>See <a href="#StartDateField">Description in Observation's Fields Table</a></td>
+	</tr>
+	</tr>
+	<tr>
+		<td>Taxon</td>
+		<td>See <a href="#TaxonField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Unit</td>
+		<td>See <a href="#UnitField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Updated</td>
+		<td>See <a href="#UpdatedField">Description in Observation's Fields Table</a></td>
+	</tr>
+</table>
+<p>
+The high level of overlap between Survey and Observation fields is intentional, as this information could be provded at either level.
+<p>
+<table border="1" id="TaxonFields">
+	<tr>
+		<th colspan="2"><a href="#Taxon">Taxon</a> Fields.</th>
+	</tr>
+	<tr>
+		<th>Field</th>
+		<th>Definition</th>
+	</tr>
+	<tr >
+		<td>XXXCommonName</td>
+		<td>For each <a href="#TaxonSubTypes">Taxon SubType</a> XXX there will be a corresponding Field to give the common name for this Taxon at that Level.</td>
+	</tr>
+	<tr >
+		<td>XXXLatinName</td>
+		<td>For each <a href="#TaxonSubTypes">Taxon SubType</a> XXX there will be a corresponding Field to give the Latin name for this Taxon at that Level.</td>
+	</tr>
+	<tr >
+		<td>Abbreviation</td>
+		<td>See <a href="#AbbreviationField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>AlternativeName</td>
+		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr id="ContributorField">
+		<td>Contributor</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Enitity">Enitity<a> that defined the Taxon.
+		<td></td>
+	</tr>
+	<tr id="DateField">
+		<td>Date</td>
+		<td>The date/time this Taxon was defined.</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Id</td>
+		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr id="SubTaxon">
+		<td>isSubTaxonOf</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to another Taxon this Taxon is part of.
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Remark</td>
+		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>SubType</td>
+		<td>See <a href="#SubTypeField">Description in Shared Fields Table</a></td>
+	</tr>
+
+</table>
+
+<h2 id="Id">Id/Value Column (or "All")</h2>
+A single table/sheet  can contain several <a href="#Observation">Observation</a>s.
+This row allows the none <a href="#ValueField">Value</a> Columns to be assined to the correct <a href="#ValueField">Value</a> Column.
+
+<ul>
+	<li>The Id... value be used to create the rdf subject's uri. See <a href="#Uri">Creating Uri's Section</a>.
+	<li>This is required.
+	<ul>
+		<li>If there is no "Id..." row the <a href="#Mapping">Mapping stage</a> will throw an Exception.
+		<li>May only be left blank if <a href="#Category">Category</a> is not "<a href="#Observation">Observation</a>" or the <a href="#Field">Field</a> is "<a href="#ValueField">Value</a>". Otherwise <a href="#Mapping">Mapping stage</a> will throw an Exception.
+	</ul>	.
+	<li>The legal values for "Id..." are:
+	<ul>
+		<li>"all"
+		<ul>
+			<li>Assigned the data in this column to every observation in the same row.
+			<li>So for example if there is a Column with Categery "Observation", Field "Date" and "Id.." "all", this would assign the triple  ObservationX vocab:hasDate Y to all the Observations.
+		</ul>
+		<li>A String Column name of one, two (or with xlsx even three) characters.
+		<ul>
+			<li>Assigned the data in this column to the observation in the specified column in the <B>RAW</B> data.
+			<li>So for example if there is a Column with Categery "Observation", Field "Date" and "Id.." "E", this would assign the triple  ObservationE... vocab:hasDate Y to the Observations whose <a href="#ValueField">Value</a> comes from column E.
+		</ul>
+		<li>Any other value will cause an Exception in the <a href="rdf">Generate rdf</a> stage.
+	</ul>
+	<li>ID... has a closed vocabulary. Currently it coveres the 255 values ("A" to "IV") in an *.xls Workbook, If needed could be extened up "ALH" for an *.xlsx Workbook.
+</ul>
+
+<h2 id="External">External Sheet</h2>
+
+Used to convert value to a Uri
+Could be a different sheet of same dataset
+Sheetname
+Could be a sheet in a different dataset
+[doi]Sheetname
+Currently no checking is done to see if external sheet exists.
+Still a valid uri just doesn’t link to anything.
+Used for Links such as isSimilarTo, Contibutor, Site
+Used in a Link table
+Which just links to external table together
+Required for Many to many Relationships
+Ex: Tarns Designations link
+
+<ul>
+	<li>This row is used for columns that contain a <a href="#http://en.wikipedia.org/wiki/Foreign_key">Foreign Key</a>.
+	<li>The External Sheet value (when provided) is used to create the rdf subject's uri. See <a href="#Uri">Creating Uri's Section</a>.
+	<li>This is not required.
+	<ul>
+		<li>If there is no "External Sheet" row the <a href="#Mapping">Mapping stage</a> assumes there are no.<a href="#http://en.wikipedia.org/wiki/Foreign_key">Foreign Keys</a>
+		<li>If left blank a local <a href="#Uri">Uri</a> will be created.
+	</ul>	.
+	<li>It could be a <a href="#http://en.wikipedia.org/wiki/Foreign_key">Foreign Key</a> to another sheet in the same workbook, a sheeting in another workbook, or some external id system.
+	<li>The legal values for "Id" are:
+	<ul>
+		<li>Another sheet in the same workbook
+		<ul>
+			<li>Just give the name of the other sheet.
+		</ul>
+		<li>A sheeting in another workbook
+		<ul>
+			<li>The other workbook will be refered to using its PID.
+			<li>The format is [PID]sheetName
+			<li>Assuming a workbook with PID "5e3de72b-a533-46fe-a319-97511f663245" and a sheet "People"
+			<ul>
+				<li>[5e3de72b-a533-46fe-a319-97511f663245]People
+			</ul>
+		</ul>
+		<li>External id system
+		<ul>
+			<li>This is currently not supported but is a highly recommended extension.
+			<li>Exact format will depend on the extenal Id Sytsem to be integrated.
+		<ul>
+		<li>Any other value may cause an Exception in the <a href="rdf">Generate rdf</a> stage, but are more likely to just generate rdf with strange links.
+	</ul>
+	<li>There is no need to included the column of the id in the external sheet.
+	<ul>
+		<li>Columns are not part if the generated <a href="#Uri">Uri</a>.
+	</ul>
+	<li>External Sheet does not have a vocabulary.
+	<ul>
+		<li>Therefor PIDs of both files already converted to RDF and ones still to be converted can be used.
+		<li>Users are allowed any legal sheetName
+		<li>The disadvantage of this open approach is there is NO error checking. An incorrect POI or Sheeet name will result in an apperently valid <a href="#Uri">Uri</a> but which does not link.
+	</ul>
+
+</ul>
+
+May be a reference to another table or even dataset.
+Would be used to create the rdf object uri
+Are zero values to be considered Nulls?
+Is a zero really zero or just “I don’t know”
+This because Access to Excel inserts these zeros?
+
+Could come from another column but rarely does.
+<h2 id="Factor">Factor</h2>
+.  What is actually being measured.
+
+
+Depth, Alkalinity, Dam, Species, Nitrate
+<h2 id="Unit">Unit</h2>
+Unit. (A number by itself is meaningless)
+<h2 id="Deviation factor">Deviation factor</h2>
+
+Raw data, Mean, Max, Min, Difference
+Should be a limited but extendable vocabulary
+For a computer, Inch != inch = in
+
+<h2 id="SubType">SubType</h2>
+
+<table border="1" id="EntitySubTypes">
+
+</table>
+
+<table border="1" id="SiteSubTypes">
+Tarn, River, Field, Lake ext
+
+
+</table>
+
+<table border="1" id="TaxonSubTypes">
+
+</table>
+
+<h2 id="AnnotateSheet">Annotation Sheet</h1>
+        <li>Excel Spreadsheet <a href="#AnnotateSheet">Annotation Sheet</a>
+        <ul>
+            <li><b>Lists<b>Copy of the vocabulary from MetaMaster.
+            <li><b>Sheet(s)<b>
+            <ul>
+                <li>One for each sheet in the raw data
+                <li>Extra header rows for collecting meta data.
+                <li>A copy of the raw data
+            </ul>
+        </ul>
+
+<h1 id="Mapping">Generate XLwrap mapping file</h1>
+<h3 id="Uri">Generate URI values</h3>
+
+<h1 id="rdf">Generate rdf files</h1>
+<h1 id="sparql">Load rdf into a sparql server</h1>
+<h1 id="query">Query the sparql endpoint</h1>
+
+<h1 id="Admin">Administration Documents</h1>
+<h2 id="MetaMaster">The MetaMaster.xlss</h2>
+<ul>
+    <li>Only available to Admistrators
+    <li>Single version to be used with all datasets
+    <li>Used creating Metasheets
+    <li>Used for checking when creating mapping files.
+    <li>Lists sheet
+    <ul>
+        <li>Vocabulary allowed
+        <ul>
+            <li>Columns before the empty column
+            <li>Row 1:    Category
+            <li>Rows 2+: Legal values for the fields
+            <li>
+        <ul>
+        <li>SubTypes
+        <ul>
+            <li>
+	Factor, Unit, DeviationFactor
+	Legal values for each of these
+	Support lists for the dropdowns
+	Undefinded, Automatic, NotApplicable, FieldsThatNeedUnit, Column
+	Order here is order that will be used in dropdowns.
+	Adding values will extend range in created sheets but not in example drop downs.
+
+    <ul>
+        <li>
+<h3 id="ChangingMetaMaster">Changing the MetaMaster</h3>
+Changes made will NOT effect already created metaSheets, mapping files or RDF.
+
+</body>
