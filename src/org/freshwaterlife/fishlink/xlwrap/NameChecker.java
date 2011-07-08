@@ -8,7 +8,7 @@ package org.freshwaterlife.fishlink.xlwrap;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.freshwaterlife.fishlink.MasterFactory;
+import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
  *
@@ -20,29 +20,28 @@ public class NameChecker {
      private HashMap<String,ArrayList<String>> subcategories;
      private HashMap<String,ArrayList<String>> constants;
 
-     NameChecker() throws XLWrapMapException{
-        Sheet masterSheet =  MasterFactory.getMasterListSheet();
+     NameChecker(Sheet masterListSheet) throws XLWrapMapException{
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = -1; //-1 as getnames starts by increasing it.
-        zeroColumn = getNames(masterSheet, categories, zeroColumn);
+        zeroColumn = getNames(masterListSheet, categories, zeroColumn);
         subcategories = new HashMap<String,ArrayList<String>>();
-        zeroColumn = getNames(masterSheet, subcategories, zeroColumn);
+        zeroColumn = getNames(masterListSheet, subcategories, zeroColumn);
         constants = new HashMap<String,ArrayList<String>>();
-        zeroColumn = getNames(masterSheet, constants, zeroColumn);
+        zeroColumn = getNames(masterListSheet, constants, zeroColumn);
      }
 
      private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws XLWrapMapException{
          String rangeName;
          do {
             zeroColumn++;
-            rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
+            rangeName =  FishLinkUtils.getTextZeroBased(masterSheet, zeroColumn, 0);
             int zeroRow = 1;
-            String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+            String fieldName = FishLinkUtils.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             ArrayList<String> feilds = new ArrayList<String>();
             while (!fieldName.isEmpty()) {
                 zeroRow++;
                 feilds.add(fieldName);
-                fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+                fieldName = FishLinkUtils.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
             } while (!fieldName.isEmpty());
             hashMap.put(rangeName, feilds);
          } while (!rangeName.isEmpty());

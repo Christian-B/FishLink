@@ -1,8 +1,6 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
-import at.jku.xlwrap.common.XLWrapException;
-import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import org.freshwaterlife.fishlink.MasterFactory;
+import at.jku.xlwrap.spreadsheet.Sheet;
 
 /**
  *
@@ -10,8 +8,8 @@ import org.freshwaterlife.fishlink.MasterFactory;
  */
 public class MasterReader extends AbstractSheet {
 
-    public MasterReader () throws XLWrapMapException {
-       super(MasterFactory.getMasterDropdownSheet());
+    public MasterReader (Sheet masterDropdownSheet) throws XLWrapMapException {
+       super(masterDropdownSheet);
     }
 
     private void checkName (SheetWrite sheet, String otherName, int firstRow, int lastRow) throws XLWrapMapException {

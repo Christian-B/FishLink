@@ -8,6 +8,9 @@ public class Constants {
 
     public static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
 
+    public static final String LIST_SHEET = "Lists";
+
+    public static final String DROP_DOWN_SHEET = "DropDowns";
 
     //Column A texts
     public static final String CATEGORY_LABEL = "Category";

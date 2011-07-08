@@ -15,7 +15,7 @@ public class ChristianRun {
 
     private static void mapAndRdf(String metaPid, String dataPid) throws XLWrapMapException{
         //Adjust this file to the your local path
-        WorkbookWrite mapWrite = new WorkbookWrite(metaPid, dataPid);
+        WorkbookWrite mapWrite = new WorkbookWrite(null, null, null, metaPid, null, dataPid); 
         mapWrite.writeMap();
         MapRun.runMap(dataPid);
     }

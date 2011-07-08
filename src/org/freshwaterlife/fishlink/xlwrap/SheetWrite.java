@@ -3,13 +3,11 @@ package org.freshwaterlife.fishlink.xlwrap;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
-import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.freshwaterlife.fishlink.FishLinkUtils;
-import org.freshwaterlife.fishlink.PidStore;
 
 /**
  *
@@ -25,19 +23,17 @@ public class SheetWrite extends AbstractSheet{
 
     private String sheetInfo;
 
-    private static NameChecker masterNameChecker;
+    private NameChecker masterNameChecker;
 
     private HashMap<String,String> idColumns;
     private HashMap<String,String> categoryUris;
     private ArrayList<String> allColumns;
 
-    public SheetWrite (Workbook metaWorkbook, String pid, String sheetName)
+    public SheetWrite (NameChecker nameChecker, Workbook metaWorkbook, Workbook dataWorkbook, String pid, String sheetName)
             throws XLWrapMapException{
         super(metaWorkbook, sheetName);
         this.pid = pid;
-        dataPath = PidStore.padStoreFactory().retreiveFile(pid);
-        Workbook dataWorkbook;
-        dataWorkbook = FishLinkUtils.getWorkbookOnPid(pid);
+        this.masterNameChecker = nameChecker;
         String[] sheetNames = dataWorkbook.getSheetNames();
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equalsIgnoreCase(sheetName)){
@@ -247,10 +243,10 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         if (Constants.isRdfTypeField(field)){
-            checkSubType(category, value);
+            masterNameChecker.checkSubType(metaSheet.getSheetInfo(), category, value);
             writeRdfType(writer, value);
         } else {
-            checkCheckConstant(field, value);
+            masterNameChecker.checkConstant(metaSheet.getSheetInfo(), field, value);
             writeVocab (writer, field);
             writeValue(writer, value);
         }
@@ -272,7 +268,7 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private String refersToCategory(String field) throws XLWrapMapException{
-       if (this.isCategory(field)) {
+       if ( masterNameChecker.isCategory(field)) {
            return field;
        }
        return Constants.refersToCategory(field);
@@ -294,35 +290,6 @@ public class SheetWrite extends AbstractSheet{
             }  catch (IOException ex) {
                 throw new XLWrapMapException("Unable to write data", ex);
             }            
-    }
-
-    private void checkName(String categery, String field) throws XLWrapMapException{
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        masterNameChecker.checkName(metaSheet.getSheetInfo(), categery, field);
-    }
-
-    private void checkSubType(String categery, String subType) throws XLWrapMapException{
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        masterNameChecker.checkSubType(metaSheet.getSheetInfo(), categery, subType);
-    }
-    
-    private void checkCheckConstant(String constant, String value) throws XLWrapMapException{
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        masterNameChecker.checkConstant(metaSheet.getSheetInfo(), constant, value);
-    }
-
-
-    private boolean isCategory(String field) throws XLWrapMapException {
-        if (masterNameChecker == null){
-            masterNameChecker = new NameChecker();
-        }
-        return masterNameChecker.isCategory(field);
     }
 
     private void writeAutoRelated(BufferedWriter writer, String category, String dataColumn, boolean ignoreZeros)
@@ -372,7 +339,7 @@ public class SheetWrite extends AbstractSheet{
             FishLinkUtils.report("Skippig column " + metaColumn + " as no Feild provided");
             return false;
         }
-        checkName(category, field);
+        masterNameChecker.checkName(metaSheet.getSheetInfo(), category, field);
         if (field.equalsIgnoreCase("id") && !external.isEmpty()){
             FishLinkUtils.report("Skipping column " + metaColumn + " as it is an external id");
             return false;

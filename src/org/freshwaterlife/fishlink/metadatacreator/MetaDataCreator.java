@@ -1,20 +1,23 @@
 package org.freshwaterlife.fishlink.metadatacreator;
 
 import at.jku.xlwrap.common.XLWrapException;
+import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
-import org.freshwaterlife.fishlink.MasterFactory;
 import org.freshwaterlife.fishlink.FishLinkUtils;
-import org.freshwaterlife.fishlink.PidRegister;
-import org.freshwaterlife.fishlink.PidStore;
+import org.freshwaterlife.fishlink.xlwrap.Constants;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
@@ -26,56 +29,59 @@ public class MetaDataCreator {
     //Limits the number of rows copied in
     static private int MAX_DATA_ROW = Integer.MAX_VALUE;
     
+    Sheet masterSheet;
+    
+    private ExecutionContext context;
+
     public MetaDataCreator(){
+        context = new ExecutionContext();
     }
     
-    private String createNamedRange (FishLinkWorkbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
-        Sheet masterSheet = MasterFactory.getMasterListSheet();
-        FishLinkSheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
-        String rangeName =  MasterFactory.getTextZeroBased(masterSheet, zeroColumn, 0);
+    private String createNamedRange (Sheet masterListSheet, FishLinkWorkbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
+        FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
+        String rangeName =  FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, 0);
         if (rangeName == null || rangeName.isEmpty()){
             return "";
         }
         String columnName = FishLinkUtils.indexToAlpha(zeroColumn);
         metaSheet.setValueZeroBased(zeroColumn, 0, rangeName);
         int zeroRow = 1;
-        String fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+        String fieldName = FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, zeroRow);
         while (!fieldName.isEmpty()) {
             metaSheet.setValueZeroBased(zeroColumn, zeroRow, fieldName);
             zeroRow++;
-            fieldName = MasterFactory.getTextZeroBased(masterSheet, zeroColumn, zeroRow);
+            fieldName = FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, zeroRow);
         } while (!fieldName.isEmpty());
         Name range = metaWorkbook.createName();
         range.setNameName(rangeName);
-        String rangeDef = "'" + MasterFactory.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
+        String rangeDef = "'" + Constants.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
         range.setRefersToFormula(rangeDef);
         return rangeName;
     }
 
-    private void createNamedRanges (FishLinkWorkbook metaWorkbook) throws XLWrapMapException {
-        Sheet masterSheet =  MasterFactory.getMasterListSheet();
-        FishLinkSheet metaSheet = metaWorkbook.getSheet(MasterFactory.LIST_SHEET);
+    private void createNamedRanges (Sheet masterListSheet, FishLinkWorkbook metaWorkbook) throws XLWrapMapException {
+        FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
         //Get the categories
         int zeroColumn = 0;
-        String rangeName =  createNamedRange(metaWorkbook, zeroColumn);
+        String rangeName =  createNamedRange(masterListSheet, metaWorkbook, zeroColumn);
         while (!rangeName.isEmpty()) {
             zeroColumn++;
-            rangeName = createNamedRange(metaWorkbook, zeroColumn);
+            rangeName = createNamedRange(masterListSheet, metaWorkbook, zeroColumn);
         }
         //first space splits the categories from the rest
         Name range = metaWorkbook.createName();
         range.setNameName("Category");
         String columnName = FishLinkUtils.indexToAlpha(zeroColumn -1);
-        range.setRefersToFormula("'" + MasterFactory.LIST_SHEET + "'!$A1:$" + columnName + "$1");
+        range.setRefersToFormula("'" + Constants.LIST_SHEET + "'!$A1:$" + columnName + "$1");
         //Now get the subTypes
         do {
             zeroColumn++;
-            rangeName = createNamedRange(metaWorkbook, zeroColumn);
+            rangeName = createNamedRange(masterListSheet, metaWorkbook, zeroColumn);
         } while (!rangeName.isEmpty());
         //Now the renaming ranges
         do {
             zeroColumn++;
-            rangeName = createNamedRange(metaWorkbook, zeroColumn);
+            rangeName = createNamedRange(masterListSheet, metaWorkbook, zeroColumn);
         } while (!rangeName.isEmpty());
         //Hack to avoid last column getting lost
         metaSheet.setValueZeroBased(zeroColumn + 1, 0, "");
@@ -85,7 +91,7 @@ public class MetaDataCreator {
         int zeroRow = 0;
         String value;
         do {
-            value = MasterFactory.getTextZeroBased(masterSheet, 0, zeroRow);
+            value = FishLinkUtils.getTextZeroBased(masterSheet, 0, zeroRow);
             metaSheet.setValue("A",zeroRow + 1, value);
             zeroRow++;
         } while (!value.isEmpty());
@@ -105,10 +111,10 @@ public class MetaDataCreator {
     private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, FishLinkSheet metaSheet, String column) 
             throws XLWrapMapException {
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
-            String list = MasterFactory.getTextZeroBased(masterSheet, 2, zeroRow);
-            String popupTitle = MasterFactory.getTextZeroBased(masterSheet, 3, zeroRow);
-            String popupMessage =  MasterFactory.getTextZeroBased(masterSheet, 4, zeroRow);
-            String errorStyleString =  MasterFactory.getTextZeroBased(masterSheet, 5, zeroRow);
+            String list = FishLinkUtils.getTextZeroBased(masterSheet, 2, zeroRow);
+            String popupTitle = FishLinkUtils.getTextZeroBased(masterSheet, 3, zeroRow);
+            String popupMessage =  FishLinkUtils.getTextZeroBased(masterSheet, 4, zeroRow);
+            String errorStyleString =  FishLinkUtils.getTextZeroBased(masterSheet, 5, zeroRow);
             int errorStyle = DataValidation.ErrorStyle.STOP;
             if (errorStyleString.startsWith("W")){
                 errorStyle = DataValidation.ErrorStyle.WARNING;
@@ -116,8 +122,8 @@ public class MetaDataCreator {
             if (errorStyleString.startsWith("I")){
                 errorStyle = DataValidation.ErrorStyle.INFO;
             }
-            String errorTitle =  MasterFactory.getTextZeroBased(masterSheet, 6, zeroRow);
-            String errorMessage =  MasterFactory.getTextZeroBased(masterSheet, 7, zeroRow);
+            String errorTitle =  FishLinkUtils.getTextZeroBased(masterSheet, 6, zeroRow);
+            String errorMessage =  FishLinkUtils.getTextZeroBased(masterSheet, 7, zeroRow);
             metaSheet.addValidation("B", column, zeroRow + 1, list, popupTitle, popupMessage,
                     errorStyle, errorTitle, errorMessage);
         }
@@ -127,10 +133,10 @@ public class MetaDataCreator {
             throws XLWrapMapException{
         //ystem.out.println(lastMetaRow + " " + copySheet.getSheetInfo());
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
-            String masterColumnA = MasterFactory.getTextZeroBased(masterSheet, 0, zeroRow);
+            String masterColumnA = FishLinkUtils.getTextZeroBased(masterSheet, 0, zeroRow);
             int copyRow = -1;
             for (int tryRow = 0; tryRow <= lastMetaRow; tryRow ++) {
-                 String tryColumnA = MasterFactory.getTextZeroBased(copySheet, 0, tryRow);
+                 String tryColumnA = FishLinkUtils.getTextZeroBased(copySheet, 0, tryRow);
                  if (tryColumnA.equalsIgnoreCase(masterColumnA)){
                      copyRow = tryRow;
                  }
@@ -138,7 +144,7 @@ public class MetaDataCreator {
             //ystem.out.println(masterColumnA + ": " + copyRow);
             if (copyRow >= 0){
                 for ( int zeroColumn = 0;  zeroColumn <= lastColumn; zeroColumn++){
-                    String copyMeta = MasterFactory.getTextZeroBased(copySheet, zeroColumn, copyRow);
+                    String copyMeta = FishLinkUtils.getTextZeroBased(copySheet, zeroColumn, copyRow);
                     metaSheet.setValueZeroBased(zeroColumn, zeroRow, copyMeta);
                 }
             }
@@ -243,9 +249,8 @@ public class MetaDataCreator {
         return true;
     }
 
-    private void prepareSheets(FishLinkWorkbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) 
+    private void prepareSheets(Sheet masterDropdownSheet, FishLinkWorkbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) 
             throws XLWrapMapException{
-        Sheet masterSheet = MasterFactory.getMasterDropdownSheet();
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
             Sheet  dataSheet;
@@ -265,93 +270,64 @@ public class MetaDataCreator {
             }
             if (containsData(dataSheet)){
                 FishLinkSheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
-                prepareSheet(masterSheet, metaSheet, dataSheet, copySheet);
+                prepareSheet(masterDropdownSheet, metaSheet, dataSheet, copySheet);
             } else  {
                 FishLinkUtils.report("Skipping empty " + dataSheet.getSheetInfo());
             }
         }
     }
 
-    public void prepareMetaDataOnPid(String metaPid, String pid, String oldMetaPid) throws XLWrapMapException{
-        PidRegister pids = PidStore.padStoreFactory();
-        File file = getMetaDataOnPid(pid, oldMetaPid);
-        pids.registerFile("file:" + file.getAbsolutePath(), metaPid); 
-    }
-    
-    public void prepareMetaDataOnPid(String metaPid, String pid) throws XLWrapMapException{
-        PidRegister pids = PidStore.padStoreFactory();
-        File file = getMetaDataOnPid(pid);
-        pids.registerFile("file:" + file.getAbsolutePath(), metaPid); 
-    }
-
-    public File getMetaDataOnPid(String pid, String oldMetaPid) throws XLWrapMapException{
-        File metaFile = createMetaData(pid);
-        prepareMetaDataOnPid(metaFile, pid, oldMetaPid);
-        return metaFile;
-    }
-    
-    public void prepareMetaDataOnPid(File metaFile, String pid, String oldMetaPid) throws XLWrapMapException{
-        Workbook copyWorkbook = FishLinkUtils.getWorkbookOnPid(oldMetaPid);
-        prepareMetaData(metaFile, pid, copyWorkbook);
-    }
-    
-    public File getMetaDataOnPid(String pid) throws XLWrapMapException{
-        File metaFile = createMetaData(pid);
-        prepareMetaData(metaFile, pid, null);        
-        return metaFile;
-    }
-    
-    public void prepareMetaDataOnPid(File metaFile, String pid) throws XLWrapMapException{
-        prepareMetaData(metaFile, pid, null);
-    }
-
-    private void prepareMetaData(File metaFile, String pid, Workbook copyWorkbook) throws XLWrapMapException{
-        Workbook dataWorkbook = FishLinkUtils.getWorkbookOnPid(pid);
-        FishLinkUtils.report("Preparing metaSheet for "+ dataWorkbook.getWorkbookInfo());
-        FishLinkWorkbook metaWorkbook = new FishLinkWorkbook();
-        //addMetaDataSheet(metaWorkbook, dataFile, doi);
-        createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook, dataWorkbook, copyWorkbook);
-        metaWorkbook.write(metaFile);
-    }
-
-    public void prepareMetaDataOnTarget(String dataPath, String targetPath) throws XLWrapMapException{
+    public void writeMetaData(String dataUrl, String masterUrl, File output) throws XLWrapMapException{
+        FishLinkUtils.report("Creating metaData sheet for " + dataUrl);
+        Sheet masterListSheet;
+        try {
+            masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+                    " in ExcelSheet " + masterUrl, ex);
+        }
+        Sheet masterDropdownSheet;
+        try {
+            masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+                    " in ExcelSheet " + masterUrl, ex);
+        }
         Workbook dataWorkbook;
         try {
-            dataWorkbook = MasterFactory.getExecutionContext().getWorkbook(dataPath);
-        } catch (Exception e){
-            try {
-                //assume the "file:" bit is missing
-                dataWorkbook = MasterFactory.getExecutionContext().getWorkbook("file:" + dataPath);
-            } catch (XLWrapException ex) {
-                throw new XLWrapMapException("Unable to create file " + dataPath, ex);
-            }
+            dataWorkbook = context.getWorkbook(dataUrl);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the dataset " + dataUrl, ex);
         }
         FishLinkWorkbook metaWorkbook = new FishLinkWorkbook();
-        createNamedRanges(metaWorkbook);
-        prepareSheets(metaWorkbook, dataWorkbook, null);
-        metaWorkbook.write(targetPath);
-    }
-    
-    public File createMetaData(String pid) throws XLWrapMapException{
-        return createMetaData(FishLinkPaths.META_DIR, pid);
-    }
-    
-    public File createMetaData(String path, String pid) throws XLWrapMapException{
-        String dataPath = PidStore.padStoreFactory().retreiveFile(pid);
-        String[] parts = dataPath.split("[\\/.]");
-        return new File (path, parts[parts.length-2] + "MetaData.xls");
+        createNamedRanges(masterListSheet, metaWorkbook);
+        //TODO copy
+        prepareSheets(masterDropdownSheet, metaWorkbook, dataWorkbook, null);
+        metaWorkbook.write(output);
+        FishLinkUtils.report("Wrote to  " + output.getAbsolutePath());
     }
 
+    public File createMetaData(String dataUrl) throws XLWrapMapException{
+        return createMetaData(dataUrl, FishLinkPaths.MASTER_FILE);
+    }
+    
+    public File createMetaData(String dataUrl, String masterUrl) throws XLWrapMapException{
+        String[] parts = dataUrl.split("[\\\\/.]");// Split on a forawrd slash, back slash and a full stop
+        System.out.println("=======");
+        File output =  new File (FishLinkPaths.META_FILE_ROOT, parts[parts.length-2] + "MetaData.xls");
+        writeMetaData(dataUrl, masterUrl, output);
+        return output;
+    }
+   
     public static void main(String[] args) throws XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
-        creator.prepareMetaDataOnPid("META_CTP1", "CTP1", "OLDMETA_CTP1");
-        creator.prepareMetaDataOnPid("META_FBA345", "FBA345", "OLDMETA_FBA345");
-        creator.prepareMetaDataOnPid("META_rec12564", "rec12564", "OLDMETA_rec12564");
-        creator.prepareMetaDataOnPid("META_spec564", "spec564", "OLDMETA_spec564");
-        creator.prepareMetaDataOnPid("META_stokoe32433232", "stokoe32433232", "OLDMETA_stokoe32433232");
-        creator.prepareMetaDataOnPid("META_tarns33exdw2", "tarns33exdw2", "OLDMETA_tarns33exdw2");
-        creator.prepareMetaDataOnPid("META_TSF1234", "TSF1234", "OLDMETA_TSF1234");
-        creator.prepareMetaDataOnPid("META_wbgROUPS8734", "wbgROUPS8734", "OLDMETA_wbgROUPS8734");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");
+        //creator.createMetaData("META_FBA345", "FBA345", "OLDMETA_FBA345");
+        //creator.createMetaData("META_rec12564", "rec12564", "OLDMETA_rec12564");
+        //creator.createMetaData("META_spec564", "spec564", "OLDMETA_spec564");
+        //creator.createMetaData("META_stokoe32433232", "stokoe32433232", "OLDMETA_stokoe32433232");
+        //creator.createMetaData("META_tarns33exdw2", "tarns33exdw2", "OLDMETA_tarns33exdw2");
+        //creator.createMetaData("META_TSF1234", "TSF1234", "OLDMETA_TSF1234");
+        //creator.createMetaData("META_wbgROUPS8734", "wbgROUPS8734", "OLDMETA_wbgROUPS8734");
     }
 }

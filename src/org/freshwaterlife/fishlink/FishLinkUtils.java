@@ -49,13 +49,13 @@ public class FishLinkUtils {
         return reply;
     }
 
-    public static final Workbook getWorkbookOnPid (String pid) throws XLWrapMapException{
+   /* public static final Workbook getWorkbookOnPid (String pid) throws XLWrapMapException{
         PidRegister pidRegister = PidStore.padStoreFactory();
         String dataFile = pidRegister.retreiveFile(pid);
         return getWorkbook(dataFile);
-    }
+    }*/
 
-    public static final Workbook getWorkbook (String path) throws XLWrapMapException{
+    /*public static Workbook getWorkbook (String path) throws XLWrapMapException{
         try {
             return MasterFactory.getExecutionContext().getWorkbook(path);
         } catch (XLWrapException ex) {
@@ -66,8 +66,8 @@ public class FishLinkUtils {
             //}        
         }        
     }
-
-    public static final Sheet getSheet(Workbook workbook, String name) throws XLWrapMapException{
+*/
+    public static Sheet getSheet(Workbook workbook, String name) throws XLWrapMapException{
         try {
             return workbook.getSheet(name);
         } catch (XLWrapException ex) {
@@ -75,7 +75,7 @@ public class FishLinkUtils {
         }     
     }
     
-    public static final Cell getCell(Sheet metaData, int col, int row) throws XLWrapMapException{
+    public static Cell getCell(Sheet metaData, int col, int row) throws XLWrapMapException{
         try{
             return metaData.getCell(col, row);
         } catch (NullPointerException ex) {
@@ -90,7 +90,7 @@ public class FishLinkUtils {
         }        
     }
     
-    public static final String getText(Cell cell) throws XLWrapMapException{
+    public static String getText(Cell cell) throws XLWrapMapException{
         try{
             return cell.getText();
         } catch (XLWrapException ex) {
@@ -98,6 +98,25 @@ public class FishLinkUtils {
         }        
     }
     
+    public static String getTextZeroBased(Sheet sheet, int column, int row) throws XLWrapMapException {
+        if (column >= sheet.getColumns()){
+            return "";
+        }
+        if (row >= sheet.getRows()){
+            return "";
+        }
+        try {
+            Cell cell = sheet.getCell(column, row);
+            return cell.getText();
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+                    sheet.getSheetInfo(), ex);
+        } catch (XLWrapEOFException ex) {
+            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+                    sheet.getSheetInfo(), ex);
+        }
+    }
+
     /**
      * Reports any message in a standard way.
      * 

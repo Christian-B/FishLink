@@ -19,11 +19,9 @@ public class WorkbookWrite {
 
     private SheetWrite[] sheetWrites;
 
-    public WorkbookWrite (String metaPid, String dataPid) throws XLWrapMapException{
-        Workbook workbook = FishLinkUtils.getWorkbookOnPid(metaPid);
-        Workbook dataWorkbook = FishLinkUtils.getWorkbookOnPid(dataPid);
+    public WorkbookWrite (NameChecker nameChecker, MasterReader masterReader, Workbook metaWorkbook, String metaPid, Workbook dataWorkbook, String dataPid) throws XLWrapMapException{
         pid = dataPid;
-        String[] sheetNames = workbook.getSheetNames();
+        String[] sheetNames = metaWorkbook.getSheetNames();
         sheetWrites = new SheetWrite[sheetNames.length - 1];
         int j = 0;
         for (int i = 0; i< sheetNames.length; i++ ){
@@ -31,8 +29,7 @@ public class WorkbookWrite {
                 //do nothing
             } else {
                 //ystem.out.println("  " + i + " " + sheetNames.length);
-                sheetWrites[j] = new SheetWrite(workbook, dataPid, sheetNames[i]);
-                MasterReader masterReader = new MasterReader ();
+                sheetWrites[j] = new SheetWrite(nameChecker, metaWorkbook, dataWorkbook, dataPid, sheetNames[i]);
                 masterReader.check(sheetWrites[j]);
                 j++;
             }
@@ -40,23 +37,23 @@ public class WorkbookWrite {
     }
 
     /*public WorkbookWrite (String metaFileName) throws XLWrapMapException{
-        Workbook workbook;
+        Workbook metaWorkbook;
         Sheet metaData;
-        workbook = FishLinkUtils.getWorkbook("file:" + metaRoot + metaFileName);
-        metaData = FishLinkUtils.getSheet(workbook, "MetaData");
+        metaWorkbook = FishLinkUtils.getWorkbook("file:" + metaRoot + metaFileName);
+        metaData = FishLinkUtils.getSheet(metaWorkbook, "MetaData");
         Cell cell = FishLinkUtils.getCell (metaData, 1, 0);
         String dataFileName = FishLinkUtils.getText(cell);
         Workbook dataWorkbook = FishLinkUtils.getWorkbook("file:" + dataRoot + dataFileName);
         cell = FishLinkUtils.getCell(metaData, 1, 1);
         doi = FishLinkUtils.getText(cell);
-        String[] sheetNames = workbook.getSheetNames();
+        String[] sheetNames = metaWorkbook.getSheetNames();
         sheetWrites = new SheetWrite[sheetNames.length - 2];
         int j = 0;
         for (int i = 0; i< sheetNames.length; i++ ){
             if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
                 //do nothing
             } else {
-                sheetWrites[j] = new SheetWrite(workbook, "file:" + dataRoot + dataFileName, doi, sheetNames[i]);
+                sheetWrites[j] = new SheetWrite(metaWorkbook, "file:" + dataRoot + dataFileName, doi, sheetNames[i]);
                 MasterReader masterReader = new MasterReader ();
                 masterReader.check(sheetWrites[j]);
                 j++;
