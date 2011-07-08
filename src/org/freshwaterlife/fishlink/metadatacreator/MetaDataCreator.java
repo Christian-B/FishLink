@@ -8,11 +8,7 @@ import at.jku.xlwrap.spreadsheet.TypeAnnotation;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
@@ -25,10 +21,7 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  * @author Christian
  */
 public class MetaDataCreator {
-
-    //Limits the number of rows copied in
-    static private int MAX_DATA_ROW = Integer.MAX_VALUE;
-    
+   
     Sheet masterSheet;
     
     private ExecutionContext context;
@@ -96,16 +89,9 @@ public class MetaDataCreator {
             zeroRow++;
         } while (!value.isEmpty());
         metaSheet.autoSizeColumn(0);
-        int maxRow = dataSheet.getRows();
-        if (maxRow > 100){
-            maxRow = 100;
-        }
-        metaSheet.setValue("A",zeroRow + 1, "Column in Data File");
-        metaSheet.setValue("A",zeroRow + 2, "Header");
-        for (int row = 2; row <= maxRow; row++){
-           metaSheet.setValue("A",zeroRow + row + 1, row);
-        }
-        return zeroRow - 1;
+        zeroRow++; //leave a blank row
+        metaSheet.setValue("A",zeroRow, "Header");
+        return zeroRow;
     }
 
     private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, FishLinkSheet metaSheet, String column) 
@@ -151,19 +137,14 @@ public class MetaDataCreator {
         }
     }
             
-    private void copyData(int letterRow, FishLinkSheet metaSheet, Sheet dataSheet, String metaColumn) throws XLWrapMapException {
-        int zeroColumn = FishLinkUtils.alphaToIndex(metaColumn) - 1; //-1 as Column A of Data goes in B of Meta
-        String dataColumn = FishLinkUtils.indexToAlpha(zeroColumn);
-        metaSheet.setValue(metaColumn, letterRow, dataColumn);
-        metaSheet.setForegroundAqua(metaColumn, letterRow);
-        int maxRow = dataSheet.getRows();
-        if (maxRow > MAX_DATA_ROW){
-            maxRow = MAX_DATA_ROW;
-        }
-        for (int zeroRow = 0; zeroRow < maxRow; zeroRow++){
+    private void copyData(int headerRow, FishLinkSheet metaSheet, Sheet dataSheet, String metaColumn, 
+            int zeroDataColumn) throws XLWrapMapException {
+       // String dataColumn = FishLinkUtils.indexToAlpha(zeroDataColumn);
+       // metaSheet.setValue(metaColumn, letterRow, dataColumn);
+        for (int zeroRow = 0; zeroRow < dataSheet.getRows(); zeroRow++){
             Cell cell;
             try {
-                cell = dataSheet.getCell(zeroColumn, zeroRow);
+                cell = dataSheet.getCell(zeroDataColumn, zeroRow);
             } catch (XLWrapException ex) {
                 throw new XLWrapMapException("Error getting Cell", ex);
             } catch (XLWrapEOFException ex) {
@@ -183,7 +164,7 @@ public class MetaDataCreator {
                     } catch (XLWrapException ex) {
                         throw new XLWrapMapException("Error getting boolean value", ex);
                     }
-                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, booleanValue);
+                    metaSheet.setValue(metaColumn, headerRow + zeroRow, booleanValue);
                     break;
                 case NUMBER:
                     double doubleValue;
@@ -192,7 +173,7 @@ public class MetaDataCreator {
                     } catch (XLWrapException ex) {
                         throw new XLWrapMapException("Error getting double value", ex);
                     }
-                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, doubleValue);
+                    metaSheet.setValue(metaColumn, headerRow + zeroRow, doubleValue);
                     break;
                 case TEXT:
                     String textValue;
@@ -201,7 +182,7 @@ public class MetaDataCreator {
                     } catch (XLWrapException ex) {
                         throw new XLWrapMapException("Error getting text value", ex);
                     }
-                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, textValue);
+                    metaSheet.setValue(metaColumn, headerRow + zeroRow, textValue);
                     break;
                 case DATE:
                     Date dateValue;
@@ -216,7 +197,7 @@ public class MetaDataCreator {
                     } catch (XLWrapException ex) {
                         throw new XLWrapMapException("Error getting date format", ex);
                     }
-                    metaSheet.setValue(metaColumn, letterRow + zeroRow + 1, dateValue, format);
+                    metaSheet.setValue(metaColumn, headerRow + zeroRow, dateValue, format);
                     break;
                 case NULL:
                     break;
@@ -224,22 +205,23 @@ public class MetaDataCreator {
                     throw new XLWrapMapException("Unexpected Cell Type");
             }
         }
-        metaSheet.autoSizeColumn(zeroColumn);
+        metaSheet.setForegroundAqua(metaColumn, headerRow);
+        metaSheet.autoSizeColumn(zeroDataColumn);
     }
 
     private void prepareSheet(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet, Sheet copySheet) throws XLWrapMapException {
-        int lastMetaRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
+        int headerRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
         int lastColumn = dataSheet.getColumns();
-        metaSheet.createFreezePane("B", lastMetaRow + 2);
+        metaSheet.createFreezePane("B", headerRow);
         for ( int zeroDataColumn = 0;  zeroDataColumn < lastColumn; zeroDataColumn++){
             String metaColumn = FishLinkUtils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
-            prepareDropDowns(masterSheet, lastMetaRow, metaSheet, metaColumn);
-            copyData(lastMetaRow + 2, metaSheet, dataSheet, metaColumn);
+            prepareDropDowns(masterSheet, headerRow -2, metaSheet, metaColumn);
+            copyData(headerRow, metaSheet, dataSheet, metaColumn, zeroDataColumn);
         }
         //Hack tp avoid last column getting lost
-        metaSheet.setValueZeroBased(lastColumn + 1, lastMetaRow, "");
+        metaSheet.setValueZeroBased(lastColumn + 1, headerRow, "");
         if (copySheet != null){
-            copyMetaData(masterSheet, metaSheet, copySheet, lastMetaRow, lastColumn); 
+            copyMetaData(masterSheet, metaSheet, copySheet, headerRow -2, lastColumn); 
         }
     }
 
