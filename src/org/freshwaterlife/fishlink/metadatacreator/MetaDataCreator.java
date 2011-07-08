@@ -22,14 +22,14 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  */
 public class MetaDataCreator {
    
-    Sheet masterSheet;
+    //Sheet masterSheet;
     
     private ExecutionContext context;
 
     public MetaDataCreator(){
         context = new ExecutionContext();
     }
-    
+        
     private String createNamedRange (Sheet masterListSheet, FishLinkWorkbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
         FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
         String rangeName =  FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, 0);
@@ -80,7 +80,7 @@ public class MetaDataCreator {
         metaSheet.setValueZeroBased(zeroColumn + 1, 0, "");
     }
 
-    private int prepareColumnA(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
+    private int prepareColumnA(Sheet masterSheet, FishLinkSheet metaSheet) throws XLWrapMapException {
         int zeroRow = 0;
         String value;
         do {
@@ -138,13 +138,13 @@ public class MetaDataCreator {
     }
             
     private void copyData(int headerRow, FishLinkSheet metaSheet, Sheet dataSheet, String metaColumn, 
-            int zeroDataColumn) throws XLWrapMapException {
+            int zeroDataColumn, int ignoreRows) throws XLWrapMapException {
        // String dataColumn = FishLinkUtils.indexToAlpha(zeroDataColumn);
        // metaSheet.setValue(metaColumn, letterRow, dataColumn);
-        for (int zeroRow = 0; zeroRow < dataSheet.getRows(); zeroRow++){
+        for (int zeroRow = 0; zeroRow < dataSheet.getRows() - ignoreRows; zeroRow++){
             Cell cell;
             try {
-                cell = dataSheet.getCell(zeroDataColumn, zeroRow);
+                cell = dataSheet.getCell(zeroDataColumn, zeroRow + ignoreRows);
             } catch (XLWrapException ex) {
                 throw new XLWrapMapException("Error getting Cell", ex);
             } catch (XLWrapEOFException ex) {
@@ -208,20 +208,48 @@ public class MetaDataCreator {
         metaSheet.setForegroundAqua(metaColumn, headerRow);
         metaSheet.autoSizeColumn(zeroDataColumn);
     }
+    
+    private int isOldMetaData(Sheet dataSheet) throws XLWrapMapException{
+        String columnA = FishLinkUtils.getTextZeroBased(dataSheet, 0, 0);
+        if (!columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
+            return 0;
+        }
+        columnA = FishLinkUtils.getTextZeroBased(dataSheet, 0, 1);
+        if (!columnA.equalsIgnoreCase(Constants.FIELD_LABEL)){
+            return 0;
+        }
+        //Ok assume it is old metaData
+        int zeroRow = 2;
+        String value;
+        do {
+            value = FishLinkUtils.getTextZeroBased(dataSheet, 0, zeroRow);
+            zeroRow++;
+        } while (!value.isEmpty());
+        return zeroRow;  
+    }
 
-    private void prepareSheet(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet, Sheet copySheet) throws XLWrapMapException {
-        int headerRow = prepareColumnA(masterSheet, metaSheet, dataSheet);
+    private void prepareSheet(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
+        int ignoreRows = isOldMetaData(dataSheet);
+        int columnShift;
+        if (ignoreRows == 0){
+            //Plus one as metaColumn on over from DetaColumn
+            columnShift = 1;
+        } else {
+            //dataSheet is a metaSheet so already has a none data column A
+            columnShift = 0;
+        }
+        int headerRow = prepareColumnA(masterSheet, metaSheet);
         int lastColumn = dataSheet.getColumns();
         metaSheet.createFreezePane("B", headerRow);
         for ( int zeroDataColumn = 0;  zeroDataColumn < lastColumn; zeroDataColumn++){
-            String metaColumn = FishLinkUtils.indexToAlpha(zeroDataColumn + 1); //Plus one as metaColumn on over from DetaColumn
+            String metaColumn = FishLinkUtils.indexToAlpha(zeroDataColumn + columnShift); 
             prepareDropDowns(masterSheet, headerRow -2, metaSheet, metaColumn);
-            copyData(headerRow, metaSheet, dataSheet, metaColumn, zeroDataColumn);
+            copyData(headerRow, metaSheet, dataSheet, metaColumn, zeroDataColumn, ignoreRows);
         }
         //Hack tp avoid last column getting lost
         metaSheet.setValueZeroBased(lastColumn + 1, headerRow, "");
-        if (copySheet != null){
-            copyMetaData(masterSheet, metaSheet, copySheet, headerRow -2, lastColumn); 
+        if (columnShift == 0){
+            copyMetaData(masterSheet, metaSheet, dataSheet, headerRow -2, lastColumn); 
         }
     }
 
@@ -231,30 +259,23 @@ public class MetaDataCreator {
         return true;
     }
 
-    private void prepareSheets(Sheet masterDropdownSheet, FishLinkWorkbook metaWorkbook, Workbook dataWorkbook, Workbook copyWorkbook) 
+    private void prepareSheets(Sheet masterDropdownSheet, FishLinkWorkbook metaWorkbook, Workbook dataWorkbook) 
             throws XLWrapMapException{
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
-            Sheet  dataSheet;
-            try {
-                dataSheet = dataWorkbook.getSheet(dataSheets[i]);
-            } catch (XLWrapException ex) {
-                throw new XLWrapMapException("Unable to get sheet " + dataSheets[i], ex);
-            }
-            Sheet copySheet = null;
-            if (copyWorkbook != null){
+            if (!dataSheets[i].equalsIgnoreCase(Constants.LIST_SHEET)){
+                Sheet  dataSheet;
                 try {
-                    copySheet = copyWorkbook.getSheet(dataSheet.getName());
+                    dataSheet = dataWorkbook.getSheet(dataSheets[i]);
                 } catch (XLWrapException ex) {
-                    System.err.println(ex);
-                    copySheet = null;
+                    throw new XLWrapMapException("Unable to get sheet " + dataSheets[i], ex);
                 }
-            }
-            if (containsData(dataSheet)){
-                FishLinkSheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
-                prepareSheet(masterDropdownSheet, metaSheet, dataSheet, copySheet);
-            } else  {
-                FishLinkUtils.report("Skipping empty " + dataSheet.getSheetInfo());
+                if (containsData(dataSheet)){
+                    FishLinkSheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
+                    prepareSheet(masterDropdownSheet, metaSheet, dataSheet);
+                } else  {
+                    FishLinkUtils.report("Skipping empty " + dataSheet.getSheetInfo());
+                }
             }
         }
     }
@@ -284,7 +305,7 @@ public class MetaDataCreator {
         FishLinkWorkbook metaWorkbook = new FishLinkWorkbook();
         createNamedRanges(masterListSheet, metaWorkbook);
         //TODO copy
-        prepareSheets(masterDropdownSheet, metaWorkbook, dataWorkbook, null);
+        prepareSheets(masterDropdownSheet, metaWorkbook, dataWorkbook);
         metaWorkbook.write(output);
         FishLinkUtils.report("Wrote to  " + output.getAbsolutePath());
     }
@@ -296,20 +317,34 @@ public class MetaDataCreator {
     public File createMetaData(String dataUrl, String masterUrl) throws XLWrapMapException{
         String[] parts = dataUrl.split("[\\\\/.]");// Split on a forawrd slash, back slash and a full stop
         System.out.println("=======");
-        File output =  new File (FishLinkPaths.META_FILE_ROOT, parts[parts.length-2] + "MetaData.xls");
+        String fileName;
+        if (parts[parts.length-2].endsWith("MetaData")){
+            fileName = parts[parts.length-2] + ".xls";
+        } else {
+            fileName = parts[parts.length-2] + "MetaData.xls";
+        }
+        File output =  new File (FishLinkPaths.META_FILE_ROOT, fileName);
         writeMetaData(dataUrl, masterUrl, output);
         return output;
     }
    
     public static void main(String[] args) throws XLWrapMapException{
         MetaDataCreator creator = new MetaDataCreator();
-        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");
-        //creator.createMetaData("META_FBA345", "FBA345", "OLDMETA_FBA345");
-        //creator.createMetaData("META_rec12564", "rec12564", "OLDMETA_rec12564");
-        //creator.createMetaData("META_spec564", "spec564", "OLDMETA_spec564");
-        //creator.createMetaData("META_stokoe32433232", "stokoe32433232", "OLDMETA_stokoe32433232");
-        //creator.createMetaData("META_tarns33exdw2", "tarns33exdw2", "OLDMETA_tarns33exdw2");
-        //creator.createMetaData("META_TSF1234", "TSF1234", "OLDMETA_TSF1234");
-        //creator.createMetaData("META_wbgROUPS8734", "wbgROUPS8734", "OLDMETA_wbgROUPS8734");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\FBA_Tarns.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\Records.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\Species.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\Stokoe.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\Tarns.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\TarnschemFinal.xls");
+        //creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\WillbyGroups.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\CumbriaTarnsPart1MetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\FBA_TarnsMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\RecordsMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\SpeciesMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\StokoeMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\TarnsMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\TarnschemFinalMetaData.xls");
+        creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\WillbyGroupsMetaData.xls");
     }
 }
