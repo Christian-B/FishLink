@@ -1,11 +1,15 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
+import at.jku.xlwrap.common.XLWrapException;
+import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
@@ -19,17 +23,46 @@ public class WorkbookWrite {
 
     private SheetWrite[] sheetWrites;
 
-    public WorkbookWrite (NameChecker nameChecker, MasterReader masterReader, Workbook metaWorkbook, String metaPid, Workbook dataWorkbook, String dataPid) throws XLWrapMapException{
-        pid = dataPid;
-        String[] sheetNames = metaWorkbook.getSheetNames();
+    public WorkbookWrite(String dataUrl, String pid, String masterUrl) throws XLWrapMapException{
+        ExecutionContext context = new ExecutionContext();
+        Workbook annotatedWorkbook;
+        try {
+            annotatedWorkbook = context.getWorkbook(dataUrl);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the workbook " + dataUrl, ex);
+        }
+        Sheet masterListSheet;
+        try {
+            masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+                    " in ExcelSheet " + masterUrl, ex);
+        }
+        Sheet masterDropdownSheet;
+        try {
+            masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
+        } catch (XLWrapException ex) {
+            throw new XLWrapMapException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+                    " in ExcelSheet " + masterUrl, ex);
+        }
+        NameChecker nameChecker = new NameChecker(masterListSheet);
+        MasterReader masterReader = new MasterReader(masterDropdownSheet);
+        this.pid = pid;
+        String[] sheetNames = annotatedWorkbook.getSheetNames();
         sheetWrites = new SheetWrite[sheetNames.length - 1];
         int j = 0;
         for (int i = 0; i< sheetNames.length; i++ ){
-            if (sheetNames[i].equals("MetaData") || sheetNames[i].equals("Lists")) {
+            Sheet sheet;
+            try {
+                sheet = annotatedWorkbook.getSheet(i);
+            } catch (XLWrapException ex) {
+                throw new XLWrapMapException ("Unable to open sheet " + i + " in " + dataUrl, ex);
+            }
+            if (sheet.getName().equals("MetaData") || sheet.getName().equals("Lists")) {
                 //do nothing
             } else {
                 //ystem.out.println("  " + i + " " + sheetNames.length);
-                sheetWrites[j] = new SheetWrite(nameChecker, metaWorkbook, dataWorkbook, dataPid, sheetNames[i]);
+                sheetWrites[j] = new SheetWrite(nameChecker, sheet, i, dataUrl, pid );
                 masterReader.check(sheetWrites[j]);
                 j++;
             }

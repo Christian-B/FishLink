@@ -596,11 +596,11 @@ public class OwlimTester {
     public static void main(String[] args) throws RepositoryConfigException, RepositoryException, IOException, Exception {
         OwlimTester tester = new OwlimTester();
 	    long initializationStart = System.currentTimeMillis();
-        tester.openRepository();
-        //tester.newRepository();
-        //File file = new File(DATA_DIR);
-        //tester.loadFiles(file);
-        //tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
+        //tester.openRepository();
+        tester.newRepository();
+        File file = new File(DATA_DIR);
+        tester.loadFiles(file);
+        tester.showInitializationStatistics(System.currentTimeMillis() - initializationStart);
         tester.iterateNamespaces();
         tester.evaluateQueries();
         tester.shutdown();

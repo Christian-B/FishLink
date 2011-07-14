@@ -5,10 +5,6 @@ import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
-import at.jku.xlwrap.spreadsheet.Workbook;
-import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
@@ -17,7 +13,7 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
  */
 public class AbstractSheet {
 
-    protected Sheet metaSheet;
+    protected Sheet sheet;
 
     protected int firstData;
 
@@ -31,22 +27,13 @@ public class AbstractSheet {
     protected int lastConstant = -1;
     protected String lastDataColumn;
 
-    public AbstractSheet (Workbook metaWorkbook, String sheetName) throws XLWrapMapException {
-        try {
-            metaSheet = metaWorkbook.getSheet(sheetName);
-        } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to find sheet " + sheetName, ex);
-        }
-        findAndCheckMetaSplits();    
-    }
-
     public AbstractSheet (Sheet theSheet) throws XLWrapMapException {
-        metaSheet = theSheet;
+        sheet = theSheet;
         findAndCheckMetaSplits();
     }
 
     private enum SplitType{
-        NONE, CONSTANT, HEADER
+        NONE, CONSTANT
     }
 
     private void endMataSplit(int row, SplitType splitType){
@@ -63,7 +50,7 @@ public class AbstractSheet {
         SplitType splitType = SplitType.NONE;
         do {
             String columnA = getCellValue("A",row);
-            if (columnA != null){
+           if (columnA != null){
                 if (columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
                     categoryRow = row;
                 } else if (columnA.equalsIgnoreCase(Constants.FIELD_LABEL)){
@@ -82,19 +69,13 @@ public class AbstractSheet {
                     splitType = SplitType.CONSTANT;
                 } else if (columnA.equalsIgnoreCase(Constants.HEADER_LABEL)) {
                     endMataSplit(row, splitType);
-                    splitType = SplitType.HEADER;
-                } else if (columnA.isEmpty()){
+                    firstData = row + 1;
+                    return;
+                 } else if (columnA.isEmpty()){
                     endMataSplit(row, splitType);
                     splitType = SplitType.NONE;
-                } else if (splitType == SplitType.HEADER){
-                    try{
-                        firstData = Integer.parseInt(columnA);
-                        return;
-                    } catch (Exception e){
-                        System.err.println("Expected a number after \"header\" but found " + columnA);
-                    }
-                } 
-            } else {
+                }
+              } else {
                    endMataSplit(row, splitType);
                    splitType = SplitType.NONE;
             }
@@ -103,7 +84,7 @@ public class AbstractSheet {
     }
 
     private void findAndCheckMetaSplits() throws XLWrapMapException{
-        lastDataColumn = FishLinkUtils.indexToAlpha(metaSheet.getColumns() -1);
+        lastDataColumn = FishLinkUtils.indexToAlpha(sheet.getColumns());
         findMetaSplits();
         if (categoryRow == -1) {
             throw new XLWrapMapException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
@@ -117,7 +98,7 @@ public class AbstractSheet {
     }
 
    private String getZeroBasedCellValue (int col, int actualRow) throws XLWrapMapException{
-        Cell cell = FishLinkUtils.getCell(metaSheet, col, actualRow);
+        Cell cell = FishLinkUtils.getCell(sheet, col, actualRow);
         XLExprValue<?> value;
         try {
             value = Utils.getXLExprValue(cell);
@@ -137,11 +118,11 @@ public class AbstractSheet {
         return getZeroBasedCellValue (col, actualRow);
     }
 
-    protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws XLWrapMapException{
-        int col = Utils.alphaToIndex(dataColumn) + 1;
-        int actualRow = row - 1;
-        return getZeroBasedCellValue (col, actualRow);
-    }
+ //   protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws XLWrapMapException{
+ //       int col = Utils.alphaToIndex(dataColumn) + 1;
+ //       int actualRow = row - 1;
+ //       return getZeroBasedCellValue (col, actualRow);
+ //   }
 }
 
 

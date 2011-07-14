@@ -23,7 +23,7 @@ public class Constants {
     //categeries
     private static final String LOCATION_LABEL = "Location";
     public static final String OBSERVATION_LABEL = "Observation";
-    private static final String PERSON_LABEL = "Person";
+    private static final String ENTITY_LABEL = "Entity";
     private static final String SITE_LABEL = "Site";
     private static final String SURVEY_LABEL = "Survey";
 
@@ -50,10 +50,10 @@ public class Constants {
     public static String refersToCategory(String field){
         //Use NameChecker.isCategory to find ones where the field name = a categeroy name
         if (field.equalsIgnoreCase(CONTIBUTOR_LABEL)){
-            return PERSON_LABEL;
+            return ENTITY_LABEL;
         }
         if (field.equalsIgnoreCase(OWNER_LABEL)){
-            return PERSON_LABEL;
+            return ENTITY_LABEL;
         }
         if (field.toLowerCase().contains("subsite")){
             return SITE_LABEL;
