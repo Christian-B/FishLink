@@ -33,11 +33,11 @@ import java.util.Date;
  */
 public class E_FuncID_URI extends XLExprFunction {
 
-	/**
-	 * default constructor
-	 */
-	public E_FuncID_URI() {
-	}
+    /**
+     * default constructor
+     */
+    public E_FuncID_URI() {
+    }
 
     private boolean ignore(XLExprValue<?> expression, XLExprValue<?> ignoreZeros) throws XLWrapException{
         if (expression == null){
@@ -67,8 +67,8 @@ public class E_FuncID_URI extends XLExprFunction {
         }
     }
 
-	protected final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
-		// ignores actual cell value, just use the range reference to determine row
+    protected final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
+            // ignores actual cell value, just use the range reference to determine row
         String url = getArg(0).eval(context).getValue().toString();
 
         if (args.size() == 3){
@@ -84,17 +84,17 @@ public class E_FuncID_URI extends XLExprFunction {
                 return null;
             }
         }
-		return new E_String(url + specific);
-	}
+        return new E_String(url + specific);
+    }
 
-	@Override
-	public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
+    @Override
+    public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
         String prefix = getArg(0).eval(context).getValue().toString();
         XLExprValue<?> value1 = getArg(1).eval(context);
         if (value1 == null){
             return null;
         }
-		return doEval(context, value1.toString());
-	}
+        return doEval(context, value1.toString());
+    }
 	
 }
