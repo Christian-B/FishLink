@@ -5,6 +5,7 @@ import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import java.util.Date;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
@@ -115,6 +116,23 @@ public class FishLinkUtils {
             throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
                     sheet.getSheetInfo(), ex);
         }
+    }
+
+    public static boolean isZero(Object value) throws XLWrapException{
+        if (value instanceof Number){
+            int i = ((Number)value).intValue();
+            return i == 0;
+        }
+        if (value instanceof String){
+            return value.toString().equals("0");
+        }
+        if (value instanceof Boolean){
+            return false;
+        }
+        if (value instanceof Date){
+            return (((Date)value).getTime() == 0);
+        }
+        throw new XLWrapException("Expected type " + value.getClass());
     }
 
     /**
