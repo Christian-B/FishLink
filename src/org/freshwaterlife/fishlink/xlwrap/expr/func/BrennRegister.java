@@ -16,5 +16,9 @@ public class BrennRegister {
         FunctionRegistry.register(functionClass);
         functionClass = E_FuncID_URI.class;
         FunctionRegistry.register(functionClass);
+        functionClass = E_FuncNULL_AS_ZERO.class;
+        FunctionRegistry.register(functionClass);
+        functionClass = E_FuncZERO_AS_NULL.class;
+        FunctionRegistry.register(functionClass);
      }
 }

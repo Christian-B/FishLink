@@ -196,21 +196,6 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
-    private void writeValue(BufferedWriter writer, String value) throws XLWrapMapException{
-        if (!value.startsWith("'")){
-            value = "'" + value ;
-        }
-        if (!value.endsWith("'")){
-            value = value + "'";
-        }
-        try {
-            writer.write("[ xl:uri \"'" + Constants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
-            writer.newLine();
-        } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write vocab", ex);
-        }            
-    }
-
     private void writeConstant (BufferedWriter writer, String category, String column, int row) 
             throws XLWrapMapException{
         String field = getCellValue ("A", row);
@@ -230,7 +215,18 @@ public class SheetWrite extends AbstractSheet{
         } else {
             masterNameChecker.checkConstant(sheet.getSheetInfo(), field, value);
             writeVocab (writer, field);
-            writeValue(writer, value);
+            if (!value.startsWith("'")){
+                value = "'" + value ;
+            }
+            if (!value.endsWith("'")){
+                value = value + "'";
+            }
+            try {
+                writer.write("[ xl:uri \"'" + Constants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
+                writer.newLine();
+            } catch (IOException ex) {
+                throw new XLWrapMapException("Unable to write constant", ex);
+            }            
         }
     }
 
@@ -260,7 +256,19 @@ public class SheetWrite extends AbstractSheet{
         String category = refersToCategory(field);
         try {
             if (category  == null) {
-                writer.write("\"" + column + firstData + "\"^^xl:Expr ;");
+                switch (zeroNull){
+                    case KEEP:
+                        writer.write("\"" + column + firstData + "\"^^xl:Expr ;");
+                        break;
+                    case ZEROS_AS_NULLS:   
+                        writer.write("\"ZERO_AS_NULL(" + column + firstData + ")\"^^xl:Expr ;");
+                        break;
+                    case NULLS_AS_ZERO:   
+                        writer.write("\"NULL_AS_ZERO(" + column + firstData + ")\"^^xl:Expr ;");
+                        break;
+                    default:
+                        throw new XLWrapMapException("Unexpected ZeroNullType " + zeroNull);
+                }
             } else {
                 String uri = getUri(column, category);
                 writer.write("[ xl:uri \"ID_URI('" + uri + "'," + column + firstData + ", '" + zeroNull + 

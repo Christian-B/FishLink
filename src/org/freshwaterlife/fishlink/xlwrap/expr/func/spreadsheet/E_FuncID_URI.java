@@ -18,15 +18,11 @@ package org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
-import at.jku.xlwrap.map.expr.XLExpr;
 import at.jku.xlwrap.map.expr.func.XLExprFunction;
-import at.jku.xlwrap.map.expr.val.E_Boolean;
 import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.freshwaterlife.fishlink.ZeroNullType;
 import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
@@ -103,10 +99,14 @@ public class E_FuncID_URI extends XLExprFunction {
     public XLExprValue<String> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
         String prefix = getArg(0).eval(context).getValue().toString();
         XLExprValue<?> value1 = getArg(1).eval(context);
+        String valueString;
         if (value1 == null){
-            return null;
+            //Set it to "0" incase NullsAsZero. Other case will be nulled by ignore
+            valueString = "0";
+        } else {
+            valueString = value1.toString();
         }
-        return doEval(context, value1.toString());
+        return doEval(context, valueString);
     }
 	
 }
