@@ -27,8 +27,8 @@ public class MasterReader extends AbstractSheet {
                 throw new XLWrapMapException("Map contains \"external sheet\" but master does not.");
            }
        }
-       if (other.ignoreZerosRow > 0){
-           if (this.ignoreZerosRow == -1){
+       if (other.ZeroNullRow > 0){
+           if (this.ZeroNullRow == -1){
                 throw new XLWrapMapException("Map contains \"ignore zero\" but master does not.");
            }
        }

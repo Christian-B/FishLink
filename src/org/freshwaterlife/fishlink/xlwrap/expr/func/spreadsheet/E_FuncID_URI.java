@@ -25,6 +25,10 @@ import at.jku.xlwrap.map.expr.val.E_String;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.freshwaterlife.fishlink.ZeroNullType;
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  * @author dorgon
@@ -39,48 +43,56 @@ public class E_FuncID_URI extends XLExprFunction {
     public E_FuncID_URI() {
     }
 
-    private boolean ignore(XLExprValue<?> expression, XLExprValue<?> ignoreZeros) throws XLWrapException{
+    private boolean ignore(XLExprValue<?> expression, XLExprValue<?> zeroToNullExpr) throws XLWrapException{
+        Object value;
         if (expression == null){
-            return true;
-        }
-        Object value = expression.getValue();
-        if (value == null){
-            return true;
-        }
-        if (((E_Boolean)ignoreZeros).getValue().booleanValue()){
-            if (value instanceof Number){
-                int i = ((Number)value).intValue();
-                return i == 0;
-            }
-            if (value instanceof String){
-                return value.toString().equals("0");
-            }
-            if (value instanceof Boolean){
-                return false;
-            }
-            if (value instanceof Date){
-                return (((Date)value).getTime() == 0);
-            }
-            throw new XLWrapException("Expected type in Cell_URI " + value.getClass());
+            value = null;
         } else {
-            return false;
+            value = expression.getValue();
         }
-    }
+        String zeroToNullString = zeroToNullExpr.getValue().toString();
+        ZeroNullType zeroNullType;
+        try {
+            zeroNullType = ZeroNullType.parse(zeroToNullString);
+        } catch (XLWrapMapException ex) {
+            throw new XLWrapException(ex);
+        }
+        switch (zeroNullType){
+            case KEEP: 
+                return value == null;
+            case NULLS_AS_ZERO:
+                return true;
+            case ZEROS_AS_NULLS:
+                if (value instanceof Number){
+                    int i = ((Number)value).intValue();
+                    return i == 0;
+                }
+                if (value instanceof String){
+                    return value.toString().equals("0");
+                }
+                if (value instanceof Boolean){
+                    return false;
+                }
+                if (value instanceof Date){
+                    return (((Date)value).getTime() == 0);
+                }
+                throw new XLWrapException("Expected type in Cell_URI " + value.getClass());
+            default:
+                throw new XLWrapException("Unexpected ZeroNullType: "+ zeroNullType);
+        }
+     }
 
     protected final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
-            // ignores actual cell value, just use the range reference to determine row
+        // ignores actual cell value, just use the range reference to determine row
         String url = getArg(0).eval(context).getValue().toString();
 
-        if (args.size() == 3){
-            if (ignore (getArg(1).eval(context), getArg(2).eval(context))){
-                return null;
-            }
+        //Check ID/Value column is not ignore
+        if (ignore (getArg(1).eval(context), getArg(2).eval(context))){
+            return null;
         }
-        if (args.size() == 4){
-            if (ignore (getArg(1).eval(context), getArg(3).eval(context))){
-                return null;
-            }
-            if (ignore (getArg(2).eval(context), getArg(3).eval(context))){
+        if (args.size() == 5){
+            //Check Data column is not ignore
+            if (ignore (getArg(3).eval(context), getArg(4).eval(context))){
                 return null;
             }
         }

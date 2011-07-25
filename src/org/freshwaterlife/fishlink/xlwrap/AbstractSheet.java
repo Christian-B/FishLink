@@ -22,7 +22,7 @@ public class AbstractSheet {
     protected int fieldRow = -1;
     protected int idTypeRow = -1;
     protected int externalSheetRow = -1;
-    protected int ignoreZerosRow = -1;
+    protected int ZeroNullRow = -1;
     protected int firstConstant = -1;
     protected int lastConstant = -1;
     protected String lastDataColumn;
@@ -59,10 +59,10 @@ public class AbstractSheet {
                     idTypeRow = row;
                 } else if (columnA.equalsIgnoreCase(Constants.EXTERNAL_LABEL)){
                     externalSheetRow = row;
-                } else if (columnA.equalsIgnoreCase(Constants.EXTERNAL_LABEL)){
-                    ignoreZerosRow = row;
+                } else if (columnA.equalsIgnoreCase(Constants.ZEROS_VS_NULLS_LABEL)){
+                    ZeroNullRow = row;
                 } else if (columnA.contains("links")){
-                    throw new XLWrapMapException ("Links not currently supproted");
+                    throw new XLWrapMapException ("Links not currently supported");
                 } else if (columnA.contains(Constants.CONSTANTS_DIVIDER)){
                     firstConstant = row + 1;
                     endMataSplit(row, splitType);
@@ -71,9 +71,11 @@ public class AbstractSheet {
                     endMataSplit(row, splitType);
                     firstData = row + 1;
                     return;
-                 } else if (columnA.isEmpty()){
+                } else if (columnA.isEmpty()){
                     endMataSplit(row, splitType);
                     splitType = SplitType.NONE;
+                } else if (splitType == SplitType.NONE){
+                    throw new XLWrapMapException ("Found unexpected \"" + columnA + "\" before " + Constants.CONSTANTS_DIVIDER);                    
                 }
               } else {
                    endMataSplit(row, splitType);

@@ -17,7 +17,7 @@ public class Constants {
     public static final String FIELD_LABEL = "Field";
     public static final String ID_VALUE_LABEL = "Id/Value Column"; //Id/Value Column (or "All")  //Old ones may have row
     public static final String EXTERNAL_LABEL = "external sheet";
-    public static final String IGNORE_ZEROS_LABEL = "Ignore Zeros";
+    public static final String ZEROS_VS_NULLS_LABEL = "Zeros vs Nulls";
     public static final String CONSTANTS_DIVIDER = "Constants"; //-- Constants --
     public static final String HEADER_LABEL = "Header";
     //categeries
@@ -37,6 +37,11 @@ public class Constants {
     public static final String ALL_LABEL = "all";
     private static final String SUB_TYPE_LABEL = "SubType";
 
+    //Zeros vs Nulls values
+    public static final String KEEP_LABEL = "Keep as is";
+    public static final String ZERO_AS_NULLS_LABEL = "Zeros as Nulls";
+    public static final String NULLS_AS_ZERO_LABEL = "Nulls as Zeros";
+     
     public static String autoRelatedCategory(String category){
         if (category.equalsIgnoreCase(SITE_LABEL)){
             return LOCATION_LABEL;

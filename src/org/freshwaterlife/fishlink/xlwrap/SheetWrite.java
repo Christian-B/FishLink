@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.freshwaterlife.fishlink.FishLinkUtils;
+import org.freshwaterlife.fishlink.ZeroNullType;
 
 /**
  *
@@ -84,12 +85,12 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
-            String dataColumn, boolean ignoreZeros) throws XLWrapMapException {
+            String dataColumn, ZeroNullType zeroVsNulls) throws XLWrapMapException {
         if(category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)) {
-            writelUriCell(writer, category, field, idType, dataColumn, ignoreZeros);
+            writeObservationUril(writer, field, idType, dataColumn, zeroVsNulls);
         } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
                 idType.equalsIgnoreCase(Constants.AUTOMATIC_LABEL)){
-            writeUri(writer, category, field, dataColumn, ignoreZeros);
+            writeUri(writer, category, field, dataColumn, zeroVsNulls);
         } else {
             //There is an Id reference to another dataColumn.
             if (idType.equalsIgnoreCase("row")){
@@ -99,34 +100,33 @@ public class SheetWrite extends AbstractSheet{
             } else {
                 String idCategory = this.getCellValue(idType, categoryRow);
                 String idColumn = idColumns.get(idCategory);
-                writeUri(writer, idCategory, field, idColumn, ignoreZeros);
+                writeUri(writer, idCategory, field, idColumn, zeroVsNulls);
             }
         }
     }
     
-    private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, boolean ignoreZeros)
-            throws XLWrapMapException {
+    private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, 
+            ZeroNullType dataZeroVsNulls) throws XLWrapMapException {
         String uri = categoryUris.get(category);
         if (field.toLowerCase().equals(Constants.ID_LABEL)){
             try {
-                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ","
-                        + ignoreZeros + ")\"^^xl:Expr ] ");
+                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ",'"
+                        + dataZeroVsNulls + "')\"^^xl:Expr ] ");
             } catch (IOException ex) {
                 throw new XLWrapMapException("Unable to write uri", ex);
             }
             return;
         }
-        String idColumn = idColumns.get(category);
-        writeUriOther(writer, uri, idColumn, dataColumn, ignoreZeros);
+        writeUriOther(writer, uri, category, dataColumn, dataZeroVsNulls);
     }
 
-    private void writelUriCell(BufferedWriter writer, String category, String field, String idColumn, String dataColumn,
-            boolean ignoreZeros) throws XLWrapMapException {
-        String uri = categoryUris.get(category);
+    private void writeObservationUril(BufferedWriter writer, String field, String idColumn, 
+            String dataColumn, ZeroNullType dataZeroNull) throws XLWrapMapException {
+        String uri = categoryUris.get(Constants.OBSERVATION_LABEL);
         if(field.equalsIgnoreCase(Constants.VALUE_LABEL)) {
             try {
-                writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ","
-                        + ignoreZeros + ")\"^^xl:Expr ] ");
+                writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ",'"
+                        + dataZeroNull + "')\"^^xl:Expr ] ");
             } catch (IOException ex) {
                 throw new XLWrapMapException("Unable to write uri", ex);
             }                
@@ -134,30 +134,31 @@ public class SheetWrite extends AbstractSheet{
         }
         if (idColumn == null || idColumn.isEmpty()){
             throw new XLWrapMapException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
-                    category + " and field " + field + " needs an id Type");
+                    Constants.OBSERVATION_LABEL + " and field " + field + " needs an id Type");
         }
-//        writer.write("[ xl:uri \"OTHER_CELL_URI('" + uri + "', " + idColumn + firstData + ","
-//            + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
+        String idNullZeroString = getCellValue (idColumn, idTypeRow);
+        ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
         try {
-            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idColumn + firstData + ","
-                + dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
+            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idColumn + firstData + ", '" + idZeroNull + "' ,"
+                + dataColumn + firstData + ",'" + dataZeroNull + "')\"^^xl:Expr ] ");
         } catch (IOException ex) {
             throw new XLWrapMapException("Unable to write uri", ex);
         }
     }
 
-    private void writeUriOther(BufferedWriter writer, String uri, String idColumn, String dataColumn, boolean ignoreZeros)
-            throws XLWrapMapException {
+    private void writeUriOther(BufferedWriter writer, String uri, String category, 
+            String dataColumn, ZeroNullType dataZeroVsNulls) throws XLWrapMapException {
         //"row" is added for automatic ones where no id column found.
+        String idColumn = idColumns.get(category);
         try {
             if (idColumn.equalsIgnoreCase("row")){
-                writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + "," +
-                        ignoreZeros + ")\"^^xl:Expr ] ");
+                writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + ",'" +
+                        dataZeroVsNulls + "')\"^^xl:Expr ] ");
             } else {
-//            writer.write("[ xl:uri \"OTHER_ID_URI('" + uri + "', " + idColumn + firstData + "," +
-//                    dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
-                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + idColumn + firstData + "," +
-                        dataColumn + firstData + "," + ignoreZeros + ")\"^^xl:Expr ] ");
+                String zeroNullString = getCellValue (idColumn, ZeroNullRow);
+                ZeroNullType idZeroNull = ZeroNullType.parse(zeroNullString);
+                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + idColumn + firstData + ",'" + idZeroNull + "'," + 
+                        dataColumn + firstData + ",'" + dataZeroVsNulls + "')\"^^xl:Expr ] ");
             }
         } catch (IOException ex) {
             throw new XLWrapMapException("Unable to write uri", ex);
@@ -233,18 +234,16 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private boolean getIgnoreZeros (String column) throws XLWrapMapException {
-        if (ignoreZerosRow >= 0){
-            String ignoreZeroString = getCellValue (column, ignoreZerosRow);
+    private ZeroNullType getZeroVsNull (String column) throws XLWrapMapException {
+        if (ZeroNullRow >= 0){
+            String ignoreZeroString = getCellValue (column, ZeroNullRow);
             if (ignoreZeroString == null){
-                return false;
-            } else  if (ignoreZeroString.isEmpty()){
-                return false;
-            } else {
-                return Boolean.parseBoolean(ignoreZeroString);
-            }
+                return ZeroNullType.KEEP;
+            } else if (ignoreZeroString.isEmpty()){
+                return ZeroNullType.KEEP;
+            } return ZeroNullType.parse(ignoreZeroString);
         } else{
-            return false;
+            return ZeroNullType.KEEP;
         }
     }
 
@@ -255,7 +254,7 @@ public class SheetWrite extends AbstractSheet{
        return Constants.refersToCategory(field);
     }
 
-    private void writeData(BufferedWriter writer, String column) throws XLWrapMapException {
+    private void writeData(BufferedWriter writer, String column, ZeroNullType zeroNull) throws XLWrapMapException {
         String field = getCellValue (column, fieldRow);
         writeVocab(writer, field);
         String category = refersToCategory(field);
@@ -264,7 +263,8 @@ public class SheetWrite extends AbstractSheet{
                 writer.write("\"" + column + firstData + "\"^^xl:Expr ;");
             } else {
                 String uri = getUri(column, category);
-                writer.write("[ xl:uri \"ID_URI('" + uri + "'," + column + firstData + ", false)\"^^xl:Expr ];");
+                writer.write("[ xl:uri \"ID_URI('" + uri + "'," + column + firstData + ", '" + zeroNull + 
+                        "')\"^^xl:Expr ];");
             }
             writer.newLine();
             }  catch (IOException ex) {
@@ -272,7 +272,7 @@ public class SheetWrite extends AbstractSheet{
             }            
     }
 
-    private void writeAutoRelated(BufferedWriter writer, String category, String column, boolean ignoreZeros)
+    private void writeAutoRelated(BufferedWriter writer, String category, String column, ZeroNullType dataZeroVsNulls)
             throws XLWrapMapException {
         String related = Constants.autoRelatedCategory(category);
         if (related == null){
@@ -283,8 +283,7 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         writeVocab(writer, related);
-        String idColumn = idColumns.get(category);
-        writeUriOther(writer, uri, idColumn, column, ignoreZeros);
+        writeUriOther(writer, uri, category, column, dataZeroVsNulls);
         try {
             writer.write(";");
             writer.newLine();
@@ -293,15 +292,16 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
-    private void writeAllRelated(BufferedWriter writer, String category, boolean ignoreZeros)
+    private void writeAllRelated(BufferedWriter writer, String category, ZeroNullType zeroVsNulls)
             throws XLWrapMapException {
         if (!category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)){
             return;
         }
-        String uri = categoryUris.get(category);
-        String idColumn = idColumns.get(category);
+        String uri = categoryUris.get(Constants.OBSERVATION_LABEL);
         for (String column : allColumns){
-            writeData(writer, column);
+            String idNullZeroString = getCellValue (column, ZeroNullRow);
+            ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
+            writeData(writer, column, idZeroNull);
         }
     }
 
@@ -328,17 +328,18 @@ public class SheetWrite extends AbstractSheet{
             FishLinkUtils.report("Skipping column " + column + " as it is an all column.");
             return false;
         }
-        boolean ignoreZeros  = getIgnoreZeros(column);
-        writeUri(writer, category, field, idType, column, ignoreZeros);
+       
+        ZeroNullType zeroNull =getZeroVsNull(column);
+        writeUri(writer, category, field, idType, column, zeroNull);
         try {
             writer.write (" a ");
             writeType (writer, category);
         }  catch (IOException ex) {
             throw new XLWrapMapException("Unable to write a type", ex);
         }            
-        writeData(writer, column);
-        writeAutoRelated(writer, category, column, ignoreZeros);
-        writeAllRelated(writer, category, ignoreZeros);
+        writeData(writer, column, zeroNull);
+        writeAutoRelated(writer, category, column, zeroNull);
+        writeAllRelated(writer, category, zeroNull);
         for (int row = firstConstant; row <= lastConstant; row++){
             writeConstant(writer,  category, column, row);
         }
