@@ -32,7 +32,7 @@ public class MapRun {
         try {
             m = mat.generateModel(map);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Error generating model "+ pid );
+            throw new XLWrapMapException ("Error generating model "+ pid , ex);
         }
         m.setNsPrefix("constant", FishLinkPaths.RDF_BASE_URL + "constant/");
         m.setNsPrefix("type", FishLinkPaths.RDF_BASE_URL + "type/");        
