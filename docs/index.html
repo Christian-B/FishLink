@@ -82,7 +82,7 @@ This step is actually a series of steps as explain in the workflow documentation
 The description here only adds extra information and limitation which directly effect the tools described here.
 
 <ul>
-	<li>The datasets will have to be uploaded to the FreshwaterLife website.
+	<li>The datasets will have to be uploaded to the FreshwaterLife web site.
 	<li>Each dataset will be assigned a PID by FBA
 	<li>The tools described here only ever need read only access to this data
 	<li>The raw data should not be modify after the annotation workbook is created
@@ -162,6 +162,7 @@ The restriction listed here only apply to dataset over which the tools described
 
 <h1 id="MetaDataCreator">Create metadata annotation sheets</h1>
 This step creates and Excel Workbook with Spreadsheets that have extra header rows which will help the data uploader provide the required information required to produce rdf which complies to the ontology.
+<p>This will probably be an automated step in the Fish.Link workflow.
 <h2> Tool </h2>
 <ul>
 	<li>Java program
@@ -172,9 +173,9 @@ This step creates and Excel Workbook with Spreadsheets that have extra header ro
 			<li>Could be a "http:\\"... link, but I am unsure if XLWrap can handle security
 			<li>Files link's should start with "file:", and include the absolute path.
 		</ul>
-		<li>Indirect imputs
+		<li>Indirect inputs
 		<ul>
-			<li>Raw data downloaed from the link
+			<li>Raw data downloaded from the link
 			<li><a href="#MetaMaster">MetaMaster Spreadsheet</a> (Obtained via a PID currently hard code in program)
 		</ul>
 	</ul>
@@ -188,7 +189,7 @@ Instead of Raw data, a Workbook which already contains annotation rows may be us
 This will produce an updated Annotation workbook, with wherever possible the existing annotation copied across.
 The new <a href="#AnnotationWorkbook">Annotation Workbook</a> will contain (only) the vocabulary from the <a href="#MetaMaster">MetaMaster Spreadsheet</a>.
 Any vocabulary added to the version input will be LOST.
-Any annotation in the previous workbook will copied even if it does not match the the vocabulary from the <a href="#MetaMaster">MetaMaster Spreadsheet</a>.
+Any annotation in the previous workbook will copied even if it does not match the vocabulary from the <a href="#MetaMaster">MetaMaster Spreadsheet</a>.
 <p>
 <h1 id="Annotate">Add the column level metadata</h1>
 The <a href="#AnnotateSheet">Annotation Sheets</a> now has to be filled in by someone with Domain Knowledge.
@@ -230,9 +231,9 @@ Type (or class) of the item being described.
 		<td id="Entity">Entity</td>Entity
 		<td>
 			<ul>
-				<li>A Person, group of People or Orgaization being described.
-				<li>The kind of things that can be an Entity are descrided in <a href="#EntitySubTypes">Entity sub types</a>
-				<li>The fields that can be included in an Entity are described in the <a href="#EntityFields">Enityty Fields table.</a>.
+				<li>A Person, group of People or Organization being described.
+				<li>The kind of things that can be an Entity are described in <a href="#EntitySubTypes">Entity sub types</a>
+				<li>The fields that can be included in an Entity are described in the <a href="#EntityFields">Entity Fields table.</a>.
 				<li>An Entities could be an <a href="#Owner">Owner</a> and or a <a href="#Contributor">Contributor</a>.
 			</ul>
 		</td>
@@ -257,7 +258,7 @@ Type (or class) of the item being described.
 					<a href="#DateField">Date</a>,
 					<a href="#StartDateField">StartDate</a> and
 					<a href="#EndDateField">EndDate</a> fields.
-				<li>Anything that changes depending on the <a href="#MeasurmentMethodField">Measurment Method</a>.
+				<li>Anything that changes depending on the <a href="#MeasurmentMethodField">Measurement Method</a>.
 				<li>Anything that could be either a single value or a combination of several factors. Therefor there is a <a href="#DevriationFactor">DevriationFactor</a> field.
 				<li>Anything that has a <a href="#Unit">Unit</a>.
 				<li>Anything that be influenced by the <a href="#ContributorField">Contributor</a>.
@@ -270,10 +271,10 @@ Type (or class) of the item being described.
 		<td>
 			<ul>
 				<li>The Physical thing being described.
-				<li>The kind of things that can be location are descrided in <a href="#SiteSubTypes">Site sub types</a>
+				<li>The kind of things that can be location are described in <a href="#SiteSubTypes">Site sub types</a>
 				<li>The fields that can be included in a site are described in the <a href="#SiteFields">Site Fields table.</a>.
 				<li>Must values about a site will be an <a href="#Observation">Observation</a>.
-				<li>Assumed to be at the Location descrided in the same row of a table.
+				<li>Assumed to be at the Location described in the same row of a table.
 				<li>A site may be a <a href="#SubSite">SubSite</a> or be <a href="#SimilarTo">SimilarTo</a> another site.
 			</ul>
 		</td>
@@ -283,7 +284,7 @@ Type (or class) of the item being described.
 		<td>
 			<ul>
 				<li>A formal or official examination of the particulars of something, made in order to ascertain condition, character, etc.
-				<li>Collects together characteristics of would otherwise have to be asserted for each <a href="#Observation">Observation</a>. So if an <a href="#Observation">Observation</a> is linked to a Suvery then the data about the Survey implicitly applies to the Observation.
+				<li>Collects together characteristics of would otherwise have to be asserted for each <a href="#Observation">Observation</a>. So if an <a href="#Observation">Observation</a> is linked to a Survey then the data about the Survey implicitly applies to the Observation.
 				<li>The fields that can be included in a survey are listed in the <a href="#SurveyFields">Survey Fields table.</a>.
 				<li>Similar to ISA's Assay Category.
 			</ul>
@@ -294,7 +295,7 @@ Type (or class) of the item being described.
 		<td>
 			<ul>
 				<li>Data about a <a href="http://en.wikipedia.org/wiki/Taxon"> taxonomic unit </a>.
-				<li>The kind of things that can be a Taxon are descrided in <a href="#TaxonSubTypes">Taxon sub types</a>
+				<li>The kind of things that can be a Taxon are described in <a href="#TaxonSubTypes">Taxon sub types</a>
 				<li>The fields that can be included in a Taxon are described in the <a href="#TaxonFields">Taxon Fields table.</a>.
 				<li>The issue of id resolution is an ongoing Msc project.
 				However the question of when two Taxon's can be considered equal may then on the usage of that assertion.
@@ -348,7 +349,7 @@ Type of value the data represents
 				<li>A unique value to be used as part of <a href="#Uri">URIs</a>
 				<li>If two rows in the same column have the same Id the rows will be considered to describe the same Subject.
 				<li>If no Id column is provided the row number in the Raw Data will be used.
-				<li>If there is an Id but a row has a nul cell, that row will be ignored for that catagory, even if other cells do contain data,
+				<li>If there is an Id but a row has a null cell, that row will be ignored for that category, even if other cells do contain data,
 			<ul>
 		</td>
 	</tr>
@@ -454,12 +455,12 @@ Type of value the data represents
 	</tr>
 	<tr >
 		<td>Title</td>
-		<td>A Peron's title</td>
+		<td>A Person's title</td>
 	</tr>
 </table>
 <p>
 These are just the fields needed for the test data sets.
-It is highly likely that additional fields will be required to propably describe an Entity.
+It is highly likely that additional fields will be required to properly describe an Entity.
 These could include AddressLine1, AddressLine2, City, Country, Fax, Email and PhoneNumber.
 See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to add these or other fields.
 <p>
@@ -508,7 +509,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>See <a href="#SubTypeField">Description in Shared Fields Table</a></td>
 	</tr>
 </table>
-<p>There is an open issue of which formats should be allowed in each of these fields. Without a strict definition comparision of location based on their values will be difficult.
+<p>There is an open issue of which formats should be allowed in each of these fields. Without a strict definition comparison of location based on their values will be difficult.
 
 <p>There are intentional no
 	<a href="#AbbreviationField">Abbreviation</a>,
@@ -557,7 +558,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 	</tr>
 	<tr id="StartDateField">
 		<td>StartDate</td>
-		<td>The begining of the date/time range during which this observation was made.</td>
+		<td>The beginning of the date/time range during which this observation was made.</td>
 	</tr>
 	<tr id="SurveyField">
 		<td>Survey</td>
@@ -576,7 +577,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>The date/time this observation's information was last updated. This is NOT the data/time the Observation was actually made.</td>
 	</tr>
 	<tr id="ValueField">
-		<td>Walue</td>
+		<td>Value</td>
 		<td>The actual (ideally) numerical value that was observed. Avoid including Unit as this make calculation on the data more difficult.</td>
 	</tr>
 </table>
@@ -616,7 +617,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 	</tr>
 	<tr id="SimilarTo">
 		<td>isSimilarTo</td>
-		<td>The Id part of an <a href="#External">External Reference<a> to another Site which is probably the same Site. Much like the rdf:sameAs relationship but without the explicite assigment of the values to the other Site.
+		<td>The Id part of an <a href="#External">External Reference<a> to another Site which is probably the same Site. Much like the rdf:sameAs relationship but without the explicit assignment of the values to the other Site.
 	</tr>
 	<tr id="SubSite">
 		<td>isSubsiteOf</td>
@@ -725,7 +726,7 @@ Note: If a Site is the rdf:sameAs in the strict sense that all the values descri
 	</tr>
 </table>
 <p>
-The high level of overlap between Survey and Observation fields is intentional, as this information could be provded at either level.
+The high level of overlap between Survey and Observation fields is intentional, as this information could be provided at either level.
 <p>
 <table border="1" id="TaxonFields">
 	<tr>
@@ -789,7 +790,7 @@ The high level of overlap between Survey and Observation fields is intentional, 
 
 <h3 id="Id">Id/Value Column (or "All")</h3>
 A single table/sheet  can contain several <a href="#Observation">Observation</a>s.
-This row allows the none <a href="#ValueField">Value</a> Columns to be assined to the correct <a href="#ValueField">Value</a> Column.
+This row allows the none <a href="#ValueField">Value</a> Columns to be assigned to the correct <a href="#ValueField">Value</a> Column.
 
 <ul>
 	<li>The Id... value be used to create the rdf uri. See <a href="#Uri">Creating Uri's Section</a>.
@@ -803,12 +804,12 @@ This row allows the none <a href="#ValueField">Value</a> Columns to be assined t
 		<li>"all"
 		<ul>
 			<li>Assigned the data in this column to every observation in the same row.
-			<li>So for example if there is a Column with Categery "Observation", Field "Date" and "Id.." "all", this would assign the triple  ObservationX vocab:hasDate Y to all the Observations.
+			<li>So for example if there is a Column with Category "Observation", Field "Date" and "Id.." "all", this would assign the triple  ObservationX vocab:hasDate Y to all the Observations.
 		</ul>
 		<li>A String Column name of one, two (or with xlsx even three) characters.
 		<ul>
 			<li>Assigned the data in this column to the observation in the specified column in the <B>RAW</B> data.
-			<li>So for example if there is a Column with Categery "Observation", Field "Date" and "Id.." "E", this would assign the triple  ObservationE... vocab:hasDate Y to the Observations whose <a href="#ValueField">Value</a> comes from column E.
+			<li>So for example if there is a Column with Category "Observation", Field "Date" and "Id.." "E", this would assign the triple  ObservationE... vocab:hasDate Y to the Observations whose <a href="#ValueField">Value</a> comes from column E.
 		</ul>
 		<li>"Automatic" or left blank
 		<ul>
@@ -816,7 +817,7 @@ This row allows the none <a href="#ValueField">Value</a> Columns to be assined t
 		</ul>
 		<li>Any other value will cause an Exception in the <a href="rdf">Generate rdf</a> stage.
 	</ul>
-	<li>ID... has a closed vocabulary. Currently it coveres the 255 values ("A" to "IV") in an *.xls Workbook, If needed could be extened up "ALH" for an *.xlsx Workbook.
+	<li>ID... has a closed vocabulary. Currently it covers the 255 values ("A" to "IV") in an *.xls Workbook, If needed could be extended up "ALH" for an *.xlsx Workbook.
 </ul>
 
 <h3 id="External">External Sheet</h3>
@@ -839,7 +840,7 @@ Data in a table/sheet many refer to data found in either another sheet in the sa
 		</ul>
 		<li>A sheeting in another workbook
 		<ul>
-			<li>The other workbook will be refered to using its PID.
+			<li>The other workbook will be referred to using its PID.
 			<li>The format is [PID]sheetName
 			<li>Assuming a workbook with PID "5e3de72b-a533-46fe-a319-97511f663245" and a sheet "People"
 			<ul>
@@ -849,7 +850,7 @@ Data in a table/sheet many refer to data found in either another sheet in the sa
 		<li>External id system
 		<ul>
 			<li>This is currently not supported but is a highly recommended extension.
-			<li>Exact format will depend on the extenal Id Sytsem to be integrated.
+			<li>Exact format will depend on the external Id System to be integrated.
 		</ul>
 		<li>Any other value may cause an Exception in the <a href="rdf">Generate rdf</a> stage, but are more likely to just generate rdf with strange links.
 	</ul>
@@ -861,7 +862,7 @@ Data in a table/sheet many refer to data found in either another sheet in the sa
 	<ul>
 		<li>Therefor PIDs of both files already converted to RDF and ones still to be converted can be used.
 		<li>Users are allowed any legal sheetName
-		<li>The disadvantage of this open approach is there is NO error checking. An incorrect PID or Sheeet name will result in an apperently valid <a href="#Uri">Uri</a> but which does not link.
+		<li>The disadvantage of this open approach is there is NO error checking. An incorrect PID or Sheet name will result in an apparently valid <a href="#Uri">Uri</a> but which does not link.
 	</ul>
 	<li>External Sheet would be required for a <a href="http://en.wikipedia.org/wiki/Link_table">Link (Junction) Table</a>.
 	<ul>
@@ -874,28 +875,33 @@ Data in a table/sheet many refer to data found in either another sheet in the sa
 			<li>As there is only every one <a href="#SiteFields">Site</a> and one <a href="#DesignationFields">Designation</a> per sheet (See <a href="#DataRestriction">Data Restriction Section</a>) The <a href="Id">ID ...</a> will be "Automatic".
 			<li>The External Sheet values should point to the sheets where the <a href="#Id">ID</a> or the things referred to can be found.
 		</ul>
-		<li>RDF and this tool can handle <a href="http://en.wikipedia.org/wiki/Many-to-many_%28data_model%29">Many to Many</a> relationsships.
+		<li>RDF and this tool can handle <a href="http://en.wikipedia.org/wiki/Many-to-many_%28data_model%29">Many to Many</a> relationships.
 			In this case a single subject would have several triples with the same predicate but different Objects.
 	</ul>
 </ul>
 
-<h3 id="External">Ignore Zeros</h3>
+<h3 id="ZeroNull">Zeros vs Nulls</h3>
 
 <ul>
-	<li>Ideally zero should only be used if there is a known value of zero. Nothing here changes that.
+	<li>Ideally zero should be used if there is a known value of zero or a known absence. Nothing here changes that.
+	<li>Ideally null should be used if the value is unknown or not applicable. Nothing here changes that.
 	<li>However some tools (such as Access) insert zeros whenever they export data with a null in a "numerical" column,
-	<li>The tool therefor allow the user to state on a column basis.
+	<li>The tool therefor allow the user to state on a column basis is null
+	<li>Other tools expect a null instead of a zero so users have to level zero values blank.
+	<li>This option allows users to determine if zero and nulls should be treated as found or replaced.
+	<li>This is set for each column.
 	<li>This is not required.
 	<ul>
-		<li>If there is no "Ignore Zeros" row the <a href="#Mapping">Mapping stage</a> assumes that all zeros mean zero and not null.
-		<li>If left blank "False" or do not ignore zeros is assumed.
+		<li>If there is no "Zeros vs Nulls" row the <a href="#Mapping">Mapping stage</a> assumes that all zeros mean zero and all nulls mean null.
+		<li>If left blank "Keep as is" is assumed.
 	</ul>
 	<li>Legal Values are:
 	<ul>
-		<li>False: In which case a zero value is included and will result in an RDF triple   X  Y 0
-		<li>True: In which case the field is treated as if it was null.
+		<li>Keep as is: In which case a zero value is included and will result in an RDF triple X  Y 0, while a null value is excluded,
+		<li>Zeros as Nulls: In which case both zero and nulls values are excluded.
+		<li>Nulls as Zeros: In which case both null and zero value are included and will result in an RDF triple X Y 0
 	</ul>
-	<li>Null cells are always considered null (never added to the rdf) regradless of the "Ignore Zeros" value.
+	<li>Cells with a none null one zero value are always included, irrespective of the value in this row.
 	<li>This is a closed vocabulary. No other values make sense,
 </ul>
 
@@ -942,7 +948,7 @@ These all behave in similar ways.
 	<li>A number by itself is meaningless.
 	<li>Represent what unit to go with a numerical value.
 	<ul>
-		<li> For example Feet, Meters, Ph, Liter
+		<li> For example Feet, Meters, Ph, Litre
 	</ul>
 	<li>Could be a complex unit combining two individual units such as use Meqvl/1.
 	<li>Could include a square of cube such as SquareMeters
@@ -955,7 +961,7 @@ These all behave in similar ways.
 	<ul>
 		<li>New terms can be added as needed.
 		<li>The <a href="#Mapping">Mapping stage</a> will throw an error unless additions are included in the <a href="#MetaMaster">Meta Master file</a>.
-		<li>Ideal this should be terms from an accepted vocabulary, but at time of writing this document no existing vocabulary had been choosen.
+		<li>Ideal this should be terms from an accepted vocabulary, but at time of writing this document no existing vocabulary had been chosen.
 	</ul>
 	<li>Keeping units out of the <a href="#ValueField">Value</a> allows for mathematical operations on the <a href="#ValueField">Value</a>.
 </ul>
@@ -989,9 +995,9 @@ These all behave in similar ways.
 <h4 id="SubType">SubType</h4>
 
 <ul>
-	<li>In some case the <a href="#Category">Category</a> is too broad a term, and all the itmes described in the table could actual be described in a more narrow way.
+	<li>In some case the <a href="#Category">Category</a> is too broad a term, and all the items described in the table could actual be described in a more narrow way.
 	<li>This cell allows such a narrower description to be applied.
-	<li>Result in an additional rdf:type triple about each of the descrided items.
+	<li>Result in an additional rdf:type triple about each of the described items.
 	<li>Only applicable for <a href="#Category">Categories</a> that have a list of subtype. At the time of writing this was
 	<li><a href="#Location">Location</a>
 	<ul>
@@ -1035,36 +1041,39 @@ These all behave in similar ways.
 	</ul>
 </ul>
 
-<h2 id="AnnotationWorkbook">Annotation Workbook</h1>
-The user will provide the <a href="#Information">Information Required</a> will be provided by filling in an Excel workbook which contains not only the original data but also extra rorws to add Column level metadata.
+<h2 id="AnnotationWorkbook">Annotation Workbook</h2>
+The user will provide the <a href="#Information">Information Required</a>.
+This will be provided by filling in an Excel workbook which contains not only the original data but also extra rows to add Column level metadata.
 
 <ul>
-	<li>Excel Spreadsheet(s) <a href="#AnnotateSheet">Annotation Sheet</a>
+	<li>Excel Spreadsheets) Annotation Sheet
 	<ul>
 		<li>One sheet for each sheet in the raw data.
 		<li>Will have the same name as in the raw data
 		<li>Extra header rows for collecting meta data.
 		<ul>
 			<li>One row for each <a href="#Information">Information Required</a>
-		<\ul>
+		</ul>
 		<li>The latest version of the raw data
-	<\ul>
-	<li><b>Lists<b>Copy of the vocabulary from MetaMaster. "#Information">Information Required
-<\ul>
+	</ul>
+	<li><b>Lists</b>Copy of the vocabulary from MetaMaster. "#Information">Information Required
+</ul>
 
 <h3>Filling in the Annotation Workbook</h3>
 <ul>
-	<li>Someone with domain knoweldge of the particular dataset will have to fill this in
+	<li>Someone with domain knowledge of the particular dataset will have to fill this in
 	<li>It is better to leave a non required cell blank rather than guess.
 	<ul>
 		<li>Leaving it blank shows the data user that this information is not known for sure.
 		<li>Data users can then assume the standard value
-		<li>For example better to leave an "Alltitude" "Units" blank rather then just guess "meters". This show that there is a small chance it could be "yards".
-	<\ul>
-<\ul>
+		<li>For example better to leave an "Altitude" "Units" blank rather then just guess "meters". This show that there is a small chance it could be "yards".
+	</ul>
+</ul>
 
 <h1 id="Mapping">Generate XLwrap mapping file</h1>
 This step creates an XLwrap mapping file which will be used to create the actual RDF.
+<p>This will probably be an automated step in the Fish.Link workflow.
+
 <h2> Tool </h2>
 <ul>
 	<li>Java program
@@ -1076,9 +1085,9 @@ This step creates an XLwrap mapping file which will be used to create the actual
 			<li>Files link's should start with "file:", and include the absolute path.
 		</ul>
 		<li>PID: persistent identifier
-		<li>Indirect imputs
+		<li>Indirect inputs
 		<ul>
-			<li>Raw data downloaed from the link
+			<li><a href="#AnnotationWorkbook">Annotation Workbook</a> downloaded from the link
 			<li><a href="#MetaMaster">MetaMaster Spreadsheet</a> (Obtained via a PID currently hard code in program)
 		</ul>
 	</ul>
@@ -1088,48 +1097,57 @@ This step creates an XLwrap mapping file which will be used to create the actual
 	</ul>
 </ul>
 
-<h2> XlWrap mapping File</h2>
+<h2 id:MappingFile> XlWrap mapping File</h2>
 <ul>
-	<li>This file should never need editting
-	<li>Valid as long as the URI link to the <a href="#AnnotationWorkbook">Annotation Workbook</a> remaains valid
+	<li>This file should never need editing
+	<li>Many of the annotation header values will be hard coded in here.
+	<li>Valid as long as:
+	<ul>
+		<li>The URI link to the <a href="#AnnotationWorkbook">Annotation Workbook</a> remains valid
+		<li>No annotation values (The header rows as described in <a href="#Information">Information Required</a>) are changed.
+		<li>Note effected by changes to the <a href="#MetaMaster">MetaMaster Spreadsheet</a>. However generated results may no longer conform to the latest vocabulary.
+	</ul>
 	<li>Can be used repeatedly
 	<ul>
 		<li>As long as the <a href="#AnnotationWorkbook">Annotation Workbook</a> does not change will produce the same rdf each time
-	<ul>
-	<ul>Depends on extra XLWrap functions provided with this tool.
+		<li>Changes to data cells will produce a different but still valid rdf file.
+		<li>Changes to the header rows will be ignored values as these are now hard coded in the mapping file.
+	</ul>
+	<li>Depends on extra XLWrap functions provided with this tool.
 </ul>
+
 <h2 id="Uri">Generate URI values</h2>
-One of the main tasks of the maping files is to (indirectly via functions) generate the URIs used as the Subjects and of the Objects of the RDf triples.
+One of the main tasks of the mapping files is to (indirectly via functions) is to generate the URIs used as the Subjects and of the Objects of the RDf triples.
 
 <ul>
 	<li>URIs will start with a prefix
 	<ul>
 		<li>This is hard coded in and is currently ""http://rdf.freshwaterlife.org/"
-	<\ul>
+	</ul>
 	<li>Then there is a keyword depending on the type of URI
 	<ul>
 		<li>type/
 		<ul>
 			<li>Use in the Object of rdf:type triples
 			<li>Followed by a String value of the type
-		<\ul>
+		</ul>
 		<li>constant/
 		<ul>
-			<li>Use in with the <a href="Constants">Constants<\a> where values come from a controlled vocabulary.
+			<li>Use in with the <a href="Constants">Constants</a> where values come from a controlled vocabulary.
 
-			<li>Follwed b the String Constant
-		<\ul>
+			<li>Followed by the String Constant
+		</ul>
 		<li>resource/"
 		<ul>
 			<li>Use in Subjects and Objects that depend on a Id, row or Cell location  (See below)
-			<li>Follwed by more information as shown below
-		<\ul>
+			<li>Followed by more information as shown below
+		</ul>
 		<li>vocab/
 		<ul>
 			<li>Used in the Predicates. (Unless they come from a known vocabulary such as rdf:type)
-			<li>Followed byt the String name of the Predicate
-		<\ul>
-	<ul>
+			<li>Followed by the String name of the Predicate
+		</ul>
+	</ul>
 	<li>The <a href="Category">Category</a>
 	<li>The PID of the document
 	<li>The name of the sheet the data was found it
@@ -1140,57 +1158,197 @@ One of the main tasks of the maping files is to (indirectly via functions) gener
 			<li>Used whenever available
 			<li>Value found in the "Id" Cell will be used
 			<li>If the "Id" cell is null no triples will be produced for this item
-		<ul>
+		</ul>
 		<li>Cell based
 		<ul>
-			<li>Used for <a href="Observation">Observation</a>
+			<li>Used for <a href="#Observation">Observation</a>
 			<li>The Cell address of the <a href="#Observation">Observation's</a> <a href="#ValueField"">Value Field"</a>"
-			<li>If that Cellis null no triples will be used.
+			<li>If that Cell is null no triples will be used.
 		</ul>
 		<li>Row based
 		<ul>
 			<li>Used for Categories other than <a href="#Observation">Observation</a> when there is no "Id" Column.
 			<li>The row number the item was found in will be used.
 		</ul>
-		<li>For Columns other than the Id or Value column, both the cell in this column as well as the corrosponding (in the same row) Cell in the Id or Value column must be none null. Otherwise no triple is generated.
+		<li>For Columns other than the Id or Value column, both the cell in this column as well as the corresponding (in the same row) Cell in the Id or Value column must be none null. Otherwise no triple is generated.
 	</ul>
-<ul>
+</ul>
 
 <h1 id="rdf">Generate rdf files</h1>
+This step uses the <a href="MappingFile">XLwrap mapping file</a>to create the actual RDF.
+<p>This will probably be an automated step in the Fish.Link workflow.
+
+<h2> Tool </h2>
+<ul>
+	<li>Java program
+	<li>Inputs
+	<ul>
+		<li> <a href="#MappingFile">XLwrap mapping file</a>.
+		<li>Indirect inputs
+		<ul>
+			<li><a href="#AnnotationWorkbook">Annotation Workbook</a> downloaded from the link
+			<ul>
+				<li>Only the data rows of this file will be used here.
+			</ul>
+		</ul>
+	</ul>
+	<li>Output
+	<ul>
+		<li>RDF File
+	</ul>
+</ul>
+
+It is recommended that the <a href="#AnnotationWorkbook">Annotation Workbook</a> is not changed between creating the <a href="MappingFile">XLwrap mapping file</a> and the RDF file.
+
 <h1 id="sparql">Load rdf into a sparql server</h1>
+The next step is to load the rdf file(s) into a sparql server.
+<p>This is expected to be an automated stage of the Fish.Link project.
+<ul>
+	<li>The exact steps are beyond the scope of this document as they are server implementation specific.
+	<li>RDF files based on different PIDs can be combined into a single graph.
+	<ul>
+		<li> The <a href="#Uri">URIs</a> for each PID will be distinct from each other, except where specifically linked <a href="#External">External Sheet</a> reference so there will be no clashes.</h3>
+	</ul>
+	<li>Generally adding an new RDF files to an existing store will not remove or change previous values.
+	<ul>
+		<li>Exact duplicates are ignored.
+		<li>However changes are considered new complementary information.
+		<ul>
+			<li>This results in both the old and new value being present.
+			<li>For example say a value is corrected from 1000 to 10. The result would be 2 triples, X vocab:hasValue 1000 and X vocab:hasValue 10.
+		</ul>
+		<li>Additional information can be safely added. As long as the previous information is not removed, because many of the <a href="#Uri">URIs</a> depend on the row the data was found in.
+	</ul>
+</ul>
+
 <h1 id="query">Query the sparql endpoint</h1>
+The sparql endpoint can now be queried, Either directly by a user or by some other application.
+
+Again how to do this depends on the sparql endpoint used.
 
 <h1 id="Admin">Administration Documents</h1>
 <h2 id="MetaMaster">The MetaMaster.xlss</h2>
 <ul>
-    <li>Only available to Admistrators
-    <li>Single version to be used with all datasets
-    <li>Used creating Metasheets
+    <li>Only available to Administrator
+    <li>Used creating <a href="#AnnotationWorkbook">Annotation Workbook</a> which contain all the important information.
     <li>Used for checking when creating mapping files.
-    <li>Lists sheet
+    <li>Single version to be used with all datasets
     <ul>
-        <li>Vocabulary allowed
+    	<li>It is technically possible to have various different MetaMaster workbooks,
+    	<li>For example a simple vocabulary and an extended vocabulary.
+    	<li>If an <a href="#AnnotationWorkbook">Annotation Workbook</a> is created with one master and checked when mapping against a different master this may cause errors.
+    </ul>
+    <li>"Lists" sheet
+    <ul>
+    	<li>This is the Master for the "Lists" sheet in the <a href="#AnnotationWorkbook">Annotation Workbook</a>
+        <li>This has three sections each divided by an empty columns.
+        <li>Categories and Fields
         <ul>
-            <li>Columns before the empty column
             <li>Row 1:    Category
             <li>Rows 2+: Legal values for the fields
             <li>
-        <ul>
+        </ul>
         <li>SubTypes
         <ul>
+            <li>Row 1:    Category +"SubType"
+            <li>Rows 2+: Legal values for the SubTypes or "n/a"
             <li>
-	Factor, Unit, DeviationFactor
-	Legal values for each of these
-	Support lists for the dropdowns
-	Undefinded, Automatic, NotApplicable, FieldsThatNeedUnit, Column
-	Order here is order that will be used in dropdowns.
-	Adding values will extend range in created sheets but not in example drop downs.
+        </ul>
+        <li>values for dropdown lists
+        <ul>
+        	<li>Factor: See <a href="#Factor">Factor Section</a>
+        	<li>Unit: See <a href="#Unit">Unit Section</a>
+        	<li>Deviation factor: See <a href="#Deviation factor">Deviation Factor Section</a>
+        	<li>Automatic and NotApplicable: single valued groups used where applicable
+        	<li>Column: "all" and then the legal column names. (xls based). Used by <a href="#Id">Id/Value Column (or "All")</a>.
 
-    <ul>
-        <li>
+        </ul>
+        <li>Note:Order the values appear here (rows 2+) is the order they will appear in the dropdowns.
+	</ul>
+	<li>"DropDown" Sheet
+	<ul>
+		<li>This is the Master for the <a href="#AnnotationWorkbook">Annotation Workbook</a> Annotation Sheet(s)
+		<li>Column A: Values to be copied to Column A of the Annotation Sheet(s)
+		<li>Column B; Test dropdown/Data validation fields. Not used
+		<li>Column C to H: Values to be used in the DataValidation. For the matching row in every column in the Annotation Sheet(s).
+		<ul>
+			<li>Values as if creating a "List" based data validation rule.
+			<li>Column C: Value for the "Source" box in the "Settings" tab.
+			<li>Column D: Value for the "Title" box in the "Input Message" tab.
+			<li>Column E: Value for the "Input Message" box in the "Input Message" tab.
+			<li>Column F: Value for the "Style" box in the "Error Alert" tab.
+			<li>Column G: Value for the "Title" box in the "Error Alert" tab.
+			<li>Column H: Value for the "Error Message" box in the "Error Alert" tab.
+		</ul>
+		<li>Rows below the Blank row: Control counts to make sure the lengths are not too long.
+		<ul>
+			<li>Poi does not check these and too long fields cause an corrupt Excel file to be generated,
+			<li>Tool does throw an Exception.
+			<li>Titles may only be 32 characters long.
+			<li>Massages may only be 255 characters long.
+		</ul>
+	</ul>
+</ul>
+
 <h3 id="ChangingMetaMaster">Changing the MetaMaster</h3>
-Changes made will NOT effect already created metaSheets, mapping files or RDF.
-
+<ul>
+	<li>The MetaMaster is in no way a complete document,
+	<ul>
+		<li>Many of the vocabularies in the "List" Sheet need much additional work.
+		<li>Many be a use to add an additional Constants row.
+		<li>Text in Dropdowns could be improved.
+	</ul>
+	<li>Changes made will NOT effect already created metaSheets, mapping files or RDF.
+	<li>Changes made before <a href="#Mapping">Generate XLwrap mapping file</a> will effect the checking done then.
+	<li>Adding to the MetaMaster will never effect the checking of valid <a href="#AnnotationWorkbook">Annotation Workbook</a> Annotation Sheet(s)
+	<li>Changing the MetaMaster will only effect the checking of valid <a href="#AnnotationWorkbook">Annotation Workbook</a> Annotation Sheet(s) if the Sheet uses a value no longer in the MetaMaster.
+</ul>
 <h1>Future Work</h1>
+There is always a lot more work that can be done.
+<ul>
+	<li>Vocabularies need completing.
+	<li>Easting and Northings allowing different units and bases needs sorting.
+</ul>
 <h2 id="DerivedFrom">Derived From Series</h2>
+There are times when a data set contains both raw data and some form of derived data. For example
+<ul>
+	<li>Data measured in one Unit and the converted to a second Unit
+	<ul>
+		<li>For Example inches converted to Centimetres but both values included.
+	</ul>
+	<li>Individual Values
+	<ul>
+		<li>For Example Daily values and then weekly values.
+	</ul>
+	<li><a href="http://en.wikipedia.org/wiki/Interpolated">Interpolated data</a>
+	<ul>
+		<li>For Example Rainfall not recorded Sunday morning. Mondays recording is assumed to be half on Saturday, half on Sunday.
+	</ul>
+	<li><a href="http://en.wikipedia.org/wiki/Ratio">Ratio data</a>
+	<ul>
+		<li>For Example: Percentage of Visitors who are Female based on both Male and Female Visitor numbers
+		<li>For Example Plants per Square meters, based on total number of plants and area.
+	</ul>
+</ul>
+The steps to capture this information would be.
+<ul>
+	<li>For each Derived value: create a Observation Series Object.
+	<ul>
+		<li>Two values are based on exactly the same Observation (for example weekly Sum and Average) could share the same series.
+	</ul>
+	<li>Add the Specific Observations to the Series
+	<ul>
+		<li>Subject is URI of the Series
+		<li>Predicate suggestion is vocab:hasObservation
+		<li>Object is the URI of the raw Observation being added
+	</ul>
+	.
+	<li>Add a triple to the Derived Observation
+	<ul>
+		<li>Subject is URI of the Derived Observation
+		<li>Predicate suggestion is vocab:DervidedFrom
+		<li>Object is the URI of the Series create above
+	</ul>
+</ul>
+Suggested to do this even when Observations are derived from a single Observation. This keeps things consistent.
 </body>
