@@ -54,24 +54,7 @@ public class FishLinkUtils {
         }
         return reply;
     }
-
-/*    public static Sheet getSheet(Workbook workbook, String name) throws FishLinkException{
-        try {
-            return workbook.getSheet(name);
-        } catch (XLWrapException ex) {
-            throw new FishLinkException ("Unable to create metaData in workbook " + workbook.getWorkbookInfo(), ex);
-        }     
-    }
-*/
-    
-/*    public static String getText(Cell cell) throws FishLinkException{
-        try{
-            return cell.getText();
-        } catch (XLWrapException ex) {
-            throw new FishLinkException ("Unable to get text from cell " + cell.getCellInfo(), ex);
-        }        
-    }
-*/   
+ 
     /**
      * Gets the String in the specified cell from a Sheet.
      * 
