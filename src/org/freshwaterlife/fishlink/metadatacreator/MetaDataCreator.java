@@ -328,4 +328,20 @@ public class MetaDataCreator {
         return output;
     }
    
+    public static void usage(){
+        FishLinkUtils.report("Creates a Meta Data collection file based on input.");
+        FishLinkUtils.report("Requires two paramters.");
+        FishLinkUtils.report("First is the raw data to be described.");
+        FishLinkUtils.report("Second if the location (path and file name) of the MetaData file.");
+    }
+
+    public static void main(String[] args) throws FishLinkException{
+        if (args.length != 2){
+            usage();
+            System.exit(2);
+        }
+        MetaDataCreator metaDataCreator = new MetaDataCreator();
+        metaDataCreator.createMetaData(args[0], args[1]);
+    }
+
 }
