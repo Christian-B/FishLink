@@ -111,7 +111,7 @@ public class FishLinkSheet {
      * @param column zero based
      * @param value Integer value
      */
-    public void setValueZeroBased (int column, int row, String value){
+    void setValueZeroBased (int column, int row, String value){
         Cell cell = getCellZeroBased(column, row);
         cell.setCellValue(value);
     }
@@ -125,7 +125,7 @@ public class FishLinkSheet {
      * @param column Using Excel names
      * @param value Integer value
      */
-    public void setValue (String column, int row, String value){
+    void setValue (String column, int row, String value){
         Cell cell = getCell(column, row);
         cell.setCellValue(value);
     }
@@ -139,7 +139,7 @@ public class FishLinkSheet {
      * @param column Using Excel names
      * @param value Integer value
      */
-    public void setValue (String column, int row, boolean value){
+    void setValue (String column, int row, boolean value){
         Cell cell = getCell(column, row);
         cell.setCellValue(value);
     }
@@ -153,7 +153,7 @@ public class FishLinkSheet {
      * @param column Using Excel names
      * @param value Integer value
      */
-    public void setValue (String column, int row, Date value){
+    void setValue (String column, int row, Date value){
         Cell cell = getCell(column, row);
         cell.setCellValue(value);
         Calendar calendar = Calendar.getInstance();
@@ -180,7 +180,7 @@ public class FishLinkSheet {
      * @param value Integer value
      * @param format String format of the datacell;
      */
-    public void setValue (String column, int row, Date value, String format){
+    void setValue (String column, int row, Date value, String format){
         Cell cell = getCell(column, row);
         cell.setCellValue(value);
         Workbook wb = poiSheet.getWorkbook();
@@ -198,7 +198,7 @@ public class FishLinkSheet {
      * @param row Using Excel counting
      * @param column Using Excel names
      */
-    public void setForegroundAqua (String column, int row){
+    void setForegroundAqua (String column, int row){
         Cell cell = getCell(column, row);
         // Aqua background
         CellStyle style = poiSheet.getWorkbook().createCellStyle();
@@ -290,7 +290,7 @@ public class FishLinkSheet {
      * @param row Using Excel counting
      * @param column Using Excel names
      */
-    public void createFreezePane (String column, int row){
+    void createFreezePane (String column, int row){
         int columnNumber = FishLinkUtils.alphaToIndex(column);
         poiSheet.createFreezePane(columnNumber, row, columnNumber, row);
     }
@@ -300,6 +300,5 @@ public class FishLinkSheet {
     void autoSizeColumn(int column) {
         poiSheet.autoSizeColumn(column);
     }
-
 
 }
