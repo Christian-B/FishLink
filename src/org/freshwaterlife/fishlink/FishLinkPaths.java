@@ -18,14 +18,9 @@ public class FishLinkPaths {
     public static final String RDF_FILE_ROOT = "output/rdf/";
 
     /**
-     * Base URL to be used in the RDF 
-     */
-    public static final String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
-
-    /**
      * Directory to which the MetaData files created will be written.
      */
-    public static final String META_FILE_ROOT = "c:/Dropbox/FishLink XLWrap data/Meta Data/";
+    public static final String META_FILE_ROOT = "output/metadata/";
    
     /**
      * Hard coded in location of the MetaMaster

@@ -2,11 +2,14 @@ package org.freshwaterlife.fishlink.xlwrap;
 
 /**
  *
- * @author christian
+ * @author Christian
  */
 public class Constants {
 
-    public static String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
+    /**
+     * Base URL to be used in the RDF 
+     */
+    public static final String RDF_BASE_URL = "http://rdf.freshwaterlife.org/";
 
     public static final String LIST_SHEET = "Lists";
 

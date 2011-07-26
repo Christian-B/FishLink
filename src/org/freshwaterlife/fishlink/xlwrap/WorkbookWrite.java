@@ -107,13 +107,13 @@ public class WorkbookWrite {
             writer.newLine();
             writer.write("@prefix foaf:	<http://xmlns.com/foaf/0.1/> .");
             writer.newLine();
-            writer.write("@prefix constant:	<" + FishLinkPaths.RDF_BASE_URL + "constant/> .");
+            writer.write("@prefix constant:	<" + Constants.RDF_BASE_URL + "constant/> .");
             writer.newLine();
-            writer.write("@prefix type:	<" + FishLinkPaths.RDF_BASE_URL + "type/> .");
+            writer.write("@prefix type:	<" + Constants.RDF_BASE_URL + "type/> .");
             writer.newLine();
-            writer.write("@prefix resource:	<" + FishLinkPaths.RDF_BASE_URL + "resource/> .");
+            writer.write("@prefix resource:	<" + Constants.RDF_BASE_URL + "resource/> .");
             writer.newLine();
-            writer.write("@prefix vocab:	<" + FishLinkPaths.RDF_BASE_URL + "vocab/> .");
+            writer.write("@prefix vocab:	<" + Constants.RDF_BASE_URL + "vocab/> .");
             writer.newLine();
             writer.write("@prefix dc:     <http://purl.org/dc/elements/1.1/> .");
             writer.newLine();

@@ -22,14 +22,14 @@ public class CreateMapAndRdf {
     
     public static void main(String[] args) throws FishLinkException {
         BrennRegister.register();
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\CumbriaTarnsPart1MetaData.xls", "CTP1");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\FBA_TarnsMetaData.xls", "FBA345");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\RecordsMetaData.xls", "rec12564");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\SpeciesMetaData.xls", "spec564");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\StokoeMetaData.xls", "stokoe32433232");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\TarnsMetaData.xls", "tarns33exdw2");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\TarnschemFinalMetaData.xls", "TSF1234");
-        mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\WillbyGroupsMetaData.xls", "wbgROUPS8734");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "CumbriaTarnsPart1MetaData.xls", "CTP1");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "FBA_TarnsMetaData.xls", "FBA345");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "RecordsMetaData.xls", "rec12564");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "SpeciesMetaData.xls", "spec564");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "StokoeMetaData.xls", "stokoe32433232");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "TarnsMetaData.xls", "tarns33exdw2");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "TarnschemFinalMetaData.xls", "TSF1234");
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "WillbyGroupsMetaData.xls", "wbgROUPS8734");
         /* */
     }
 }
