@@ -27,8 +27,7 @@ import at.jku.xlwrap.map.range.Range;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 
 /**
- * @author dorgon
- * @athour Christian
+ * @author Christian
  *
  */
 public class E_FuncCELL_URI extends E_FuncID_URI {

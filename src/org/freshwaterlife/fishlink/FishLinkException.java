@@ -12,8 +12,8 @@ public class FishLinkException extends Exception {
      * @param  message the detail message (which is saved for later retrieval
      *         by the {@link #getMessage()} method).
      */
-    public FishLinkException(String msg) {
-        super(msg);
+    public FishLinkException(String message) {
+        super(message);
     }
 
    /**
@@ -29,7 +29,7 @@ public class FishLinkException extends Exception {
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.)
      */
-    public FishLinkException(String msg, Exception ex) {
-        super(msg, ex);
+    public FishLinkException(String message, Exception cause) {
+        super(message, cause);
     }
 }

@@ -91,7 +91,7 @@ public class FishLinkUtils {
      * Reports any message in a standard way.
      * 
      * Current implementation is just to System.out but logging can be added here!
-     * @param messages Any text to be output.
+     * @param message Any text to be output.
      */
     public static void report (String message){
         System.out.println(message);
