@@ -9,7 +9,7 @@ import at.jku.xlwrap.spreadsheet.Sheet;
  */
 public class MasterReader extends AbstractSheet {
 
-    public MasterReader (Sheet masterDropdownSheet) throws FishLinkException {
+    MasterReader (Sheet masterDropdownSheet) throws FishLinkException {
        super(masterDropdownSheet);
     }
 

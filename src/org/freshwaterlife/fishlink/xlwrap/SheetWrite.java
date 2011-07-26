@@ -1,9 +1,7 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
 import org.freshwaterlife.fishlink.FishLinkException;
-import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Sheet;
-import at.jku.xlwrap.spreadsheet.Workbook;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ public class SheetWrite extends AbstractSheet{
     private HashMap<String,String> categoryUris;
     private ArrayList<String> allColumns;
 
-    public SheetWrite (NameChecker nameChecker, Sheet annotatedSheet, int sheetNumber, String url, String pid)
+    SheetWrite (NameChecker nameChecker, Sheet annotatedSheet, int sheetNumber, String url, String pid)
             throws FishLinkException{
         super(annotatedSheet);
         this.pid = pid;
@@ -48,7 +46,7 @@ public class SheetWrite extends AbstractSheet{
         return sheet.getName() + "template";
     }
 
-    protected void writeMapping(BufferedWriter writer) throws FishLinkException{
+    void writeMapping(BufferedWriter writer) throws FishLinkException{
         try {
             writer.write("	xl:offline \"false\"^^xsd:boolean ;");
             writer.newLine();
@@ -452,7 +450,7 @@ public class SheetWrite extends AbstractSheet{
         }
      }
 
-    protected void writeTemplate(BufferedWriter writer) throws FishLinkException{
+    void writeTemplate(BufferedWriter writer) throws FishLinkException{
         FishLinkUtils.report("Writing template for "+sheet.getSheetInfo());
         findIds();
         try {

@@ -65,7 +65,7 @@ public class E_FuncID_URI extends E_Func_with_zero {
         }
      }
 
-    protected final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
+    final XLExprValue<String> doEval(ExecutionContext context, String specific) throws XLWrapException, XLWrapEOFException {
         // ignores actual cell value, just use the range reference to determine row
         String url = getArg(0).eval(context).getValue().toString();
 

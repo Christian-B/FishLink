@@ -15,21 +15,21 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
  */
 public class AbstractSheet {
 
-    protected Sheet sheet;
+    Sheet sheet;
 
-    protected int firstData;
+    int firstData;
 
     //Excell columns and Rows used here are Excell based and not 0 based as XLWrap uses internally
-    protected int categoryRow = -1;
-    protected int fieldRow = -1;
-    protected int idTypeRow = -1;
-    protected int externalSheetRow = -1;
-    protected int ZeroNullRow = -1;
-    protected int firstConstant = -1;
-    protected int lastConstant = -1;
-    protected String lastDataColumn;
+    int categoryRow = -1;
+    int fieldRow = -1;
+    int idTypeRow = -1;
+    int externalSheetRow = -1;
+    int ZeroNullRow = -1;
+    int firstConstant = -1;
+    int lastConstant = -1;
+    String lastDataColumn;
 
-    public AbstractSheet (Sheet theSheet) throws FishLinkException {
+    AbstractSheet (Sheet theSheet) throws FishLinkException {
         sheet = theSheet;
         findAndCheckMetaSplits();
     }
@@ -132,17 +132,12 @@ public class AbstractSheet {
         return value.toString().replace("\"","");
     }
 
-    protected String getCellValue (String column, int row) throws FishLinkException{
+    String getCellValue (String column, int row) throws FishLinkException{
         int col = Utils.alphaToIndex(column);
         int actualRow = row - 1;
         return getZeroBasedCellValue (col, actualRow);
     }
 
- //   protected String getMetaCellValueOnDataColumn (String dataColumn, int row) throws FishLinkException{
- //       int col = Utils.alphaToIndex(dataColumn) + 1;
- //       int actualRow = row - 1;
- //       return getZeroBasedCellValue (col, actualRow);
- //   }
 }
 
 
