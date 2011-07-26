@@ -6,6 +6,7 @@ import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
+import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
@@ -100,8 +101,24 @@ public class AbstractSheet {
         }
     }
 
+    private static Cell getCell(Sheet metaData, int col, int row) throws FishLinkException{
+        try{
+            return metaData.getCell(col, row);
+        } catch (NullPointerException ex) {
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+                    metaData.getSheetInfo(), ex);
+        } catch (XLWrapException ex) {
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+                    metaData.getSheetInfo(), ex);
+        } catch (XLWrapEOFException ex) {
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+                    metaData.getSheetInfo(), ex);
+        }        
+    }
+    
+
    private String getZeroBasedCellValue (int col, int actualRow) throws FishLinkException{
-        Cell cell = FishLinkUtils.getCell(sheet, col, actualRow);
+        Cell cell = getCell(sheet, col, actualRow);
         XLExprValue<?> value;
         try {
             value = Utils.getXLExprValue(cell);

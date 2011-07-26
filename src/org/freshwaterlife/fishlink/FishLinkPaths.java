@@ -3,7 +3,7 @@ package org.freshwaterlife.fishlink;
 /**
  * Centralization point for all paths hard coded in Fish.Link
  * 
- * @author christian
+ * @author Christian
  */
 public class FishLinkPaths {
 
