@@ -2,9 +2,9 @@ package org.freshwaterlife.fishlink;
 
 
 
+import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 import org.freshwaterlife.fishlink.xlwrap.NameChecker;
 import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
 import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
@@ -12,7 +12,7 @@ import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
  *
  * @author christian
  */
-public class ChristianRun {
+public class CreateMapAndRdf {
 
     private static void mapAndRdf(String dataUrl, String pid) throws XLWrapMapException{
         //Adjust this file to the your local path
