@@ -39,6 +39,9 @@ public class E_FuncZERO_AS_NULL extends XLExprFunction {
     @Override
     public XLExprValue<?> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
         XLExprValue<?> value = getArg(0).eval(context);
+        if (value == null){
+            return null;
+        }
         if (FishLinkUtils.isZero(value.getValue())){
             return null;
         }

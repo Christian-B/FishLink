@@ -59,6 +59,9 @@ public class E_FuncID_URI extends XLExprFunction {
             case NULLS_AS_ZERO:
                 return true;
             case ZEROS_AS_NULLS:
+                if (value == null){
+                    return false;
+                }
                 if (value instanceof Number){
                     int i = ((Number)value).intValue();
                     return i == 0;
