@@ -25,18 +25,8 @@ public class FishLinkSheet {
 
     private Sheet poiSheet;
 
-    private CellStyle dateStyle;
-
-    private CellStyle dateAndTimeStyle;
-
     FishLinkSheet(Sheet sheet) {
         poiSheet = sheet;
-        Workbook wb = sheet.getWorkbook();
-        CreationHelper createHelper = wb.getCreationHelper();
-        dateAndTimeStyle = wb.createCellStyle();
-        dateAndTimeStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
-        dateStyle = wb.createCellStyle();
-        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
     }
 
     /**
@@ -160,12 +150,18 @@ public class FishLinkSheet {
         calendar.setTime(value);
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
         int minutes = calendar.get(Calendar.MINUTE);
+        Workbook wb = poiSheet.getWorkbook();
+        CreationHelper createHelper = wb.getCreationHelper();
         if (hours == 0 && minutes == 0){
             //TODO: check for seconds
+            CellStyle dateStyle = wb.createCellStyle();
+            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
             cell.setCellStyle(dateStyle);
             CellStyle test = cell.getCellStyle();
         } else {
             //TODO: Check if just a time
+            CellStyle dateAndTimeStyle = wb.createCellStyle();
+            dateAndTimeStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
             cell.setCellStyle(dateAndTimeStyle);
         }
     }
