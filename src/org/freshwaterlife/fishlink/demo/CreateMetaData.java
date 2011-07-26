@@ -4,7 +4,7 @@
  */
 package org.freshwaterlife.fishlink.demo;
 
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
 
 /**
@@ -12,7 +12,7 @@ import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
  * @author Christian
  */
 public class CreateMetaData {
-        public static void main(String[] args) throws XLWrapMapException{
+        public static void main(String[] args) throws FishLinkException{
         MetaDataCreator creator = new MetaDataCreator();
         /*
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");

@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.xlwrap.Constants;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
  *
@@ -30,7 +30,7 @@ public class MetaDataCreator {
         context = new ExecutionContext();
     }
         
-    private String createNamedRange (Sheet masterListSheet, FishLinkWorkbook metaWorkbook, int zeroColumn) throws XLWrapMapException {
+    private String createNamedRange (Sheet masterListSheet, FishLinkWorkbook metaWorkbook, int zeroColumn) throws FishLinkException {
         FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
         String rangeName =  FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, 0);
         if (rangeName == null || rangeName.isEmpty()){
@@ -52,7 +52,7 @@ public class MetaDataCreator {
         return rangeName;
     }
 
-    private void createNamedRanges (Sheet masterListSheet, FishLinkWorkbook metaWorkbook) throws XLWrapMapException {
+    private void createNamedRanges (Sheet masterListSheet, FishLinkWorkbook metaWorkbook) throws FishLinkException {
         FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
         //Get the categories
         int zeroColumn = 0;
@@ -80,7 +80,7 @@ public class MetaDataCreator {
         metaSheet.setValueZeroBased(zeroColumn + 1, 0, "");
     }
 
-    private int prepareColumnA(Sheet masterSheet, FishLinkSheet metaSheet) throws XLWrapMapException {
+    private int prepareColumnA(Sheet masterSheet, FishLinkSheet metaSheet) throws FishLinkException {
         int zeroRow = 0;
         String value;
         do {
@@ -95,7 +95,7 @@ public class MetaDataCreator {
     }
 
     private void prepareDropDowns(Sheet masterSheet, int lastMetaRow, FishLinkSheet metaSheet, String column) 
-            throws XLWrapMapException {
+            throws FishLinkException {
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String list = FishLinkUtils.getTextZeroBased(masterSheet, 2, zeroRow);
             String popupTitle = FishLinkUtils.getTextZeroBased(masterSheet, 3, zeroRow);
@@ -116,7 +116,7 @@ public class MetaDataCreator {
     }
 
     private void copyMetaData(Sheet masterSheet, FishLinkSheet metaSheet, Sheet copySheet, int lastMetaRow, int lastColumn) 
-            throws XLWrapMapException{
+            throws FishLinkException{
         //ystem.out.println(lastMetaRow + " " + copySheet.getSheetInfo());
         for (int zeroRow = 0; zeroRow < lastMetaRow; zeroRow ++) {
             String masterColumnA = FishLinkUtils.getTextZeroBased(masterSheet, 0, zeroRow);
@@ -138,7 +138,7 @@ public class MetaDataCreator {
     }
             
     private void copyData(int headerRow, FishLinkSheet metaSheet, Sheet dataSheet, String metaColumn, 
-            int zeroDataColumn, int ignoreRows) throws XLWrapMapException {
+            int zeroDataColumn, int ignoreRows) throws FishLinkException {
        // String dataColumn = FishLinkUtils.indexToAlpha(zeroDataColumn);
        // metaSheet.setValue(metaColumn, letterRow, dataColumn);
         for (int zeroRow = 0; zeroRow < dataSheet.getRows() - ignoreRows; zeroRow++){
@@ -146,15 +146,15 @@ public class MetaDataCreator {
             try {
                 cell = dataSheet.getCell(zeroDataColumn, zeroRow + ignoreRows);
             } catch (XLWrapException ex) {
-                throw new XLWrapMapException("Error getting Cell", ex);
+                throw new FishLinkException("Error getting Cell", ex);
             } catch (XLWrapEOFException ex) {
-                throw new XLWrapMapException("Error getting Cell", ex);
+                throw new FishLinkException("Error getting Cell", ex);
             }
             TypeAnnotation typeAnnotation;
             try {
                 typeAnnotation = cell.getType();
             } catch (XLWrapException ex) {
-                throw new XLWrapMapException("Error getting annotation type", ex);
+                throw new FishLinkException("Error getting annotation type", ex);
             }
             switch (typeAnnotation){
                 case BOOLEAN:
@@ -162,7 +162,7 @@ public class MetaDataCreator {
                     try {
                         booleanValue = cell.getBoolean();
                     } catch (XLWrapException ex) {
-                        throw new XLWrapMapException("Error getting boolean value", ex);
+                        throw new FishLinkException("Error getting boolean value", ex);
                     }
                     metaSheet.setValue(metaColumn, headerRow + zeroRow, booleanValue);
                     break;
@@ -171,7 +171,7 @@ public class MetaDataCreator {
                     try {
                         doubleValue = cell.getNumber();
                     } catch (XLWrapException ex) {
-                        throw new XLWrapMapException("Error getting double value", ex);
+                        throw new FishLinkException("Error getting double value", ex);
                     }
                     metaSheet.setValue(metaColumn, headerRow + zeroRow, doubleValue);
                     break;
@@ -180,7 +180,7 @@ public class MetaDataCreator {
                     try {
                         textValue = cell.getText();
                     } catch (XLWrapException ex) {
-                        throw new XLWrapMapException("Error getting text value", ex);
+                        throw new FishLinkException("Error getting text value", ex);
                     }
                     metaSheet.setValue(metaColumn, headerRow + zeroRow, textValue);
                     break;
@@ -189,27 +189,27 @@ public class MetaDataCreator {
                     try {
                         dateValue = cell.getDate();
                     } catch (XLWrapException ex) {
-                        throw new XLWrapMapException("Error getting date text value", ex);
+                        throw new FishLinkException("Error getting date text value", ex);
                     }
                     String format;
                     try {
                         format = cell.getDateFormat();
                     } catch (XLWrapException ex) {
-                        throw new XLWrapMapException("Error getting date format", ex);
+                        throw new FishLinkException("Error getting date format", ex);
                     }
                     metaSheet.setValue(metaColumn, headerRow + zeroRow, dateValue, format);
                     break;
                 case NULL:
                     break;
                 default:
-                    throw new XLWrapMapException("Unexpected Cell Type");
+                    throw new FishLinkException("Unexpected Cell Type");
             }
         }
         metaSheet.setForegroundAqua(metaColumn, headerRow);
         metaSheet.autoSizeColumn(zeroDataColumn);
     }
     
-    private int isOldMetaData(Sheet dataSheet) throws XLWrapMapException{
+    private int isOldMetaData(Sheet dataSheet) throws FishLinkException{
         String columnA = FishLinkUtils.getTextZeroBased(dataSheet, 0, 0);
         if (!columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
             return 0;
@@ -228,7 +228,7 @@ public class MetaDataCreator {
         return zeroRow;  
     }
 
-    private void prepareSheet(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet) throws XLWrapMapException {
+    private void prepareSheet(Sheet masterSheet, FishLinkSheet metaSheet, Sheet dataSheet) throws FishLinkException {
         int ignoreRows = isOldMetaData(dataSheet);
         int columnShift;
         if (ignoreRows == 0){
@@ -260,7 +260,7 @@ public class MetaDataCreator {
     }
 
     private void prepareSheets(Sheet masterDropdownSheet, FishLinkWorkbook metaWorkbook, Workbook dataWorkbook) 
-            throws XLWrapMapException{
+            throws FishLinkException{
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
             if (!dataSheets[i].equalsIgnoreCase(Constants.LIST_SHEET)){
@@ -268,7 +268,7 @@ public class MetaDataCreator {
                 try {
                     dataSheet = dataWorkbook.getSheet(dataSheets[i]);
                 } catch (XLWrapException ex) {
-                    throw new XLWrapMapException("Unable to get sheet " + dataSheets[i], ex);
+                    throw new FishLinkException("Unable to get sheet " + dataSheets[i], ex);
                 }
                 if (containsData(dataSheet)){
                     FishLinkSheet metaSheet = metaWorkbook.getSheet(dataSheets[i]);
@@ -280,27 +280,27 @@ public class MetaDataCreator {
         }
     }
 
-    public void writeMetaData(String dataUrl, String masterUrl, File output) throws XLWrapMapException{
+    public void writeMetaData(String dataUrl, String masterUrl, File output) throws FishLinkException{
         FishLinkUtils.report("Creating metaData sheet for " + dataUrl);
         Sheet masterListSheet;
         try {
             masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+            throw new FishLinkException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Sheet masterDropdownSheet;
         try {
             masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+            throw new FishLinkException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Workbook dataWorkbook;
         try {
             dataWorkbook = context.getWorkbook(dataUrl);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the dataset " + dataUrl, ex);
+            throw new FishLinkException("Error opening the dataset " + dataUrl, ex);
         }
         FishLinkWorkbook metaWorkbook = new FishLinkWorkbook();
         createNamedRanges(masterListSheet, metaWorkbook);
@@ -310,11 +310,11 @@ public class MetaDataCreator {
         FishLinkUtils.report("Wrote to  " + output.getAbsolutePath());
     }
 
-    public File createMetaData(String dataUrl) throws XLWrapMapException{
+    public File createMetaData(String dataUrl) throws FishLinkException{
         return createMetaData(dataUrl, FishLinkPaths.MASTER_FILE);
     }
     
-    public File createMetaData(String dataUrl, String masterUrl) throws XLWrapMapException{
+    public File createMetaData(String dataUrl, String masterUrl) throws FishLinkException{
         String[] parts = dataUrl.split("[\\\\/.]");// Split on a forawrd slash, back slash and a full stop
         System.out.println("=======");
         String fileName;

@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.freshwaterlife.fishlink.FishLinkUtils;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
  *
@@ -211,36 +211,36 @@ public class FishLinkSheet {
     }
 
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
-            int errorStyle, String errorTitle, String errorMessage) throws XLWrapMapException {
+            int errorStyle, String errorTitle, String errorMessage) throws FishLinkException {
         rule = rule.replaceAll("\\$"+replaceColum, "\\$" + column);
         //ystem.out.println(rule);
         addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
     private void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
-            int errorStyle, String errorTitle, String errorMessage) throws XLWrapMapException {
+            int errorStyle, String errorTitle, String errorMessage) throws FishLinkException {
         if (rule.length() > 255) {
-            throw new XLWrapMapException("Validation rule can not be longer than 255 for " + column + row);
+            throw new FishLinkException("Validation rule can not be longer than 255 for " + column + row);
         }
         if (popupTitle.length() > 31) {
             System.err.println(popupTitle);
             System.err.println(popupTitle.length());
-            throw new XLWrapMapException("Validation popupTitle can not be longer than 31 for " + column + row);
+            throw new FishLinkException("Validation popupTitle can not be longer than 31 for " + column + row);
         }
         if (popupMessage.length() > 255) {
             System.err.println(popupMessage);
             System.err.println(popupMessage.length());
-            throw new XLWrapMapException("Validation popupMessage can not be longer than 255 for " + column + row);
+            throw new FishLinkException("Validation popupMessage can not be longer than 255 for " + column + row);
         }
         if (errorTitle.length() > 31) {
             System.err.println(errorTitle);
             System.err.println(errorTitle.length());
-            throw new XLWrapMapException("Validation errorTitle can not be longer than 31 for " + column + row);
+            throw new FishLinkException("Validation errorTitle can not be longer than 31 for " + column + row);
         }
         if (errorMessage.length() > 255) {
             System.err.println(errorMessage);
             System.err.println(errorMessage.length());
-            throw new XLWrapMapException("Validation errorMessage can not be longer than 255 for " + column + row);
+            throw new FishLinkException("Validation errorMessage can not be longer than 255 for " + column + row);
         }
         addCheckedValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }

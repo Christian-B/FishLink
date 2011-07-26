@@ -1,5 +1,6 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
+import org.freshwaterlife.fishlink.FishLinkException;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
 import at.jku.xlwrap.spreadsheet.Sheet;
@@ -23,26 +24,26 @@ public class WorkbookWrite {
 
     private SheetWrite[] sheetWrites;
 
-    public WorkbookWrite(String dataUrl, String pid, String masterUrl) throws XLWrapMapException{
+    public WorkbookWrite(String dataUrl, String pid, String masterUrl) throws FishLinkException{
         ExecutionContext context = new ExecutionContext();
         Workbook annotatedWorkbook;
         try {
             annotatedWorkbook = context.getWorkbook(dataUrl);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the workbook " + dataUrl, ex);
+            throw new FishLinkException("Error opening the workbook " + dataUrl, ex);
         }
         Sheet masterListSheet;
         try {
             masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+            throw new FishLinkException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Sheet masterDropdownSheet;
         try {
             masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+            throw new FishLinkException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
                     " in ExcelSheet " + masterUrl, ex);
         }
         NameChecker nameChecker = new NameChecker(masterListSheet);
@@ -56,7 +57,7 @@ public class WorkbookWrite {
             try {
                 sheet = annotatedWorkbook.getSheet(i);
             } catch (XLWrapException ex) {
-                throw new XLWrapMapException ("Unable to open sheet " + i + " in " + dataUrl, ex);
+                throw new FishLinkException ("Unable to open sheet " + i + " in " + dataUrl, ex);
             }
             if (sheet.getName().equals("MetaData") || sheet.getName().equals("Lists")) {
                 //do nothing
@@ -69,7 +70,7 @@ public class WorkbookWrite {
         }
     }
 
-    /*public WorkbookWrite (String metaFileName) throws XLWrapMapException{
+    /*public WorkbookWrite (String metaFileName) throws FishLinkException{
         Workbook metaWorkbook;
         Sheet metaData;
         metaWorkbook = FishLinkUtils.getWorkbook("file:" + metaRoot + metaFileName);
@@ -94,7 +95,7 @@ public class WorkbookWrite {
         }
     }*/
 
-    private void writePrefix (BufferedWriter writer) throws XLWrapMapException {
+    private void writePrefix (BufferedWriter writer) throws FishLinkException {
         try {
             writer.write("@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .");
             writer.newLine();
@@ -124,15 +125,15 @@ public class WorkbookWrite {
             writer.newLine();
             writer.newLine();
         } catch (IOException ex) {
-            throw new XLWrapMapException ("Unable to write prefix", ex);
+            throw new FishLinkException ("Unable to write prefix", ex);
         }
     }
 
-     public void writeMap() throws XLWrapMapException {
+     public void writeMap() throws FishLinkException {
         FishLinkUtils.report("write map");
         File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
-            throw new XLWrapMapException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
+            throw new FishLinkException("Unable to find MAP_FILE_ROOT. " + FishLinkPaths.MAP_FILE_ROOT + " Please create it.");
         }
         mapFile = new File(FishLinkPaths.MAP_FILE_ROOT + pid + ".trig");
         BufferedWriter mapWriter;
@@ -156,7 +157,7 @@ public class WorkbookWrite {
             }
             mapWriter.close();
         } catch (IOException ex) {
-            throw new XLWrapMapException ("Unable to write mapping file.", ex);
+            throw new FishLinkException ("Unable to write mapping file.", ex);
         }
         FishLinkUtils.report("Done writing map file");
     }

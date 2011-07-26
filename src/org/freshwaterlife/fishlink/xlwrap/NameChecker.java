@@ -5,6 +5,7 @@
 
 package org.freshwaterlife.fishlink.xlwrap;
 
+import org.freshwaterlife.fishlink.FishLinkException;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class NameChecker {
      private HashMap<String,ArrayList<String>> subcategories;
      private HashMap<String,ArrayList<String>> constants;
 
-     NameChecker(Sheet masterListSheet) throws XLWrapMapException{
+     NameChecker(Sheet masterListSheet) throws FishLinkException{
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = -1; //-1 as getnames starts by increasing it.
         zeroColumn = getNames(masterListSheet, categories, zeroColumn);
@@ -30,7 +31,7 @@ public class NameChecker {
         zeroColumn = getNames(masterListSheet, constants, zeroColumn);
      }
 
-     private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws XLWrapMapException{
+     private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws FishLinkException{
          String rangeName;
          do {
             zeroColumn++;
@@ -52,40 +53,40 @@ public class NameChecker {
         return categories.containsKey(field);
     }
 
-    void checkName (String sheetInfo, String category, String field) throws XLWrapMapException{
+    void checkName (String sheetInfo, String category, String field) throws FishLinkException{
         ArrayList<String> fields = categories.get(category);
         if (fields == null){
-            throw new XLWrapMapException("Map used catagory "+ category + " which is not in the Master");
+            throw new FishLinkException("Map used catagory "+ category + " which is not in the Master");
         }
         if (!fields.contains(field)){
-            throw new XLWrapMapException(sheetInfo + " used field " + field + " in catagory "+ category +
+            throw new FishLinkException(sheetInfo + " used field " + field + " in catagory "+ category +
                     " which is not in the Master");
         }
     }
 
-    void checkSubType (String sheetInfo, String category, String subType) throws XLWrapMapException{
+    void checkSubType (String sheetInfo, String category, String subType) throws FishLinkException{
         ArrayList<String> subTypes = subcategories.get(category + "SubType");
         if (subTypes == null){
-            throw new XLWrapMapException("Map used catagory "+ category + 
+            throw new FishLinkException("Map used catagory "+ category + 
                     " which does not have a subtype in the Master");
         }
         if (!subTypes.contains(subType)){
-            throw new XLWrapMapException(sheetInfo + " used subtype " + subType + " for catagory "+ category +
+            throw new FishLinkException(sheetInfo + " used subtype " + subType + " for catagory "+ category +
                     " which is not in the Master");
         }
     }
 
-    void checkConstant (String sheetInfo, String constant, String value) throws XLWrapMapException{
+    void checkConstant (String sheetInfo, String constant, String value) throws FishLinkException{
         ArrayList<String> values = constants.get(constant);
         if (values == null){
             for (String valuex : constants.keySet()){
                 System.out.println(valuex);
             }
-            throw new XLWrapMapException("Map used constant field "+ constant + 
+            throw new FishLinkException("Map used constant field "+ constant + 
                     " which is not in the Master");
         }
         if (!values.contains(value)){
-            throw new XLWrapMapException(sheetInfo + " used value " + value + " for constant "+ constant +
+            throw new FishLinkException(sheetInfo + " used value " + value + " for constant "+ constant +
                     " which is not in the Master");
         }
     }

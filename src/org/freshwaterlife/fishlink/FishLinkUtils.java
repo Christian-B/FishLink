@@ -6,7 +6,6 @@ import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.Date;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
@@ -50,56 +49,56 @@ public class FishLinkUtils {
         return reply;
     }
 
-   /* public static final Workbook getWorkbookOnPid (String pid) throws XLWrapMapException{
+   /* public static final Workbook getWorkbookOnPid (String pid) throws FishLinkException{
         PidRegister pidRegister = PidStore.padStoreFactory();
         String dataFile = pidRegister.retreiveFile(pid);
         return getWorkbook(dataFile);
     }*/
 
-    /*public static Workbook getWorkbook (String path) throws XLWrapMapException{
+    /*public static Workbook getWorkbook (String path) throws FishLinkException{
         try {
             return MasterFactory.getExecutionContext().getWorkbook(path);
         } catch (XLWrapException ex) {
             //try {
             //    return MasterFactory.getExecutionContext().getWorkbook("file:" + path);
             //} catch (XLWrapException ex2) {
-                throw new XLWrapMapException ("Unable to create workbook", ex);
+                throw new FishLinkException ("Unable to create workbook", ex);
             //}        
         }        
     }
 */
-    public static Sheet getSheet(Workbook workbook, String name) throws XLWrapMapException{
+    public static Sheet getSheet(Workbook workbook, String name) throws FishLinkException{
         try {
             return workbook.getSheet(name);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Unable to create metaData in workbook " + workbook.getWorkbookInfo(), ex);
+            throw new FishLinkException ("Unable to create metaData in workbook " + workbook.getWorkbookInfo(), ex);
         }     
     }
     
-    public static Cell getCell(Sheet metaData, int col, int row) throws XLWrapMapException{
+    public static Cell getCell(Sheet metaData, int col, int row) throws FishLinkException{
         try{
             return metaData.getCell(col, row);
         } catch (NullPointerException ex) {
-            throw new XLWrapMapException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
                     metaData.getSheetInfo(), ex);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
                     metaData.getSheetInfo(), ex);
         } catch (XLWrapEOFException ex) {
-            throw new XLWrapMapException ("Unable to find cell " + col + "  " + row + " in sheet " + 
+            throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
                     metaData.getSheetInfo(), ex);
         }        
     }
     
-    public static String getText(Cell cell) throws XLWrapMapException{
+    public static String getText(Cell cell) throws FishLinkException{
         try{
             return cell.getText();
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Unable to get text from cell " + cell.getCellInfo(), ex);
+            throw new FishLinkException ("Unable to get text from cell " + cell.getCellInfo(), ex);
         }        
     }
     
-    public static String getTextZeroBased(Sheet sheet, int column, int row) throws XLWrapMapException {
+    public static String getTextZeroBased(Sheet sheet, int column, int row) throws FishLinkException {
         if (column >= sheet.getColumns()){
             return "";
         }
@@ -110,10 +109,10 @@ public class FishLinkUtils {
             Cell cell = sheet.getCell(column, row);
             return cell.getText();
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+            throw new FishLinkException("Unable to cell column: " + column + " row:" + row + " from " + 
                     sheet.getSheetInfo(), ex);
         } catch (XLWrapEOFException ex) {
-            throw new XLWrapMapException("Unable to cell column: " + column + " row:" + row + " from " + 
+            throw new FishLinkException("Unable to cell column: " + column + " row:" + row + " from " + 
                     sheet.getSheetInfo(), ex);
         }
     }

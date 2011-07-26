@@ -24,7 +24,7 @@ import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 import java.util.Date;
 import org.freshwaterlife.fishlink.ZeroNullType;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
  * @author dorgon
@@ -50,7 +50,7 @@ public class E_FuncID_URI extends XLExprFunction {
         ZeroNullType zeroNullType;
         try {
             zeroNullType = ZeroNullType.parse(zeroToNullString);
-        } catch (XLWrapMapException ex) {
+        } catch (FishLinkException ex) {
             throw new XLWrapException(ex);
         }
         switch (zeroNullType){

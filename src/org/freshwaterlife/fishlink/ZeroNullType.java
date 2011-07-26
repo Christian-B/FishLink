@@ -1,7 +1,6 @@
 package org.freshwaterlife.fishlink;
 
 import org.freshwaterlife.fishlink.xlwrap.Constants;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 
 /**
  *
@@ -23,7 +22,7 @@ public enum ZeroNullType {
         return text;
     }
     
-    public static ZeroNullType parse(String label) throws XLWrapMapException{
+    public static ZeroNullType parse(String label) throws FishLinkException{
         if (label == null){
             return KEEP;
         }
@@ -35,7 +34,7 @@ public enum ZeroNullType {
                 return zeroNullType;
             }
         }
-        throw new XLWrapMapException("Unexpected ZeroVSNull type " + label);
+        throw new FishLinkException("Unexpected ZeroVSNull type " + label);
     }
   
 }

@@ -9,7 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
  *
@@ -31,42 +31,42 @@ public class FishLinkWorkbook {
         return new FishLinkSheet(sheet);
     }
 
-    void write(String filePath) throws XLWrapMapException {
+    void write(String filePath) throws FishLinkException {
         FileOutputStream fileOut;
         try {
             fileOut = new FileOutputStream(filePath);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to open "+ filePath, ex);
+            throw new FishLinkException("Unable to open "+ filePath, ex);
         }
         try {
             poiWorkbook.write(fileOut);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write "+ filePath, ex);
+            throw new FishLinkException("Unable to write "+ filePath, ex);
         }
         try {
             fileOut.close();
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to close "+ filePath, ex);
+            throw new FishLinkException("Unable to close "+ filePath, ex);
         }
 
     }
 
-    void write(File file) throws XLWrapMapException {
+    void write(File file) throws FishLinkException {
         FileOutputStream fileOut;
         try {
             fileOut = new FileOutputStream(file);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to open "+ file.getAbsolutePath(), ex);
+            throw new FishLinkException("Unable to open "+ file.getAbsolutePath(), ex);
         }
         try {
             poiWorkbook.write(fileOut);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write "+ file.getAbsolutePath(), ex);
+            throw new FishLinkException("Unable to write "+ file.getAbsolutePath(), ex);
         }
         try {
             fileOut.close();
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to close "+ file.getAbsolutePath(), ex);
+            throw new FishLinkException("Unable to close "+ file.getAbsolutePath(), ex);
         }
 
     }

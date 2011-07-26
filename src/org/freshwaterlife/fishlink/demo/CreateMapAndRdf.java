@@ -2,7 +2,6 @@ package org.freshwaterlife.fishlink;
 
 
 
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
 import org.freshwaterlife.fishlink.xlwrap.NameChecker;
 import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
 import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
@@ -14,14 +13,14 @@ import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
  */
 public class CreateMapAndRdf {
 
-    private static void mapAndRdf(String dataUrl, String pid) throws XLWrapMapException{
+    private static void mapAndRdf(String dataUrl, String pid) throws FishLinkException{
         //Adjust this file to the your local path
         WorkbookWrite mapWrite = new WorkbookWrite(dataUrl, pid, FishLinkPaths.MASTER_FILE); 
         mapWrite.writeMap();
         MapRun.runMap(pid);
     }
     
-    public static void main(String[] args) throws XLWrapMapException {
+    public static void main(String[] args) throws FishLinkException {
         BrennRegister.register();
         mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\CumbriaTarnsPart1MetaData.xls", "CTP1");
         mapAndRdf("file:c:\\Dropbox\\FishLink XLWrap data\\Meta Data\\FBA_TarnsMetaData.xls", "FBA345");

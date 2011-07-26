@@ -1,5 +1,6 @@
 package org.freshwaterlife.fishlink.xlwrap;
 
+import org.freshwaterlife.fishlink.FishLinkException;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.Workbook;
@@ -28,7 +29,7 @@ public class SheetWrite extends AbstractSheet{
     private ArrayList<String> allColumns;
 
     public SheetWrite (NameChecker nameChecker, Sheet annotatedSheet, int sheetNumber, String url, String pid)
-            throws XLWrapMapException{
+            throws FishLinkException{
         super(annotatedSheet);
         this.pid = pid;
         this.sheetNumber = sheetNumber;
@@ -47,7 +48,7 @@ public class SheetWrite extends AbstractSheet{
         return sheet.getName() + "template";
     }
 
-    protected void writeMapping(BufferedWriter writer) throws XLWrapMapException{
+    protected void writeMapping(BufferedWriter writer) throws FishLinkException{
         try {
             writer.write("	xl:offline \"false\"^^xsd:boolean ;");
             writer.newLine();
@@ -80,12 +81,12 @@ public class SheetWrite extends AbstractSheet{
             writer.write("	] ;");
             writer.newLine();
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write mapping", ex);
+            throw new FishLinkException("Unable to write mapping", ex);
         }
     }
 
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
-            String dataColumn, ZeroNullType zeroVsNulls) throws XLWrapMapException {
+            String dataColumn, ZeroNullType zeroVsNulls) throws FishLinkException {
         if(category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)) {
             writeObservationUril(writer, field, idType, dataColumn, zeroVsNulls);
         } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
@@ -94,9 +95,9 @@ public class SheetWrite extends AbstractSheet{
         } else {
             //There is an Id reference to another dataColumn.
             if (idType.equalsIgnoreCase("row")){
-                throw new XLWrapMapException("IDType row not longer supported. Found in sheet " + sheet.getSheetInfo());
+                throw new FishLinkException("IDType row not longer supported. Found in sheet " + sheet.getSheetInfo());
             } else if (idType.equalsIgnoreCase(Constants.ALL_LABEL)){
-                throw new XLWrapMapException("Unexpected IDType " + Constants.ALL_LABEL);
+                throw new FishLinkException("Unexpected IDType " + Constants.ALL_LABEL);
             } else {
                 String idCategory = this.getCellValue(idType, categoryRow);
                 String idColumn = idColumns.get(idCategory);
@@ -106,14 +107,14 @@ public class SheetWrite extends AbstractSheet{
     }
     
     private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, 
-            ZeroNullType dataZeroVsNulls) throws XLWrapMapException {
+            ZeroNullType dataZeroVsNulls) throws FishLinkException {
         String uri = categoryUris.get(category);
         if (field.toLowerCase().equals(Constants.ID_LABEL)){
             try {
                 writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ",'"
                         + dataZeroVsNulls + "')\"^^xl:Expr ] ");
             } catch (IOException ex) {
-                throw new XLWrapMapException("Unable to write uri", ex);
+                throw new FishLinkException("Unable to write uri", ex);
             }
             return;
         }
@@ -121,19 +122,19 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private void writeObservationUril(BufferedWriter writer, String field, String idColumn, 
-            String dataColumn, ZeroNullType dataZeroNull) throws XLWrapMapException {
+            String dataColumn, ZeroNullType dataZeroNull) throws FishLinkException {
         String uri = categoryUris.get(Constants.OBSERVATION_LABEL);
         if(field.equalsIgnoreCase(Constants.VALUE_LABEL)) {
             try {
                 writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ",'"
                         + dataZeroNull + "')\"^^xl:Expr ] ");
             } catch (IOException ex) {
-                throw new XLWrapMapException("Unable to write uri", ex);
+                throw new FishLinkException("Unable to write uri", ex);
             }                
             return;
         }
         if (idColumn == null || idColumn.isEmpty()){
-            throw new XLWrapMapException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
+            throw new FishLinkException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
                     Constants.OBSERVATION_LABEL + " and field " + field + " needs an id Type");
         }
         String idNullZeroString = getCellValue (idColumn, idTypeRow);
@@ -142,12 +143,12 @@ public class SheetWrite extends AbstractSheet{
             writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idColumn + firstData + ", '" + idZeroNull + "' ,"
                 + dataColumn + firstData + ",'" + dataZeroNull + "')\"^^xl:Expr ] ");
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write uri", ex);
+            throw new FishLinkException("Unable to write uri", ex);
         }
     }
 
     private void writeUriOther(BufferedWriter writer, String uri, String category, 
-            String dataColumn, ZeroNullType dataZeroVsNulls) throws XLWrapMapException {
+            String dataColumn, ZeroNullType dataZeroVsNulls) throws FishLinkException {
         //"row" is added for automatic ones where no id column found.
         String idColumn = idColumns.get(category);
         try {
@@ -161,11 +162,11 @@ public class SheetWrite extends AbstractSheet{
                         dataColumn + firstData + ",'" + dataZeroVsNulls + "')\"^^xl:Expr ] ");
             }
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write uri", ex);
+            throw new FishLinkException("Unable to write uri", ex);
         }
     }
 
-    private void writeVocab (BufferedWriter writer, String vocab) throws XLWrapMapException {
+    private void writeVocab (BufferedWriter writer, String vocab) throws FishLinkException {
         try {
             if (vocab.startsWith("is") || vocab.startsWith("has")){
                 writer.write("	vocab:" + vocab + "\t");
@@ -173,31 +174,31 @@ public class SheetWrite extends AbstractSheet{
                 writer.write("	vocab:has" + vocab + "\t");
             }
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write vocab", ex);
+            throw new FishLinkException("Unable to write vocab", ex);
         }            
     }
 
-    private void writeRdfType (BufferedWriter writer, String type) throws XLWrapMapException {
+    private void writeRdfType (BufferedWriter writer, String type) throws FishLinkException {
         try {
            writer.write ("	rdf:type");
            writeType(writer, type);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write vocab", ex);
+            throw new FishLinkException("Unable to write vocab", ex);
         }            
     }
 
-    private void writeType (BufferedWriter writer, String type) throws XLWrapMapException {
+    private void writeType (BufferedWriter writer, String type) throws FishLinkException {
         try {
            writer.write (" type:" + type);
            writer.write (" ;");
            writer.newLine();
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write vocab", ex);
+            throw new FishLinkException("Unable to write vocab", ex);
         }            
     }
 
     private void writeConstant (BufferedWriter writer, String category, String column, int row) 
-            throws XLWrapMapException{
+            throws FishLinkException{
         String field = getCellValue ("A", row);
         if (field == null){
             return;
@@ -225,12 +226,12 @@ public class SheetWrite extends AbstractSheet{
                 writer.write("[ xl:uri \"'" + Constants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
                 writer.newLine();
             } catch (IOException ex) {
-                throw new XLWrapMapException("Unable to write constant", ex);
+                throw new FishLinkException("Unable to write constant", ex);
             }            
         }
     }
 
-    private ZeroNullType getZeroVsNull (String column) throws XLWrapMapException {
+    private ZeroNullType getZeroVsNull (String column) throws FishLinkException {
         if (ZeroNullRow >= 0){
             String ignoreZeroString = getCellValue (column, ZeroNullRow);
             if (ignoreZeroString == null){
@@ -243,14 +244,14 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private String refersToCategory(String field) throws XLWrapMapException{
+    private String refersToCategory(String field) throws FishLinkException{
        if ( masterNameChecker.isCategory(field)) {
            return field;
        }
        return Constants.refersToCategory(field);
     }
 
-    private void writeData(BufferedWriter writer, String column, ZeroNullType zeroNull) throws XLWrapMapException {
+    private void writeData(BufferedWriter writer, String column, ZeroNullType zeroNull) throws FishLinkException {
         String field = getCellValue (column, fieldRow);
         writeVocab(writer, field);
         String category = refersToCategory(field);
@@ -267,7 +268,7 @@ public class SheetWrite extends AbstractSheet{
                         writer.write("\"NULL_AS_ZERO(" + column + firstData + ")\"^^xl:Expr ;");
                         break;
                     default:
-                        throw new XLWrapMapException("Unexpected ZeroNullType " + zeroNull);
+                        throw new FishLinkException("Unexpected ZeroNullType " + zeroNull);
                 }
             } else {
                 String uri = getUri(column, category);
@@ -276,12 +277,12 @@ public class SheetWrite extends AbstractSheet{
             }
             writer.newLine();
             }  catch (IOException ex) {
-                throw new XLWrapMapException("Unable to write data", ex);
+                throw new FishLinkException("Unable to write data", ex);
             }            
     }
 
     private void writeAutoRelated(BufferedWriter writer, String category, String column, ZeroNullType dataZeroVsNulls)
-            throws XLWrapMapException {
+            throws FishLinkException {
         String related = Constants.autoRelatedCategory(category);
         if (related == null){
             return;
@@ -296,12 +297,12 @@ public class SheetWrite extends AbstractSheet{
             writer.write(";");
             writer.newLine();
         }  catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write ", ex);
+            throw new FishLinkException("Unable to write ", ex);
         }            
     }
 
     private void writeAllRelated(BufferedWriter writer, String category, ZeroNullType zeroVsNulls)
-            throws XLWrapMapException {
+            throws FishLinkException {
         if (!category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)){
             return;
         }
@@ -314,7 +315,7 @@ public class SheetWrite extends AbstractSheet{
     }
 
     private boolean writeTemplateColumn(BufferedWriter writer, String column)
-            throws XLWrapMapException{
+            throws FishLinkException{
         String category = getCellValue (column, categoryRow);
         //ystem.out.println(category + " " + metaColumn + " " + categoryRow);
         String field = getCellValue (column, fieldRow);
@@ -343,7 +344,7 @@ public class SheetWrite extends AbstractSheet{
             writer.write (" a ");
             writeType (writer, category);
         }  catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write a type", ex);
+            throw new FishLinkException("Unable to write a type", ex);
         }            
         writeData(writer, column, zeroNull);
         writeAutoRelated(writer, category, column, zeroNull);
@@ -361,12 +362,12 @@ public class SheetWrite extends AbstractSheet{
             writer.newLine();
             writer.newLine();
         }  catch (IOException ex) {
-            throw new XLWrapMapException("Unable to other type ", ex);
+            throw new FishLinkException("Unable to other type ", ex);
         }            
         return true;
     }
 
-    private String getExternal(String metaColumn) throws XLWrapMapException {
+    private String getExternal(String metaColumn) throws FishLinkException {
         if (externalSheetRow < 1){
             return "";
         }
@@ -381,7 +382,7 @@ public class SheetWrite extends AbstractSheet{
        return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet.getName() + "/";
    }
 
-   private String getUri(String metaColumn , String category) throws XLWrapMapException {
+   private String getUri(String metaColumn , String category) throws FishLinkException {
         String externalField = getExternal(metaColumn);
         if (externalField.isEmpty()){
             return getCatgerogyUri(category);
@@ -398,7 +399,7 @@ public class SheetWrite extends AbstractSheet{
         return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + externalSheet + "/";
     }
 
-   private void findId(String category, String column) throws XLWrapMapException{
+   private void findId(String category, String column) throws FishLinkException{
         String field = getCellValue (column, fieldRow);
         String id = idColumns.get(category);
         if (field.equalsIgnoreCase("id")){
@@ -407,7 +408,7 @@ public class SheetWrite extends AbstractSheet{
                 idColumns.put(category, column);
                 categoryUris.put(category, getUri(column, category));
             } else {
-                throw new XLWrapMapException("Found two different id columns of type " + category);
+                throw new FishLinkException("Found two different id columns of type " + category);
             }
         } else {
             if (id == null){
@@ -420,7 +421,7 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-   private void findAll(String category, String metaColumn) throws XLWrapMapException{
+   private void findAll(String category, String metaColumn) throws FishLinkException{
         String idColumn = getCellValue (metaColumn, idTypeRow);
         if (idColumn == null || !idColumn.equalsIgnoreCase("all")){
             return;
@@ -428,16 +429,16 @@ public class SheetWrite extends AbstractSheet{
         if (category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)){
             String field = getCellValue (metaColumn, fieldRow);
             if (field == null || field.isEmpty()){
-                throw new XLWrapMapException ("All id.Value Column " + metaColumn + " missing a field value");
+                throw new FishLinkException ("All id.Value Column " + metaColumn + " missing a field value");
             }
             allColumns.add(metaColumn);
         } else {
-            throw new XLWrapMapException ("All id.Value Column only supported for Categeroy " +
+            throw new FishLinkException ("All id.Value Column only supported for Categeroy " +
                     Constants.OBSERVATION_LABEL);
         }
     }
 
-   private void findIds() throws XLWrapMapException{
+   private void findIds() throws FishLinkException{
         int maxColumn = FishLinkUtils.alphaToIndex(lastDataColumn);
         for (int i = 1; i < maxColumn; i++){
             String metaColumn = FishLinkUtils.indexToAlpha(i);
@@ -451,7 +452,7 @@ public class SheetWrite extends AbstractSheet{
         }
      }
 
-    protected void writeTemplate(BufferedWriter writer) throws XLWrapMapException{
+    protected void writeTemplate(BufferedWriter writer) throws FishLinkException{
         FishLinkUtils.report("Writing template for "+sheet.getSheetInfo());
         findIds();
         try {
@@ -460,7 +461,7 @@ public class SheetWrite extends AbstractSheet{
             writer.write(" {");
             writer.newLine();
         }  catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write template ", ex);
+            throw new FishLinkException("Unable to write template ", ex);
         }            
         int maxColumn = FishLinkUtils.alphaToIndex(lastDataColumn);
         boolean foundColumn = false;
@@ -472,13 +473,13 @@ public class SheetWrite extends AbstractSheet{
             }
         }
         if (!foundColumn){
-            throw new XLWrapMapException("No mappable columns found in sheet " +  sheet.getSheetInfo());
+            throw new FishLinkException("No mappable columns found in sheet " +  sheet.getSheetInfo());
         }
         try {
             writer.write("}");
             writer.newLine();
         }  catch (IOException ex) {
-            throw new XLWrapMapException("Unable to write template end ", ex);
+            throw new FishLinkException("Unable to write template end ", ex);
         }            
     }
 

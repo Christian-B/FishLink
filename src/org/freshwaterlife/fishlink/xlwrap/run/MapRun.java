@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
-import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
+import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
  *
@@ -18,13 +18,13 @@ import org.freshwaterlife.fishlink.xlwrap.XLWrapMapException;
  */
 public class MapRun {
 
-    public static void runMap(String pid) throws XLWrapMapException{
+    public static void runMap(String pid) throws FishLinkException{
         FishLinkUtils.report("Running map");     
         XLWrapMapping map;
         try {
             map = MappingParser.parse(FishLinkPaths.MAP_FILE_ROOT + pid + ".trig");
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Error parsing "+ pid );
+            throw new FishLinkException ("Error parsing "+ pid );
         }
 
         XLWrapMaterializer mat = new XLWrapMaterializer();
@@ -32,7 +32,7 @@ public class MapRun {
         try {
             m = mat.generateModel(map);
         } catch (XLWrapException ex) {
-            throw new XLWrapMapException ("Error generating model "+ pid , ex);
+            throw new FishLinkException ("Error generating model "+ pid , ex);
         }
         m.setNsPrefix("constant", FishLinkPaths.RDF_BASE_URL + "constant/");
         m.setNsPrefix("type", FishLinkPaths.RDF_BASE_URL + "type/");        
@@ -41,14 +41,14 @@ public class MapRun {
 
         File out = new File (FishLinkPaths.RDF_FILE_ROOT);
         if (!out.exists()){
-            throw new XLWrapMapException("Unable to find RDF_FILE_ROOT. " + FishLinkPaths.RDF_FILE_ROOT + " Please create it.");
+            throw new FishLinkException("Unable to find RDF_FILE_ROOT. " + FishLinkPaths.RDF_FILE_ROOT + " Please create it.");
         }
         out = new File (FishLinkPaths.RDF_FILE_ROOT + pid + ".rdf");
         FileWriter writer;
         try {
             writer = new FileWriter(out);
         } catch (IOException ex) {
-            throw new XLWrapMapException("Unable to open " + FishLinkPaths.RDF_FILE_ROOT + pid + ".rdf", ex);
+            throw new FishLinkException("Unable to open " + FishLinkPaths.RDF_FILE_ROOT + pid + ".rdf", ex);
         }
                 //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
         m.write(writer, "RDF/XML");
