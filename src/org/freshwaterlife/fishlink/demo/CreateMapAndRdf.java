@@ -1,5 +1,6 @@
 package org.freshwaterlife.fishlink.demo;
 
+import java.io.File;
 import org.freshwaterlife.fishlink.FishLinkException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
@@ -7,7 +8,6 @@ import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
 import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
 /**
- *
  * @author christian
  */
 public class CreateMapAndRdf {
@@ -15,8 +15,8 @@ public class CreateMapAndRdf {
     private static void mapAndRdf(String dataUrl, String pid) throws FishLinkException{
         //Adjust this file to the your local path
         WorkbookWrite mapWrite = new WorkbookWrite(dataUrl, pid, FishLinkPaths.MASTER_FILE); 
-        mapWrite.writeMap();
-        MapRun.runMap(pid);
+        File mapping = mapWrite.writeMap();
+        MapRun.runMap(mapping, pid);
     }
     
     public static void main(String[] args) throws FishLinkException {

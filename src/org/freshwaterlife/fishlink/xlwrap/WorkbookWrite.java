@@ -129,7 +129,7 @@ public class WorkbookWrite {
         }
     }
 
-     public void writeMap() throws FishLinkException {
+     public File writeMap() throws FishLinkException {
         FishLinkUtils.report("write map");
         File mapFile = new File(FishLinkPaths.MAP_FILE_ROOT);
         if (!mapFile.exists()){
@@ -160,6 +160,7 @@ public class WorkbookWrite {
             throw new FishLinkException ("Unable to write mapping file.", ex);
         }
         FishLinkUtils.report("Done writing map file");
+        return mapFile;
     }
 
 }
