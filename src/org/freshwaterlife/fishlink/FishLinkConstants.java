@@ -1,10 +1,10 @@
-package org.freshwaterlife.fishlink.xlwrap;
+package org.freshwaterlife.fishlink;
 
 /**
  *
  * @author Christian
  */
-public class Constants {
+public class FishLinkConstants {
 
     /**
      * Base URL to be used in the RDF 
@@ -21,7 +21,7 @@ public class Constants {
     public static final String ID_VALUE_LABEL = "Id/Value Column"; //Id/Value Column (or "All")  //Old ones may have row
     public static final String EXTERNAL_LABEL = "external sheet";
     public static final String ZEROS_VS_NULLS_LABEL = "Zeros vs Nulls";
-    public static final String CONSTANTS_DIVIDER = "Constants"; //-- Constants --
+    public static final String CONSTANTS_DIVIDER = "Constants"; //-- FishLinkConstants --
     public static final String HEADER_LABEL = "Header";
     //categeries
     private static final String LOCATION_LABEL = "Location";

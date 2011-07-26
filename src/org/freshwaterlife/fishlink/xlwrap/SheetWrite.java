@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.ZeroNullType;
 
@@ -85,17 +86,17 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeUri(BufferedWriter writer, String category, String field, String idType,
             String dataColumn, ZeroNullType zeroVsNulls) throws FishLinkException {
-        if(category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)) {
+        if(category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)) {
             writeObservationUril(writer, field, idType, dataColumn, zeroVsNulls);
         } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
-                idType.equalsIgnoreCase(Constants.AUTOMATIC_LABEL)){
+                idType.equalsIgnoreCase(FishLinkConstants.AUTOMATIC_LABEL)){
             writeUri(writer, category, field, dataColumn, zeroVsNulls);
         } else {
             //There is an Id reference to another dataColumn.
             if (idType.equalsIgnoreCase("row")){
                 throw new FishLinkException("IDType row not longer supported. Found in sheet " + sheet.getSheetInfo());
-            } else if (idType.equalsIgnoreCase(Constants.ALL_LABEL)){
-                throw new FishLinkException("Unexpected IDType " + Constants.ALL_LABEL);
+            } else if (idType.equalsIgnoreCase(FishLinkConstants.ALL_LABEL)){
+                throw new FishLinkException("Unexpected IDType " + FishLinkConstants.ALL_LABEL);
             } else {
                 String idCategory = this.getCellValue(idType, categoryRow);
                 String idColumn = idColumns.get(idCategory);
@@ -107,7 +108,7 @@ public class SheetWrite extends AbstractSheet{
     private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, 
             ZeroNullType dataZeroVsNulls) throws FishLinkException {
         String uri = categoryUris.get(category);
-        if (field.toLowerCase().equals(Constants.ID_LABEL)){
+        if (field.toLowerCase().equals(FishLinkConstants.ID_LABEL)){
             try {
                 writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ",'"
                         + dataZeroVsNulls + "')\"^^xl:Expr ] ");
@@ -121,8 +122,8 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeObservationUril(BufferedWriter writer, String field, String idColumn, 
             String dataColumn, ZeroNullType dataZeroNull) throws FishLinkException {
-        String uri = categoryUris.get(Constants.OBSERVATION_LABEL);
-        if(field.equalsIgnoreCase(Constants.VALUE_LABEL)) {
+        String uri = categoryUris.get(FishLinkConstants.OBSERVATION_LABEL);
+        if(field.equalsIgnoreCase(FishLinkConstants.VALUE_LABEL)) {
             try {
                 writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ",'"
                         + dataZeroNull + "')\"^^xl:Expr ] ");
@@ -133,7 +134,7 @@ public class SheetWrite extends AbstractSheet{
         }
         if (idColumn == null || idColumn.isEmpty()){
             throw new FishLinkException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
-                    Constants.OBSERVATION_LABEL + " and field " + field + " needs an id Type");
+                    FishLinkConstants.OBSERVATION_LABEL + " and field " + field + " needs an id Type");
         }
         String idNullZeroString = getCellValue (idColumn, idTypeRow);
         ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
@@ -208,7 +209,7 @@ public class SheetWrite extends AbstractSheet{
         if (value.equalsIgnoreCase("n/a")){
             return;
         }
-        if (Constants.isRdfTypeField(field)){
+        if (FishLinkConstants.isRdfTypeField(field)){
             masterNameChecker.checkSubType(sheet.getSheetInfo(), category, value);
             writeRdfType(writer, value);
         } else {
@@ -221,7 +222,7 @@ public class SheetWrite extends AbstractSheet{
                 value = value + "'";
             }
             try {
-                writer.write("[ xl:uri \"'" + Constants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
+                writer.write("[ xl:uri \"'" + FishLinkConstants.RDF_BASE_URL + "constant/' & URLENCODE(" + value + ")\"^^xl:Expr ] ;");
                 writer.newLine();
             } catch (IOException ex) {
                 throw new FishLinkException("Unable to write constant", ex);
@@ -246,7 +247,7 @@ public class SheetWrite extends AbstractSheet{
        if ( masterNameChecker.isCategory(field)) {
            return field;
        }
-       return Constants.refersToCategory(field);
+       return FishLinkConstants.refersToCategory(field);
     }
 
     private void writeData(BufferedWriter writer, String column, ZeroNullType zeroNull) throws FishLinkException {
@@ -281,7 +282,7 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeAutoRelated(BufferedWriter writer, String category, String column, ZeroNullType dataZeroVsNulls)
             throws FishLinkException {
-        String related = Constants.autoRelatedCategory(category);
+        String related = FishLinkConstants.autoRelatedCategory(category);
         if (related == null){
             return;
         }
@@ -301,10 +302,10 @@ public class SheetWrite extends AbstractSheet{
 
     private void writeAllRelated(BufferedWriter writer, String category, ZeroNullType zeroVsNulls)
             throws FishLinkException {
-        if (!category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)){
+        if (!category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)){
             return;
         }
-        String uri = categoryUris.get(Constants.OBSERVATION_LABEL);
+        String uri = categoryUris.get(FishLinkConstants.OBSERVATION_LABEL);
         for (String column : allColumns){
             String idNullZeroString = getCellValue (column, ZeroNullRow);
             ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
@@ -331,7 +332,7 @@ public class SheetWrite extends AbstractSheet{
             FishLinkUtils.report("Skipping column " + column + " as it is an external id");
             return false;
         }
-        if (idType != null && idType.equals(Constants.ALL_LABEL)){
+        if (idType != null && idType.equals(FishLinkConstants.ALL_LABEL)){
             FishLinkUtils.report("Skipping column " + column + " as it is an all column.");
             return false;
         }
@@ -377,7 +378,7 @@ public class SheetWrite extends AbstractSheet{
    }
 
    private String getCatgerogyUri(String category){
-       return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet.getName() + "/";
+       return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet.getName() + "/";
    }
 
    private String getUri(String metaColumn , String category) throws FishLinkException {
@@ -394,7 +395,7 @@ public class SheetWrite extends AbstractSheet{
             externalPid = pid;
             externalSheet = externalField;
         }
-        return  Constants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + externalSheet + "/";
+        return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + externalSheet + "/";
     }
 
    private void findId(String category, String column) throws FishLinkException{
@@ -424,7 +425,7 @@ public class SheetWrite extends AbstractSheet{
         if (idColumn == null || !idColumn.equalsIgnoreCase("all")){
             return;
         }
-        if (category.equalsIgnoreCase(Constants.OBSERVATION_LABEL)){
+        if (category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)){
             String field = getCellValue (metaColumn, fieldRow);
             if (field == null || field.isEmpty()){
                 throw new FishLinkException ("All id.Value Column " + metaColumn + " missing a field value");
@@ -432,7 +433,7 @@ public class SheetWrite extends AbstractSheet{
             allColumns.add(metaColumn);
         } else {
             throw new FishLinkException ("All id.Value Column only supported for Categeroy " +
-                    Constants.OBSERVATION_LABEL);
+                    FishLinkConstants.OBSERVATION_LABEL);
         }
     }
 

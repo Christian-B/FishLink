@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Name;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
-import org.freshwaterlife.fishlink.xlwrap.Constants;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
@@ -36,7 +36,7 @@ public class MetaDataCreator {
     }
         
     private String createNamedRange (Sheet masterListSheet, FishLinkWorkbook metaWorkbook, int zeroColumn) throws FishLinkException {
-        FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
+        FishLinkSheet metaSheet = metaWorkbook.getSheet(FishLinkConstants.LIST_SHEET);
         String rangeName =  FishLinkUtils.getTextZeroBased(masterListSheet, zeroColumn, 0);
         if (rangeName == null || rangeName.isEmpty()){
             return "";
@@ -52,13 +52,13 @@ public class MetaDataCreator {
         } while (!fieldName.isEmpty());
         Name range = metaWorkbook.createName();
         range.setNameName(rangeName);
-        String rangeDef = "'" + Constants.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
+        String rangeDef = "'" + FishLinkConstants.LIST_SHEET + "'!$" + columnName + "$2:$" + columnName + "$" + zeroRow;
         range.setRefersToFormula(rangeDef);
         return rangeName;
     }
 
     private void createNamedRanges (Sheet masterListSheet, FishLinkWorkbook metaWorkbook) throws FishLinkException {
-        FishLinkSheet metaSheet = metaWorkbook.getSheet(Constants.LIST_SHEET);
+        FishLinkSheet metaSheet = metaWorkbook.getSheet(FishLinkConstants.LIST_SHEET);
         //Get the categories
         int zeroColumn = 0;
         String rangeName =  createNamedRange(masterListSheet, metaWorkbook, zeroColumn);
@@ -70,7 +70,7 @@ public class MetaDataCreator {
         Name range = metaWorkbook.createName();
         range.setNameName("Category");
         String columnName = FishLinkUtils.indexToAlpha(zeroColumn -1);
-        range.setRefersToFormula("'" + Constants.LIST_SHEET + "'!$A1:$" + columnName + "$1");
+        range.setRefersToFormula("'" + FishLinkConstants.LIST_SHEET + "'!$A1:$" + columnName + "$1");
         //Now get the subTypes
         do {
             zeroColumn++;
@@ -216,11 +216,11 @@ public class MetaDataCreator {
     
     private int isOldMetaData(Sheet dataSheet) throws FishLinkException{
         String columnA = FishLinkUtils.getTextZeroBased(dataSheet, 0, 0);
-        if (!columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
+        if (!columnA.equalsIgnoreCase(FishLinkConstants.CATEGORY_LABEL)){
             return 0;
         }
         columnA = FishLinkUtils.getTextZeroBased(dataSheet, 0, 1);
-        if (!columnA.equalsIgnoreCase(Constants.FIELD_LABEL)){
+        if (!columnA.equalsIgnoreCase(FishLinkConstants.FIELD_LABEL)){
             return 0;
         }
         //Ok assume it is old metaData
@@ -268,7 +268,7 @@ public class MetaDataCreator {
             throws FishLinkException{
         String[] dataSheets = dataWorkbook.getSheetNames();
         for (int i = 0; i  < dataSheets.length; i++){
-            if (!dataSheets[i].equalsIgnoreCase(Constants.LIST_SHEET)){
+            if (!dataSheets[i].equalsIgnoreCase(FishLinkConstants.LIST_SHEET)){
                 Sheet  dataSheet;
                 try {
                     dataSheet = dataWorkbook.getSheet(dataSheets[i]);
@@ -289,16 +289,16 @@ public class MetaDataCreator {
         FishLinkUtils.report("Creating metaData sheet for " + dataUrl);
         Sheet masterListSheet;
         try {
-            masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
+            masterListSheet = context.getSheet(masterUrl, FishLinkConstants.LIST_SHEET);
         } catch (XLWrapException ex) {
-            throw new FishLinkException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+            throw new FishLinkException("Error opening the vocabulary sheet " + FishLinkConstants.LIST_SHEET + 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Sheet masterDropdownSheet;
         try {
-            masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
+            masterDropdownSheet = context.getSheet(masterUrl, FishLinkConstants.DROP_DOWN_SHEET);
         } catch (XLWrapException ex) {
-            throw new FishLinkException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+            throw new FishLinkException("Error opening the dropdown sheet " + FishLinkConstants.DROP_DOWN_SHEET+ 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Workbook dataWorkbook;

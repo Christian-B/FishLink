@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
@@ -32,16 +33,16 @@ public class WorkbookWrite {
         }
         Sheet masterListSheet;
         try {
-            masterListSheet = context.getSheet(masterUrl, Constants.LIST_SHEET);
+            masterListSheet = context.getSheet(masterUrl, FishLinkConstants.LIST_SHEET);
         } catch (XLWrapException ex) {
-            throw new FishLinkException("Error opening the vocabulary sheet " + Constants.LIST_SHEET + 
+            throw new FishLinkException("Error opening the vocabulary sheet " + FishLinkConstants.LIST_SHEET + 
                     " in ExcelSheet " + masterUrl, ex);
         }
         Sheet masterDropdownSheet;
         try {
-            masterDropdownSheet = context.getSheet(masterUrl, Constants.DROP_DOWN_SHEET);
+            masterDropdownSheet = context.getSheet(masterUrl, FishLinkConstants.DROP_DOWN_SHEET);
         } catch (XLWrapException ex) {
-            throw new FishLinkException("Error opening the dropdown sheet " + Constants.DROP_DOWN_SHEET+ 
+            throw new FishLinkException("Error opening the dropdown sheet " + FishLinkConstants.DROP_DOWN_SHEET+ 
                     " in ExcelSheet " + masterUrl, ex);
         }
         NameChecker nameChecker = new NameChecker(masterListSheet);
@@ -105,13 +106,13 @@ public class WorkbookWrite {
             writer.newLine();
             writer.write("@prefix foaf:	<http://xmlns.com/foaf/0.1/> .");
             writer.newLine();
-            writer.write("@prefix constant:	<" + Constants.RDF_BASE_URL + "constant/> .");
+            writer.write("@prefix constant:	<" + FishLinkConstants.RDF_BASE_URL + "constant/> .");
             writer.newLine();
-            writer.write("@prefix type:	<" + Constants.RDF_BASE_URL + "type/> .");
+            writer.write("@prefix type:	<" + FishLinkConstants.RDF_BASE_URL + "type/> .");
             writer.newLine();
-            writer.write("@prefix resource:	<" + Constants.RDF_BASE_URL + "resource/> .");
+            writer.write("@prefix resource:	<" + FishLinkConstants.RDF_BASE_URL + "resource/> .");
             writer.newLine();
-            writer.write("@prefix vocab:	<" + Constants.RDF_BASE_URL + "vocab/> .");
+            writer.write("@prefix vocab:	<" + FishLinkConstants.RDF_BASE_URL + "vocab/> .");
             writer.newLine();
             writer.write("@prefix dc:     <http://purl.org/dc/elements/1.1/> .");
             writer.newLine();

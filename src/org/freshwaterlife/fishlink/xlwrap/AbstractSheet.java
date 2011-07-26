@@ -7,10 +7,15 @@ import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
- *
+ * Abstract superclass for both Data Sheet and Master Sheets.
+ * 
+ * Wraps an xlwrap Sheet.
+ * <p>Finds the rows on which various items are found. See field summary for more details.
+ * 
  * @author Christian
  */
 public class AbstractSheet {
@@ -29,6 +34,12 @@ public class AbstractSheet {
     int lastConstant = -1;
     String lastDataColumn;
 
+    /**
+     * Constructs an AbstractSheet, finding and checking all the fields.
+     * 
+     * @param theSheet xlwrap sheet
+     * @throws FishLinkException An errors finding and checking teh fields.
+     */
     AbstractSheet (Sheet theSheet) throws FishLinkException {
         sheet = theSheet;
         findAndCheckMetaSplits();
@@ -47,29 +58,34 @@ public class AbstractSheet {
         }
     }
 
+    /**
+     * Finds all the values to the fields.
+     * This approach allows for some changes to the MetaMaster without having to change the code.
+     * @throws FishLinkException Unexpected MetaNaster format.
+     */
     private void findMetaSplits() throws FishLinkException{
         int row = 1;
         SplitType splitType = SplitType.NONE;
         do {
             String columnA = getCellValue("A",row);
            if (columnA != null){
-                if (columnA.equalsIgnoreCase(Constants.CATEGORY_LABEL)){
+                if (columnA.equalsIgnoreCase(FishLinkConstants.CATEGORY_LABEL)){
                     categoryRow = row;
-                } else if (columnA.equalsIgnoreCase(Constants.FIELD_LABEL)){
+                } else if (columnA.equalsIgnoreCase(FishLinkConstants.FIELD_LABEL)){
                     fieldRow = row;
-                } else if (columnA.startsWith(Constants.ID_VALUE_LABEL)){
+                } else if (columnA.startsWith(FishLinkConstants.ID_VALUE_LABEL)){
                     idTypeRow = row;
-                } else if (columnA.equalsIgnoreCase(Constants.EXTERNAL_LABEL)){
+                } else if (columnA.equalsIgnoreCase(FishLinkConstants.EXTERNAL_LABEL)){
                     externalSheetRow = row;
-                } else if (columnA.equalsIgnoreCase(Constants.ZEROS_VS_NULLS_LABEL)){
+                } else if (columnA.equalsIgnoreCase(FishLinkConstants.ZEROS_VS_NULLS_LABEL)){
                     ZeroNullRow = row;
                 } else if (columnA.contains("links")){
                     throw new FishLinkException ("Links not currently supported");
-                } else if (columnA.contains(Constants.CONSTANTS_DIVIDER)){
+                } else if (columnA.contains(FishLinkConstants.CONSTANTS_DIVIDER)){
                     firstConstant = row + 1;
                     endMataSplit(row, splitType);
                     splitType = SplitType.CONSTANT;
-                } else if (columnA.equalsIgnoreCase(Constants.HEADER_LABEL)) {
+                } else if (columnA.equalsIgnoreCase(FishLinkConstants.HEADER_LABEL)) {
                     endMataSplit(row, splitType);
                     firstData = row + 1;
                     return;
@@ -77,7 +93,7 @@ public class AbstractSheet {
                     endMataSplit(row, splitType);
                     splitType = SplitType.NONE;
                 } else if (splitType == SplitType.NONE){
-                    throw new FishLinkException ("Found unexpected \"" + columnA + "\" before " + Constants.CONSTANTS_DIVIDER);                    
+                    throw new FishLinkException ("Found unexpected \"" + columnA + "\" before " + FishLinkConstants.CONSTANTS_DIVIDER);                    
                 }
               } else {
                    endMataSplit(row, splitType);
@@ -87,38 +103,58 @@ public class AbstractSheet {
         } while (true); //will return out when finished
     }
 
+    /**
+     * Finds all the values to the fields, checking the critical ones.
+     * 
+     * This approach allows for some changes to the MetaMaster without having to change the code.
+     * 
+     * @throws FishLinkException Unexpected MetaNaster format.
+     */
     private void findAndCheckMetaSplits() throws FishLinkException{
         lastDataColumn = FishLinkUtils.indexToAlpha(sheet.getColumns());
         findMetaSplits();
         if (categoryRow == -1) {
-            throw new FishLinkException("Unable to find \"" + Constants.CATEGORY_LABEL + "\" in column A.");
+            throw new FishLinkException("Unable to find \"" + FishLinkConstants.CATEGORY_LABEL + "\" in column A.");
         }
         if (fieldRow == -1) {
-            throw new FishLinkException("Unable to find \"" + Constants.FIELD_LABEL + "\" in column A.");
+            throw new FishLinkException("Unable to find \"" + FishLinkConstants.FIELD_LABEL + "\" in column A.");
         }
         if (idTypeRow == -1) {
-            throw new FishLinkException("Unable to find \"" + Constants.ID_VALUE_LABEL + "\" in column A.");
+            throw new FishLinkException("Unable to find \"" + FishLinkConstants.ID_VALUE_LABEL + "\" in column A.");
         }
     }
 
-    private static Cell getCell(Sheet metaData, int col, int row) throws FishLinkException{
+    /**
+     * Wraps xlwraps getCell (based on zerobased indexes) and catches any Exceptions
+     * @param col column zero based
+     * @param row Zero based
+     * @return xlwrap Cell
+     * @throws FishLinkException An thrown Exception Wrapped. 
+     */
+    private Cell getZeroBasedCell(int col, int row) throws FishLinkException{
         try{
-            return metaData.getCell(col, row);
+            return sheet.getCell(col, row);
         } catch (NullPointerException ex) {
             throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
-                    metaData.getSheetInfo(), ex);
+                    sheet.getSheetInfo(), ex);
         } catch (XLWrapException ex) {
             throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
-                    metaData.getSheetInfo(), ex);
+                    sheet.getSheetInfo(), ex);
         } catch (XLWrapEOFException ex) {
             throw new FishLinkException ("Unable to find cell " + col + "  " + row + " in sheet " + 
-                    metaData.getSheetInfo(), ex);
+                    sheet.getSheetInfo(), ex);
         }        
     }
-    
-
+   
+    /**
+     * Gets a cell's value (based on zerobased indexes) and catches any Exceptions
+     * @param col column zero based
+     * @param row Zero based
+     * @return String value of the Cells contents or null if cell was empty
+     * @throws FishLinkException An thrown Exception Wrapped. 
+     */
    private String getZeroBasedCellValue (int col, int actualRow) throws FishLinkException{
-        Cell cell = getCell(sheet, col, actualRow);
+        Cell cell = getZeroBasedCell(col, actualRow);
         XLExprValue<?> value;
         try {
             value = Utils.getXLExprValue(cell);
@@ -132,6 +168,13 @@ public class AbstractSheet {
         return value.toString().replace("\"","");
     }
 
+   /**
+     * Gets a cell's value (based on Excel indexes) and catches any Exceptions
+     * @param column Using Excel names
+     * @param row Using Excel counting
+     * @return String value of the Cells contents or null if cell was empty
+     * @throws FishLinkException An thrown Exception Wrapped. 
+     */
     String getCellValue (String column, int row) throws FishLinkException{
         int col = Utils.alphaToIndex(column);
         int actualRow = row - 1;

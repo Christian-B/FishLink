@@ -1,6 +1,6 @@
 package org.freshwaterlife.fishlink;
 
-import org.freshwaterlife.fishlink.xlwrap.Constants;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 
 /**
  * Enum for the different types of actions that can be done on Zeros and Nulls.
@@ -11,21 +11,21 @@ public enum ZeroNullType {
     /**
      * (Default) indicates that Nulls and Zeros should be kept as is.
      * All values including zero and nulls remain unchanged. 
-     * <p>Uses the Text from {@link Constants#KEEP_LABEL}
+     * <p>Uses the Text from {@link FishLinkConstants#KEEP_LABEL}
      */
-    KEEP(Constants.KEEP_LABEL), 
+    KEEP(FishLinkConstants.KEEP_LABEL), 
     /**
      * Indicates that any zero values found should be considered null. 
      * All none zero values (including nulls) remain as is.
-     * <p>Uses the Text from {@link Constants#ZERO_AS_NULLS_LABEL}
+     * <p>Uses the Text from {@link FishLinkConstants#ZERO_AS_NULLS_LABEL}
      */
-    ZEROS_AS_NULLS (Constants.ZERO_AS_NULLS_LABEL), 
+    ZEROS_AS_NULLS (FishLinkConstants.ZERO_AS_NULLS_LABEL), 
     /**
      * Indicates that any null values found should be considered zero. 
      * All none null values (including zero) remain as is.
-     * <p>Uses the Text from {@link Constants#NULLS_AS_ZERO_LABEL}
+     * <p>Uses the Text from {@link FishLinkConstants#NULLS_AS_ZERO_LABEL}
      */
-    NULLS_AS_ZERO(Constants.NULLS_AS_ZERO_LABEL);
+    NULLS_AS_ZERO(FishLinkConstants.NULLS_AS_ZERO_LABEL);
         
     String text;
     
@@ -34,8 +34,8 @@ public enum ZeroNullType {
     }
     
     /**
-     * Returns the String representation of this Object based on the Values found in Constants
-     * @return Matching Constants
+     * Returns the String representation of this Object based on the Values found in FishLinkConstants
+     * @return Matching FishLinkConstants
      */
     @Override
     public String toString(){

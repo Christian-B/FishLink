@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.FishLinkException;
-import org.freshwaterlife.fishlink.xlwrap.Constants;
+import org.freshwaterlife.fishlink.FishLinkConstants;
 
 /**
  *
@@ -52,10 +52,10 @@ public class MapRun {
         } catch (XLWrapException ex) {
             throw new FishLinkException ("Error generating model "+ mappingUrl , ex);
         }
-        m.setNsPrefix("constant", Constants.RDF_BASE_URL + "constant/");
-        m.setNsPrefix("type", Constants.RDF_BASE_URL + "type/");        
-        m.setNsPrefix("vocab", Constants.RDF_BASE_URL + "vocab/");
-        m.setNsPrefix("resource", Constants.RDF_BASE_URL + "resource/");
+        m.setNsPrefix("constant", FishLinkConstants.RDF_BASE_URL + "constant/");
+        m.setNsPrefix("type", FishLinkConstants.RDF_BASE_URL + "type/");        
+        m.setNsPrefix("vocab", FishLinkConstants.RDF_BASE_URL + "vocab/");
+        m.setNsPrefix("resource", FishLinkConstants.RDF_BASE_URL + "resource/");
 
         if (!rdfFile.exists()){
             throw new FishLinkException("Unable to find RDF_FILE_ROOT. " + FishLinkPaths.RDF_FILE_ROOT + " Please create it.");
