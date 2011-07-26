@@ -18,13 +18,21 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.FishLinkException;
 
 /**
- *
+ * Wrapper for an Apache Poi SS Sheet.
+ * 
+ * Main use is to allow Excel style Letter Column references and row numbers starting with 1.
  * @author Christian
  */
 public class FishLinkSheet {
 
     private Sheet poiSheet;
 
+    /**
+     * Wraps a Apache Poi sheet with support methods.
+     * 
+     * Lets Columns and Row be referred to Using Excel referrences.
+     * @param sheet The Apache poi method
+     */
     FishLinkSheet(Sheet sheet) {
         poiSheet = sheet;
     }
@@ -206,6 +214,26 @@ public class FishLinkSheet {
         cell.setCellStyle(style);
     }
 
+    /**
+     * Adds data validation to a cell.
+     * 
+     * Replaces and reference to a replaceable Columns with the actual Column in the rule.
+     * For Example if the Rule is "=indirect($B)" and the replace column is "B" and the actual colum is "R",
+     * It Changes the Rule to "=indirect($R)".
+     * <p> Then calls {@link #addValidation(java.lang.String, int, java.lang.String, java.lang.String, java.lang.String, 
+     *     int, java.lang.String, java.lang.String)} which in turn calls {@link #addCheckedValidation(java.lang.String, 
+     * int, java.lang.String, java.lang.String, java.lang.String, int, java.lang.String, java.lang.String) }
+     * @param replaceColum Excel name (excluding $) of the Column used in the preset rule
+     * @param column Using Excel names
+     * @param row Using Excel counting
+     * @param rule String representation of the Rule.
+     * @param popupTitle The Text for the title of the popup
+     * @param popupMessage The Text for the message of the popup
+     * @param errorStyle The Style of the Error based on POI DataValidation.ErrorStyle
+     * @param errorTitle The Text for the title of the error popup
+     * @param errorMessage The Text for the message of the error popup
+     * @throws FishLinkException Any Exceptions Caught and wrapped
+     */
     void addValidation (String replaceColum, String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) throws FishLinkException {
         rule = rule.replaceAll("\\$"+replaceColum, "\\$" + column);
@@ -213,6 +241,22 @@ public class FishLinkSheet {
         addValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
+    /**
+     * Adds data validation to a cell.
+     * 
+     * Validates the lengths of the titles and input messages.
+     * <p> Then calls {@link #addCheckedValidation(java.lang.String, 
+     * int, java.lang.String, java.lang.String, java.lang.String, int, java.lang.String, java.lang.String) }
+     * @param column Using Excel names
+     * @param row Using Excel counting
+     * @param rule String representation of the Rule.
+     * @param popupTitle The Text for the title of the popup
+     * @param popupMessage The Text for the message of the popup
+     * @param errorStyle The Style of the Error based on POI DataValidation.ErrorStyle
+     * @param errorTitle The Text for the title of the error popup
+     * @param errorMessage The Text for the message of the error popup
+     * @throws FishLinkException If any of the Titles or Messages are too long. 
+     */
     private void addValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) throws FishLinkException {
         if (rule.length() > 255) {
@@ -241,6 +285,26 @@ public class FishLinkSheet {
         addCheckedValidation (column, row, rule, popupTitle, popupMessage, errorStyle, errorTitle, errorMessage);
     }
     
+    /**
+     * Adds data validation to a cell.
+     * 
+     * Type of Data Validation used depends on the rule.
+     * <ul>
+     *    <li>An Empty rule can be used to Set a DataValidation which does no checking but does provide a popup.
+     *    <li>Rules that start with '{' will be assumed to be an Explicit List, with the values comma separated 
+     *        and an Optional closing '}'   
+     *    <li>The Rule "BLANK" will create a DataValidation which forces the cell to be left Blank or empty.
+     *    <li>Any other rule taken as a Formula List.
+     * </ul>
+     * @param column Using Excel names
+     * @param row Using Excel counting
+     * @param rule String representation of the Rule.
+     * @param popupTitle The Text for the title of the popup
+     * @param popupMessage The Text for the message of the popup
+     * @param errorStyle The Style of the Error based on POI DataValidation.ErrorStyle
+     * @param errorTitle The Text for the title of the error popup
+     * @param errorMessage The Text for the message of the error popup
+     */
     private void addCheckedValidation (String column, int row, String rule, String popupTitle, String popupMessage,
             int errorStyle, String errorTitle, String errorMessage) {
         int columnNumber = FishLinkUtils.alphaToIndex(column);
@@ -293,6 +357,10 @@ public class FishLinkSheet {
 
     /* Pass through methods */
     
+    /**
+     * Sets the Column Width to the maximum Width of any cell in that Column.
+     * @param column Zero Based Column Integer
+     */
     void autoSizeColumn(int column) {
         poiSheet.autoSizeColumn(column);
     }
