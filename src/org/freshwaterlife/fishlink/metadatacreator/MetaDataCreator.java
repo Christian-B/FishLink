@@ -26,6 +26,11 @@ public class MetaDataCreator {
     
     private ExecutionContext context;
 
+    /**
+     * Constructs a new MetaDataCreator class.
+     * 
+     * Creates an XLWrap ExecutionContext
+     */
     public MetaDataCreator(){
         context = new ExecutionContext();
     }
@@ -280,7 +285,7 @@ public class MetaDataCreator {
         }
     }
 
-    public void writeMetaData(String dataUrl, String masterUrl, File output) throws FishLinkException{
+    private void writeMetaData(String dataUrl, String masterUrl, File output) throws FishLinkException{
         FishLinkUtils.report("Creating metaData sheet for " + dataUrl);
         Sheet masterListSheet;
         try {
@@ -310,10 +315,43 @@ public class MetaDataCreator {
         FishLinkUtils.report("Wrote to  " + output.getAbsolutePath());
     }
 
+    /**
+     * Calls {@link #createMetaData(java.lang.String, java.lang.String)} with the default MetaMaster
+     * @param dataUrl
+     * @return
+     * @throws FishLinkException 
+     */
     public File createMetaData(String dataUrl) throws FishLinkException{
         return createMetaData(dataUrl, FishLinkPaths.MASTER_FILE);
     }
     
+    /**
+     * Creates a annotated workbook based on the dataFile and the masterFile.
+     * 
+     * Opens an XLWrap Workbook based on dataUrl, and an XLWrap Workbook based on masterUrl.
+     * Creates a new Excel workbook which contains the vocabulary lists from the master and all the sheets from data,
+     *     annotated with the dropDowns found in the Master.
+     * <p>Both the data pointed to by dataUrl and the masterFile pointed to by masterUrl 
+     *     must be in a format XLWrap can handle.
+     * <p>File formats XLWrap can handle include
+     * <ul>
+     *     <li>Excel xls files
+     *     <li>Excel 2001 xlsx files (Assuming the FishLink extended XlWrap is used.
+     *     <li>csv Files
+     *     <li>Open Office files. (untested)
+     * </ul>
+     * <p>Know protocols it can handle included
+     * <ul>
+     *     <li>File: 
+     *     <li>http:
+     * </ul>
+     * <p>If the data already contains annotated header rows, this tool will copy over the notations are much as possible.
+     *     Even if they are no longer correct. The vocabulary lists and dropdown rules are taken from the new MetaMaster.
+     * @param dataUrl Url to the raw data or a previous annotated data workbook to be updated. 
+     * @param masterUrl URl to the MetaMaster file
+     * @return File Where the annotated sheet is saved.
+     * @throws FishLinkException Any Exceptions that might have occurred. Including that where thrown by XLWrap. 
+     */
     public File createMetaData(String dataUrl, String masterUrl) throws FishLinkException{
         String[] parts = dataUrl.split("[\\\\/.]");// Split on a forawrd slash, back slash and a full stop
         System.out.println("=======");
@@ -328,20 +366,29 @@ public class MetaDataCreator {
         return output;
     }
    
-    public static void usage(){
+    private static void usage(){
         FishLinkUtils.report("Creates a Meta Data collection file based on input.");
         FishLinkUtils.report("Requires two paramters.");
         FishLinkUtils.report("First is the raw data to be described.");
         FishLinkUtils.report("Second if the location (path and file name) of the MetaData file.");
     }
 
+    /**
+     * Main method for creating MetaData.
+     * 
+     * Converts the first argument into DataUrl, the second into MasterUrl and 
+     * then calls {@link #createMetaData(java.lang.String, java.lang.String)}
+     * @param args DataUrl and MasterUrl
+     * @throws FishLinkException 
+     */
     public static void main(String[] args) throws FishLinkException{
         if (args.length != 2){
             usage();
             System.exit(2);
         }
         MetaDataCreator metaDataCreator = new MetaDataCreator();
-        metaDataCreator.createMetaData(args[0], args[1]);
+        File output = metaDataCreator.createMetaData(args[0], args[1]);
+        FishLinkUtils.report("Mapping file can be found at: "+output.getAbsolutePath());
     }
 
 }
