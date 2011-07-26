@@ -28,7 +28,7 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
  * @author Christian
  *
  */
-public class E_FuncZERO_AS_NULL extends XLExprFunction {
+public class E_FuncZERO_AS_NULL extends E_Func_with_zero {
 
     /**
      * default constructor
@@ -42,7 +42,7 @@ public class E_FuncZERO_AS_NULL extends XLExprFunction {
         if (value == null){
             return null;
         }
-        if (FishLinkUtils.isZero(value.getValue())){
+        if (isZero(value.getValue())){
             return null;
         }
         return value;

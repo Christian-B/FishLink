@@ -31,7 +31,7 @@ import org.freshwaterlife.fishlink.FishLinkException;
  * @author Christian
  *
  */
-public class E_FuncID_URI extends XLExprFunction {
+public class E_FuncID_URI extends E_Func_with_zero {
 
     /**
      * default constructor
@@ -59,23 +59,7 @@ public class E_FuncID_URI extends XLExprFunction {
             case NULLS_AS_ZERO:
                 return true;
             case ZEROS_AS_NULLS:
-                if (value == null){
-                    return false;
-                }
-                if (value instanceof Number){
-                    int i = ((Number)value).intValue();
-                    return i == 0;
-                }
-                if (value instanceof String){
-                    return value.toString().equals("0");
-                }
-                if (value instanceof Boolean){
-                    return false;
-                }
-                if (value instanceof Date){
-                    return (((Date)value).getTime() == 0);
-                }
-                throw new XLWrapException("Expected type in Cell_URI " + value.getClass());
+                return isZero(value);
             default:
                 throw new XLWrapException("Unexpected ZeroNullType: "+ zeroNullType);
         }

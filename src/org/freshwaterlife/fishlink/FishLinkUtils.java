@@ -104,23 +104,6 @@ public class FishLinkUtils {
         }
     }
 
-    public static boolean isZero(Object value) throws XLWrapException{
-        if (value instanceof Number){
-            int i = ((Number)value).intValue();
-            return i == 0;
-        }
-        if (value instanceof String){
-            return value.toString().equals("0");
-        }
-        if (value instanceof Boolean){
-            return false;
-        }
-        if (value instanceof Date){
-            return (((Date)value).getTime() == 0);
-        }
-        throw new XLWrapException("Expected type " + value.getClass());
-    }
-
     /**
      * Reports any message in a standard way.
      * 
