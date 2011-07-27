@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.freshwaterlife.fishlink.demo;
 
 import java.util.Date;
 
 /**
- *
+ * This is just an example of how to manage a single instance of a class.
  * @author Christian
  */
 public class FactoryDemo {
