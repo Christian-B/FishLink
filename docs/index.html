@@ -134,12 +134,14 @@ The restriction listed here only apply to dataset over which the tools described
 		and <a href="#Survey">Species</a> can be described per row in each table
 	<ul>
 		<li>Except for links such as
-			<a href="#Owner">Owner</a>,
-			<a href="#Contributor">Contributor</a>,
+			<a href="#OwnerField1">Site Owner</a>,
+			<a href="#OwnerField2">Survey Owner</a>,
+			<a href="#SurveyorField">Surveyor</a>,
+			<a href="#UploaderField">Uploader</a>,
 			<a href="#SiteField">Site</a>,
 			<a href="#SurveyField">Survey</a>,
-			<a href="#SubSite">isSubsiteOf</a>,
-			<a href="#SimilarTo">isSimilarTo</a>
+			<a href="#SubSiteField">isSubsiteOf</a>,
+			<a href="#SimilarToField">isSimilarTo</a>
 		<li>Only the id field of the second
 	</ul>
 	<li>There many be one of each type on the same row but they must be related.
@@ -548,6 +550,10 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>MeasurmentMethod</td>
 		<td>The method used to measure this observation. This could include things like the instrument used.</td>
 	</tr>
+	<tr id="OwnerField1">
+		<td>Owner</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to Owner of this Data. For example the Enitity that commisioned the Observation/<a href="#Survey">Survey<a>..
+	</tr>
 	<tr>
 		<td>Remark</td>
 		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
@@ -564,6 +570,10 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>Survey</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Survey">Survey<a>.
 	</tr>
+	<tr id="SurveyorField">
+		<td>Surveyor</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Entity">Entity<a> that actually made the Observation.</td>
+	</tr>
 	<tr id="TaxonField">
 		<td>Taxon</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Taxon">Taxon<a>.
@@ -575,6 +585,10 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 	<tr id="UpdatedField">
 		<td>Updated</td>
 		<td>The date/time this observation's information was last updated. This is NOT the data/time the Observation was actually made.</td>
+	</tr>
+	<tr id="UploaderField">
+		<td>Uploader</td>
+		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Entity">Entity<a> that loaded/typed in the Observation.</td>
 	</tr>
 	<tr id="ValueField">
 		<td>Value</td>
@@ -603,7 +617,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>Description</td>
 		<td>See <a href="#DescriptionField">Description in Shared Fields Table</a></td>
 	</tr>
-	<tr id="Designation">
+	<tr id="DesignationField">
 		<td>Designation</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to a <a href="#Designation">Designation<a>.
 	</tr>
@@ -615,11 +629,11 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>Id</td>
 		<td>See <a href="#IdField">Description in Shared Fields Table</a></td>
 	</tr>
-	<tr id="SimilarTo">
+	<tr id="SimilarToField">
 		<td>isSimilarTo</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to another Site which is probably the same Site. Much like the rdf:sameAs relationship but without the explicit assignment of the values to the other Site.
 	</tr>
-	<tr id="SubSite">
+	<tr id="SubSiteField">
 		<td>isSubsiteOf</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to another Site this Site is part of.
 	</tr>
@@ -631,7 +645,7 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 		<td>Name</td>
 		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
 	</tr>
-	<tr id="Owner">
+	<tr id="OwnerField2">
 		<td>Owner</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to Owner of this Site.
 	</tr>
@@ -662,10 +676,6 @@ Note: If a Site is the rdf:sameAs in the strict sense that all the values descri
 	<tr>
 		<td>AlternativeName</td>
 		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
-	</tr>
-	<tr>
-		<td>Contributor</td>
-		<td>See <a href="#ContributorField">Description in Observation's Fields Table</a></td>
 	</tr>
 	<tr>
 		<td>Date</td>
@@ -700,6 +710,10 @@ Note: If a Site is the rdf:sameAs in the strict sense that all the values descri
 		<td>See <a href="#NameField">Description in Shared Fields Table</a></td>
 	</tr>
 	<tr>
+		<td>Owner</td>
+		<td>See <a href="#OwnerField1">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
 		<td>Remark</td>
 		<td>See <a href="#RemarkField">Description in Shared Fields Table</a></td>
 	</tr>
@@ -711,6 +725,9 @@ Note: If a Site is the rdf:sameAs in the strict sense that all the values descri
 		<td>StartDate</td>
 		<td>See <a href="#StartDateField">Description in Observation's Fields Table</a></td>
 	</tr>
+	<tr>
+		<td>Surveyor</td>
+		<td>See <a href="#SurveyorField">Description in Observation's Fields Table</a></td>
 	</tr>
 	<tr>
 		<td>Taxon</td>
@@ -723,6 +740,10 @@ Note: If a Site is the rdf:sameAs in the strict sense that all the values descri
 	<tr>
 		<td>Updated</td>
 		<td>See <a href="#UpdatedField">Description in Observation's Fields Table</a></td>
+	</tr>
+	<tr>
+		<td>Uploader</td>
+		<td>See <a href="#UploaderField">Description in Observation's Fields Table</a></td>
 	</tr>
 </table>
 <p>
