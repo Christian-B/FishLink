@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.freshwaterlife.fishlink.xlwrap;
 
 import org.freshwaterlife.fishlink.FishLinkException;
@@ -12,16 +7,34 @@ import java.util.HashMap;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
+ * Wraps the MetaMaster Names List to allow vocabulary checking.
  *
  * @author Christian
  */
 public class NameChecker {
 
-     private HashMap<String,ArrayList<String>> categories;
-     private HashMap<String,ArrayList<String>> subcategories;
-     private HashMap<String,ArrayList<String>> constants;
+    /**
+     * Lists the Categories and the Fields.
+     */
+    private HashMap<String,ArrayList<String>> categories;
+    /**
+     * Lists the SubCatgerories by Category.
+     */
+    private HashMap<String,ArrayList<String>> subcategories;
+    /**
+     * List the legal values for each Constant.
+     */
+    private HashMap<String,ArrayList<String>> constants;
 
-     NameChecker(Sheet masterListSheet) throws FishLinkException{
+    /**
+     * Constructs a nameChecker based on a List Sheet from the MetaMaster.
+     *
+     * Builds maps holding all the vocabulary
+     *
+     * @param masterListSheet  Lists Sheet from the MetaMaster
+     * @throws FishLinkException Thrown if the MetaMaster is corrupt
+     */
+    NameChecker(Sheet masterListSheet) throws FishLinkException{
         categories = new HashMap<String,ArrayList<String>>();
         int zeroColumn = -1; //-1 as getnames starts by increasing it.
         zeroColumn = getNames(masterListSheet, categories, zeroColumn);
@@ -31,7 +44,15 @@ public class NameChecker {
         zeroColumn = getNames(masterListSheet, constants, zeroColumn);
      }
 
-     private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws FishLinkException{
+    /**
+     * Support function which loads a Hashmap with all the values found in the columns up to the empty 
+     * @param masterListSheet  Lists Sheet from the MetaMaster
+     * @param hashMap Map to be filled
+     * @param zeroColumn column before first to check (ZeroBased index)
+     * @return Empty column at the end of this series of columns
+     * @throws FishLinkException If the MasterSheet is corrupt.
+     */
+    private int getNames(Sheet masterSheet, HashMap<String,ArrayList<String>> hashMap, int zeroColumn) throws FishLinkException{
          String rangeName;
          do {
             zeroColumn++;
@@ -49,10 +70,22 @@ public class NameChecker {
          return zeroColumn;
     }
 
+    /**
+     * Tests to see if the field name matches a category.
+     * @param field Fields as in annotation sheet (Without the vocab:has)
+     * @return True if and only if the field matches a Category name, otherwise False.
+     */
     boolean isCategory (String field) {
         return categories.containsKey(field);
     }
 
+    /**
+     * Checks that the given field is in the given Category
+     * @param sheetInfo Info about the sheet used for error reporting only
+     * @param category name of the Category
+     * @param field Fields as in annotation sheet (Without the vocab:has)
+     * @throws FishLinkException If either the Category is unknown or the Fields is not applicable to this category.
+     */
     void checkName (String sheetInfo, String category, String field) throws FishLinkException{
         ArrayList<String> fields = categories.get(category);
         if (fields == null){
@@ -64,6 +97,13 @@ public class NameChecker {
         }
     }
 
+    /**
+     * Checks that the given subType is in the given Category
+     * @param sheetInfo Info about the sheet used for error reporting only
+     * @param category name of the Category
+     * @param subType name of the subType
+     * @throws FishLinkException If either the Category has no subTypes or the subType is not applicable to this category.
+     */
     void checkSubType (String sheetInfo, String category, String subType) throws FishLinkException{
         ArrayList<String> subTypes = subcategories.get(category + "SubType");
         if (subTypes == null){
@@ -76,6 +116,13 @@ public class NameChecker {
         }
     }
 
+    /**
+     * Checks that the given value is part of the Constant vocabulary
+     * @param sheetInfo Info about the sheet used for error reporting only
+     * @param constant Name of the Constant Type
+     * @param value Specific value to check
+     * @throws FishLinkException IF either the Constant Type has no vocabulary or the Value is not applicable to this type.
+     */
     void checkConstant (String sheetInfo, String constant, String value) throws FishLinkException{
         ArrayList<String> values = constants.get(constant);
         if (values == null){
