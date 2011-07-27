@@ -1,0 +1,204 @@
+//Prefixes for all Queries
+PREFIX type:  <http://rdf.freshwaterlife.org/type/>
+PREFIX vocab: <http://rdf.freshwaterlife.org/vocab/>
+PREFIX resource:  <http://rdf.freshwaterlife.org/resource/>
+PREFIX constant:  <http://rdf.freshwaterlife.org/constant/>
+
+****
+Get All / test query
+*
+select * 
+{
+    ?subject ?object ?predicate
+}
+
+****
+Count the number of Observation in each rdf file
+*
+SELECT DISTINCT ?graph (COUNT (DISTINCT ?observation) as ?frequency)
+{
+    GRAPH ?graph 
+    {
+       ?observation rdf:type type:Observation.
+      }
+}
+group by ?graph 
+order by ?graph  
+
+****
+Find me the type of Objects in the triple Observation vocab:hasSite xxx
+*
+SELECT DISTINCT ?graph ?type 
+{
+    GRAPH ?graph 
+    {
+       ?observation rdf:type type:Observation.
+       ?observation vocab:hasSite ?site.
+       ?site rdf:type ?type.
+       FILTER (?type != type:Site)
+    }
+}
+order by ?graph ?type 
+
+
+*****
+Find me the type of Objects in the triple Observation vocab:hasSite xxx and the number of Observations for each site
+*
+SELECT DISTINCT ?graph ?type (COUNT (DISTINCT ?observation) as ?frequency)
+{
+    GRAPH ?graph 
+    {
+       ?observation rdf:type type:Observation.
+       ?observation vocab:hasSite ?site.
+       ?site rdf:type ?type.
+       FILTER (?type != type:Site)
+    }
+}
+group by ?graph ?type 
+order by ?graph ?type 
+
+****
+Query just one Graph/RDF file
+*
+SELECT DISTINCT ?observation
+{
+    GRAPH <file://FBA345.rdf> 
+    {
+       ?observation rdf:type type:Observation.
+      }
+}
+
+****
+What are the types of the Subjects
+*
+SELECT DISTINCT ?type WHERE {
+       [] rdf:type ?type .
+}
+
+****
+What are the types of the Objects
+*
+SELECT DISTINCT ?type WHERE {
+    ?subject ?predicate ?object.
+    ?object rdf:type ?type .
+}
+
+****
+For Each Subject type find the predicates used and the frequency it was used and the number of unqiue occurances
+*
+SELECT DISTINCT ?type ?predicate (COUNT (?value) AS ?frequency)
+(COUNT (DISTINCT ?value) AS ?occurrences) {
+       ?element rdf:type ?type .
+       ?element ?predicate ?value .
+}
+GROUP BY ?type ?predicate
+ORDER BY ?type ?predicate
+
+****
+List all values and and count hw often the occur
+*
+SELECT ?value  (COUNT (DISTINCT ?element) AS ?occurrences) {
+       ?element rdf:type type:Observation .
+       ?element vocab:hasValue  ?value  .
+}
+GROUP BY ?value
+ORDER BY ?value
+
+****
+List all values and and count hw often the occur
+Ordered by occurence
+#Note their is a way to refeverse the order but google down.
+*
+SELECT ?value ?occurrences {
+    SELECT ?value  (COUNT (DISTINCT ?element) AS ?occurrences) {
+           ?element rdf:type type:Observation .
+           ?element vocab:hasValue  ?value  .
+    }
+    GROUP BY ?value
+}
+ORDER BY ?occurrences
+
+****
+Find the Obeservations with value zero
+*
+SELECT DISTINCT ?element ?value{
+       ?element rdf:type type:Observation .
+       ?element vocab:hasValue  ?value .
+       FILTER (?value = 0.0)
+}
+
+****
+Find all the Factors and which graphs the are used in
+*
+SELECT DISTINCT ?factor ?graph
+{
+    GRAPH ?graph 
+    {
+       ?observation vocab:hasFactor ?factor .
+    }
+}
+order by ?factor
+
+****
+Find all the Units and which graphs the are used in
+*
+SELECT DISTINCT ?unit ?graph
+{
+    GRAPH ?graph 
+    {
+       ?observation vocab:hasUnit ?unit .
+    }
+}
+order by ?unit
+
+SELECT DISTINCT ?unit
+{
+   ?obesrvation vocab:hasfactor Depth
+   ?observation vocab:hasValue ?value 
+}
+order by ?unit
+
+****
+Find Sites with 2 or more different depths
+*
+SELECT ?site ?min_depth ?max_depth
+{
+    SELECT DISTINCT ?site (MIN (?depth1) as ?min_depth) (MAX (?depth2) as ?max_depth)
+    {
+        ?observation vocab:hasFactor constant:Depth .
+        ?observation vocab:hasSite ?site.
+        ?observation vocab:hasValue ?depth1.
+        ?observation2 vocab:hasFactor constant:Depth .
+        ?observation2 vocab:hasSite ?site.
+        ?observation2 vocab:hasValue ?depth2.
+        FILTER (?depth1 < ?depth2)
+    } group by ?site
+}
+order by ?site
+
+****
+Find Sites and their factors
+*
+SELECT ?site ?name ?factor
+{
+   ?observation vocab:hasSite ?site.
+   OPTIONAL { ?site vocab:hasName ?name }.
+   ?observation vocab:hasFactor ?factor.
+}
+order by ?site
+
+
+****
+Value for a specfic named site and spefic factor
+*
+SELECT ?value ?date
+{
+   ?observation vocab:hasSite ?site.
+   ?site vocab:hasName "Angle".
+   ?observation vocab:hasFactor constant:Magnesium.
+   ?observation vocab:hasValue ?value.
+   OPTIONAL { ?observation vocab:hasDate ?date }.
+   
+}
+order by ?date
+
