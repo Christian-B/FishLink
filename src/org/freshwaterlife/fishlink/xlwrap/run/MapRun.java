@@ -36,6 +36,24 @@ public class MapRun {
         runMap(mappingUrl, rdfFile);        
     }
 
+    private static void writeRDF(Model m, File rdfFile) throws FishLinkException{
+        File root = new File(FishLinkPaths.RDF_FILE_ROOT);
+        if (!root.exists()){
+            throw new FishLinkException("Unable to find RDF_FILE_ROOT. " + FishLinkPaths.RDF_FILE_ROOT + " Please create it.");
+        }
+        if (!root.isDirectory()){
+            throw new FishLinkException("RDF_FILE_ROOT " + FishLinkPaths.RDF_FILE_ROOT + " Is not a directory.");
+        }
+        FileWriter writer;
+        try {
+            writer = new FileWriter(rdfFile);
+        } catch (IOException ex) {
+            throw new FishLinkException("Unable to open " + rdfFile.getAbsolutePath(), ex);
+        }
+                //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
+        m.write(writer, "RDF/XML");
+    }
+
     public static void runMap(String mappingUrl, File rdfFile) throws FishLinkException{
         FishLinkUtils.report("Running map");     
         XLWrapMapping map;
@@ -56,18 +74,7 @@ public class MapRun {
         m.setNsPrefix("type", FishLinkConstants.RDF_BASE_URL + "type/");        
         m.setNsPrefix("vocab", FishLinkConstants.RDF_BASE_URL + "vocab/");
         m.setNsPrefix("resource", FishLinkConstants.RDF_BASE_URL + "resource/");
-
-        if (!rdfFile.exists()){
-            throw new FishLinkException("Unable to find RDF_FILE_ROOT. " + FishLinkPaths.RDF_FILE_ROOT + " Please create it.");
-        }
-        FileWriter writer;
-        try {
-            writer = new FileWriter(rdfFile);
-        } catch (IOException ex) {
-            throw new FishLinkException("Unable to open " + rdfFile.getAbsolutePath(), ex);
-        }
-                //"RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3"
-        m.write(writer, "RDF/XML");
+        writeRDF(m, rdfFile);
         FishLinkUtils.report("Done writing rdf file to "+ rdfFile.getAbsolutePath());
     }
 
