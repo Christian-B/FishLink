@@ -81,10 +81,6 @@ public class FishLinkConstants {
 
     //fields
     /**
-     * Holds the vocabulary name for the field
-     */
-    private static final String CONTIBUTOR_LABEL = "Contributor";
-    /**
      * Holds the vocabulary name for the field Owner
      */
     private static final String OWNER_LABEL = "Owner";
@@ -116,6 +112,14 @@ public class FishLinkConstants {
      * Holds the vocabulary name for the field "isSubtaxonOf"
      */
     private static final String IS_SUBTAXON_OF_LABEL = "isSubtaxonOf";
+    /**
+     * Holds the vocabulary name for the field "Surveyor"
+     */
+    private static final String SURVEYOR_LABEL = "Surveyor";
+    /**
+     * Holds the vocabulary name for the field "Uploader"
+     */
+    private static final String UPLOADER_LABEL = "Uploader";
 
     /**
      * Holds the vocabulary name for the label that says id column will be found automatically 
@@ -170,10 +174,13 @@ public class FishLinkConstants {
      */
     public static String refersToCategory(String field){
         //Caller Used NameChecker.isCategory to find ones where the field name = a categeroy name
-        if (field.equalsIgnoreCase(CONTIBUTOR_LABEL)){
+        if (field.equalsIgnoreCase(OWNER_LABEL)){
             return ENTITY_LABEL;
         }
-        if (field.equalsIgnoreCase(OWNER_LABEL)){
+        if (field.equalsIgnoreCase(SURVEYOR_LABEL)){
+            return ENTITY_LABEL;
+        }
+        if (field.equalsIgnoreCase(UPLOADER_LABEL)){
             return ENTITY_LABEL;
         }
         return null;
