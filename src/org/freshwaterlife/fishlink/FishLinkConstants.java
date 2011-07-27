@@ -95,7 +95,27 @@ public class FishLinkConstants {
     /**
      * Holds the vocabulary name for the field Value
      */
-    public static final String VALUE_LABEL = "Value"; 
+    public static final String VALUE_LABEL = "Value";
+    /**
+     * Holds the vocabulary name for the field "hasSubsite"
+     */
+    private static final String HAS_SUBSITE_LABEL = "hasSubsite";
+    /**
+     * Holds the vocabulary name for the field "isSimilarTo"
+     */
+    private static final String IS_SIMILAR_TO_LABEL = "isSimilarTo";
+    /**
+     * Holds the vocabulary name for the field "isSubsiteOf"
+     */
+    private static final String IS_SUBSITE_OF_LABEL = "isSubsiteOf";
+    /**
+     * Holds the vocabulary name for the field "hasSubtaxon"
+     */
+    private static final String HAS_SUBTAXON_LABEL = "hasSubtaxon";
+    /**
+     * Holds the vocabulary name for the field "isSubtaxonOf"
+     */
+    private static final String IS_SUBTAXON_OF_LABEL = "isSubtaxonOf";
 
     /**
      * Holds the vocabulary name for the label that says id column will be found automatically 
@@ -145,12 +165,6 @@ public class FishLinkConstants {
      *
      * Cases where the Field name matches the Category such as vocab:hasSite pointing to Site
      *      are assumed to have been caught by calling class.
-     * Matches are:
-     * <ul>
-     *     <li> Contributor := Entity
-     *     <li> Owner := Entity
-     *     <li> SubSite := Entity
-     * </ul>
      * @param field Fields as in annotation sheet (Without the vocab:has)
      * @return Match or Null.
      */
@@ -162,9 +176,6 @@ public class FishLinkConstants {
         if (field.equalsIgnoreCase(OWNER_LABEL)){
             return ENTITY_LABEL;
         }
-        if (field.toLowerCase().contains("subsite")){
-            return SITE_LABEL;
-        }
         return null;
     }
 
@@ -172,9 +183,35 @@ public class FishLinkConstants {
      * Identifies a field has having to be represented with the predicate rdf:type
      *
      * @param field Fields as in annotation sheet (Without the vocab:has)
-     * @return True if and only if field == subStite, otherwise false.
+     * @return True if and only if field predicate is rdf:type, otherwise false.
      */
     public static boolean isRdfTypeField(String field){
         return SUB_TYPE_LABEL.equalsIgnoreCase(field);
+    }
+
+    /**
+     * Identifies a field that has an Object with the same type (category) as the subject
+     *
+     * The following fields point to an Object of the same type.
+     * @param field Fields as in annotation sheet (Without the vocab:has)
+     * @return True if and only if fields points to an Predicate of the same type as the Object, otherwise False.
+     */
+    public static boolean refersToSameCategery(String field){
+        if (field.equalsIgnoreCase(HAS_SUBSITE_LABEL)){
+            return true;
+        }
+        if (field.equalsIgnoreCase(IS_SIMILAR_TO_LABEL)){
+            return true;
+        }
+        if (field.equalsIgnoreCase(IS_SUBSITE_OF_LABEL)){
+            return true;
+        }
+        if (field.equalsIgnoreCase(HAS_SUBTAXON_LABEL)){
+            return true;
+        }
+        if (field.equalsIgnoreCase(IS_SUBTAXON_OF_LABEL)){
+            return true;
+        }
+        return false;
     }
 }

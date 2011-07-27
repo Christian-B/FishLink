@@ -243,17 +243,23 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private String refersToCategory(String field) throws FishLinkException{
+    private String refersToCategory(String subjectCategory, String field) throws FishLinkException{
        if ( masterNameChecker.isCategory(field)) {
+           System.out.println("£££");
            return field;
+       }
+       if (FishLinkConstants.refersToSameCategery(field)){
+           return subjectCategory;
        }
        return FishLinkConstants.refersToCategory(field);
     }
 
-    private void writeData(BufferedWriter writer, String column, ZeroNullType zeroNull) throws FishLinkException {
+    private void writeData(BufferedWriter writer, String subjectCategory, String column, ZeroNullType zeroNull)
+            throws FishLinkException {
         String field = getCellValue (column, fieldRow);
         writeVocab(writer, field);
-        String category = refersToCategory(field);
+        String category = refersToCategory(subjectCategory, field);
+        System.out.println(field + " = " + category);
         try {
             if (category  == null) {
                 switch (zeroNull){
@@ -305,11 +311,11 @@ public class SheetWrite extends AbstractSheet{
         if (!category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)){
             return;
         }
-        String uri = categoryUris.get(FishLinkConstants.OBSERVATION_LABEL);
+        String uri = categoryUris.get(category);
         for (String column : allColumns){
             String idNullZeroString = getCellValue (column, ZeroNullRow);
             ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
-            writeData(writer, column, idZeroNull);
+            writeData(writer, category, column, idZeroNull);
         }
     }
 
@@ -345,7 +351,7 @@ public class SheetWrite extends AbstractSheet{
         }  catch (IOException ex) {
             throw new FishLinkException("Unable to write a type", ex);
         }            
-        writeData(writer, column, zeroNull);
+        writeData(writer, category, column, zeroNull);
         writeAutoRelated(writer, category, column, zeroNull);
         writeAllRelated(writer, category, zeroNull);
         for (int row = firstConstant; row <= lastConstant; row++){
