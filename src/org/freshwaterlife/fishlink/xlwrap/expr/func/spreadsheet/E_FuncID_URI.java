@@ -59,6 +59,9 @@ public class E_FuncID_URI extends E_Func_with_zero {
             case NULLS_AS_ZERO:
                 return true;
             case ZEROS_AS_NULLS:
+                if (value == null){
+                    return true;
+                }
                 return isZero(value);
             default:
                 throw new XLWrapException("Unexpected ZeroNullType: "+ zeroNullType);
