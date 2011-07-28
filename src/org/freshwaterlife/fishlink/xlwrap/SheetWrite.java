@@ -23,7 +23,7 @@ public class SheetWrite extends AbstractSheet{
 
     private NameChecker masterNameChecker;
 
-    private HashMap<String,String> idColumns;
+    private HashMap<String,String> idValueLinks;
     private HashMap<String,String> categoryUris;
     private ArrayList<String> allColumns;
 
@@ -34,7 +34,7 @@ public class SheetWrite extends AbstractSheet{
         this.sheetNumber = sheetNumber;
         this.dataPath = url;
         this.masterNameChecker = nameChecker;
-        idColumns = new HashMap<String,String>();
+        idValueLinks = new HashMap<String,String>();
         categoryUris = new HashMap<String,String>();
         allColumns = new ArrayList<String>();
     }
@@ -84,84 +84,168 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private void writeUri(BufferedWriter writer, String category, String field, String idType,
-            String dataColumn, ZeroNullType zeroVsNulls) throws FishLinkException {
-        if(category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)) {
-            writeObservationUril(writer, field, idType, dataColumn, zeroVsNulls);
-        } else if (idType == null || idType.isEmpty()  || idType.equalsIgnoreCase("n/a") ||
-                idType.equalsIgnoreCase(FishLinkConstants.AUTOMATIC_LABEL)){
-            writeUri(writer, category, field, dataColumn, zeroVsNulls);
-        } else {
-            //There is an Id reference to another dataColumn.
-            if (idType.equalsIgnoreCase("row")){
-                throw new FishLinkException("IDType row not longer supported. Found in sheet " + sheet.getSheetInfo());
-            } else if (idType.equalsIgnoreCase(FishLinkConstants.ALL_LABEL)){
-                throw new FishLinkException("Unexpected IDType " + FishLinkConstants.ALL_LABEL);
+    private boolean hasIdValueLink(String idValueLink){
+        if (idValueLink == null) return false;
+        if (idValueLink.isEmpty()) return false;
+        if (idValueLink.equalsIgnoreCase("n/a")) return false;
+        if (idValueLink.equalsIgnoreCase(FishLinkConstants.AUTOMATIC_LABEL)) return false;
+        return true;
+    }
+    
+    /**
+     * Write the URI for the Subject of a Tripe.
+     * 
+     * Main job of this method is to distinguish between different types of 
+     *    data and then call the correct WriteURIForXXX method.
+     * <p>
+     * Result will be a XLwarp function for creating the applicable URI.
+     * 
+     * @param writer
+     * @param category category for the column being written
+     * @param field field for column being written 
+     * @param idValueLink Possible link to the idValueLink
+     * @param dataColumn Column currently being written
+     * @param dataZeroNull ZeroNull Setting or column being written
+     * @throws FishLinkException 
+     */
+    private void writeUriForSubject(BufferedWriter writer, String category, String field, String idValueLink,
+            String dataColumn, ZeroNullType dataZeroNull) throws FishLinkException {
+        if(category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)) { 
+            if (field.equalsIgnoreCase(FishLinkConstants.VALUE_LABEL)) {
+                writeUriForObservationValue(writer, idValueLink, dataColumn, dataZeroNull);
             } else {
-                String idCategory = this.getCellValue(idType, categoryRow);
-                String idColumn = idColumns.get(idCategory);
-                writeUri(writer, idCategory, field, idColumn, zeroVsNulls);
+                writeUriForObservationNonValue(writer, idValueLink, dataColumn, dataZeroNull);
+            }
+        } else { 
+            if (hasIdValueLink(idValueLink)){
+                throw new FishLinkException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
+                        category + " and field " + field + " is not allowed to have an id/Value Link");
+            }
+            if (field.toLowerCase().equals(FishLinkConstants.ID_LABEL)){
+                writeUriForId(writer, category, dataColumn, dataZeroNull);
+            } else {
+                writeUriForOther(writer, category, dataColumn, dataZeroNull);
             }
         }
     }
     
-    private void writeUri(BufferedWriter writer, String category, String field, String dataColumn, 
-            ZeroNullType dataZeroVsNulls) throws FishLinkException {
-        String uri = categoryUris.get(category);
-        if (field.toLowerCase().equals(FishLinkConstants.ID_LABEL)){
-            try {
-                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ",'"
-                        + dataZeroVsNulls + "')\"^^xl:Expr ] ");
-            } catch (IOException ex) {
-                throw new FishLinkException("Unable to write uri", ex);
-            }
-            return;
+    /**
+     * Writes a URI based on the CELL in which the Observation value was saved.
+     * 
+     * @param writer
+     * @param idValueLink Should be empty
+     * @param dataColumn Column currently being written
+     * @param dataZeroNull ZeroNull Setting or column being written
+     * @throws FishLinkException 
+     */
+    private void writeUriForObservationValue(BufferedWriter writer, String idValueLink, String dataColumn, 
+            ZeroNullType dataZeroNull) throws FishLinkException {
+        String uri = categoryUris.get(FishLinkConstants.OBSERVATION_LABEL);
+        if (hasIdValueLink(idValueLink)){
+            throw new FishLinkException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
+                    FishLinkConstants.OBSERVATION_LABEL + " and field " + FishLinkConstants.VALUE_LABEL + 
+                    " is not allowed to have an id/Value Link");
         }
-        writeUriOther(writer, uri, category, dataColumn, dataZeroVsNulls);
+        try {
+            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ",'"
+                    + dataZeroNull + "')\"^^xl:Expr ] ");
+        } catch (IOException ex) {
+            throw new FishLinkException("Unable to write uri", ex);
+        }                
+        return;
     }
-
-    private void writeObservationUril(BufferedWriter writer, String field, String idColumn, 
+    
+    /**
+     * Writes a URI based on the CELL in which the Observation's value was saved.
+     * 
+     * The URI written will be exactly the same as the one for the Value Column.
+     * This will allow the underlying model to combine the triples into a single subject.
+     * <p>
+     * The Difference between the function written here and the one write for the value column 
+     *    is that it will also check that the data cell (this column) is not null too.
+     * 
+     * @param writer
+     * @param idValueLink Link to the column that holds the Observation's Value.
+     * @param dataColumn Column currently being written
+     * @param dataZeroNull ZeroNull Setting or column being written
+     * @throws FishLinkException 
+     */
+    private void writeUriForObservationNonValue(BufferedWriter writer, String idValueLink, 
             String dataColumn, ZeroNullType dataZeroNull) throws FishLinkException {
         String uri = categoryUris.get(FishLinkConstants.OBSERVATION_LABEL);
-        if(field.equalsIgnoreCase(FishLinkConstants.VALUE_LABEL)) {
-            try {
-                writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + dataColumn + firstData + ",'"
-                        + dataZeroNull + "')\"^^xl:Expr ] ");
-            } catch (IOException ex) {
-                throw new FishLinkException("Unable to write uri", ex);
-            }                
-            return;
-        }
-        if (idColumn == null || idColumn.isEmpty()){
+        if (!hasIdValueLink(idValueLink)){
             throw new FishLinkException(sheet.getSheetInfo() + " Data Column " + dataColumn + " with category " +
-                    FishLinkConstants.OBSERVATION_LABEL + " and field " + field + " needs an id Type");
+                    FishLinkConstants.OBSERVATION_LABEL + " and field " + FishLinkConstants.VALUE_LABEL + 
+                    " needs an id/Value Link");
         }
-        String idNullZeroString = getCellValue (idColumn, idTypeRow);
+        String idNullZeroString = getCellValue (idValueLink, idTypeRow);
         ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
         try {
-            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idColumn + firstData + ", '" + idZeroNull + "' ,"
+            writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idValueLink + firstData + ", '" + idZeroNull + "' ,"
                 + dataColumn + firstData + ",'" + dataZeroNull + "')\"^^xl:Expr ] ");
         } catch (IOException ex) {
             throw new FishLinkException("Unable to write uri", ex);
         }
     }
 
-    private void writeUriOther(BufferedWriter writer, String uri, String category, 
-            String dataColumn, ZeroNullType dataZeroVsNulls) throws FishLinkException {
-        //"row" is added for automatic ones where no id column found.
-        String idColumn = idColumns.get(category);
+    /**
+     * Writes an URI based on the ID values found in this column.
+     * 
+     * @param writer
+     * @param category category for the column being written
+     * @param dataColumn Column currently being written
+     * @param zeroNull ZeroNull Setting or column being written
+     * @throws FishLinkException 
+     */
+     private void writeUriForId(BufferedWriter writer, String category, String dataColumn, ZeroNullType zeroNull) 
+            throws FishLinkException {
+        String uri = categoryUris.get(category);
         try {
-            if (idColumn.equalsIgnoreCase("row")){
-                writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + ",'" +
-                        dataZeroVsNulls + "')\"^^xl:Expr ] ");
-            } else {
-                String zeroNullString = getCellValue (idColumn, ZeroNullRow);
-                ZeroNullType idZeroNull = ZeroNullType.parse(zeroNullString);
-                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + idColumn + firstData + ",'" + idZeroNull + "'," + 
-                        dataColumn + firstData + ",'" + dataZeroVsNulls + "')\"^^xl:Expr ] ");
-            }
+            writer.write("[ xl:uri \"ID_URI('" + uri + "', " + dataColumn + firstData + ",'"
+                    + zeroNull + "')\"^^xl:Expr ] ");
         } catch (IOException ex) {
             throw new FishLinkException("Unable to write uri", ex);
+        }
+    }
+
+    /**
+     * Writes an URI based on the ID values for the given category.
+     * 
+     * if this category has an Id column the URI written will be exactly the same as the one for the Id Column.
+     * This will allow the underlying model to combine the triples into a single subject.
+     * <p>
+     * The Difference between the function written here and the one write for the Id column 
+     *    is that it will also check that the data cell (this column) is not null too.
+     * <p>
+     * If there is no Id Column for s given category a row based URI will be generated.
+      * 
+     * @param writer
+     * @param category category for the column being written
+     * @param dataColumn Column currently being written
+     * @param zeroNull ZeroNull Setting or column being written
+     * @throws FishLinkException 
+     */
+    private void writeUriForOther(BufferedWriter writer, String category, String dataColumn, 
+            ZeroNullType dataZeroVsNulls) throws FishLinkException {
+        String uri = categoryUris.get(category);
+        //"row" is added for automatic ones where no id column found.
+        String idValueLink = idValueLinks.get(category);
+        if (idValueLink.equalsIgnoreCase("row")){
+            try {
+                writer.write("[ xl:uri \"ROW_URI('" + uri + "', " + dataColumn + firstData + ",'" +
+                        dataZeroVsNulls + "')\"^^xl:Expr ] ");
+            } catch (IOException ex) {
+                throw new FishLinkException("Unable to write uri", ex);
+            }
+        } else {
+            String zeroNullString = getCellValue (idValueLink, ZeroNullRow);
+            ZeroNullType idZeroNull = ZeroNullType.parse(zeroNullString);
+            try {
+                writer.write("[ xl:uri \"ID_URI('" + uri + "', " + idValueLink + firstData + ",'" + idZeroNull + "'," + 
+                        dataColumn + firstData + ",'" + dataZeroVsNulls + "')\"^^xl:Expr ] ");
+            } catch (IOException ex) {
+                throw new FishLinkException("Unable to write uri", ex);
+            }
         }
     }
 
@@ -297,7 +381,7 @@ public class SheetWrite extends AbstractSheet{
             return;
         }
         writeVocab(writer, related);
-        writeUriOther(writer, uri, category, column, dataZeroVsNulls);
+        writeUriForOther(writer, related, column, dataZeroVsNulls);
         try {
             writer.write(";");
             writer.newLine();
@@ -345,7 +429,7 @@ public class SheetWrite extends AbstractSheet{
         }
        
         ZeroNullType zeroNull =getZeroVsNull(column);
-        writeUri(writer, category, field, idType, column, zeroNull);
+        writeUriForSubject(writer, category, field, idType, column, zeroNull);
         try {
             writer.write (" a ");
             writeType (writer, category);
@@ -407,11 +491,11 @@ public class SheetWrite extends AbstractSheet{
 
    private void findId(String category, String column) throws FishLinkException{
         String field = getCellValue (column, fieldRow);
-        String id = idColumns.get(category);
+        String id = idValueLinks.get(category);
         if (field.equalsIgnoreCase("id")){
             if (id == null || id.equalsIgnoreCase("row")){
                 System.out.println (column + " " +category + "    " + column);
-                idColumns.put(category, column);
+                idValueLinks.put(category, column);
                 categoryUris.put(category, getUri(column, category));
             } else {
                 throw new FishLinkException("Found two different id columns of type " + category);
@@ -419,7 +503,7 @@ public class SheetWrite extends AbstractSheet{
         } else {
             if (id == null){
                 System.out.println (column + " " + category + "    row");
-                idColumns.put(category, "row");
+                idValueLinks.put(category, "row");
             }//else leave the column or "row" already there.
             if (categoryUris.get(category) == null){
                 categoryUris.put(category, getCatgerogyUri(category));
