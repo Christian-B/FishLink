@@ -328,6 +328,7 @@ public class SheetWrite extends AbstractSheet{
         String external = getExternal(column);
         if (category == null || category.toLowerCase().equals("undefined")) {
             FishLinkUtils.report("Skippig column " + column + " as no Category provided");
+            return false;
         }
         if (field == null){
             FishLinkUtils.report("Skippig column " + column + " as no Feild provided");
