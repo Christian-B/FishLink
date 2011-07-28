@@ -1,0 +1,15 @@
+The code here depends on Xlwrap.
+
+It mainly depends on Mark Birkeck version available at:
+https://github.com/markbirbeck/xlwrap.git
+
+I have since added in Apache POI which allows it to read xlsx files (Excel 2007+)
+
+The long term hope is that this will be pulled into the above project.
+
+In the short term my stuff is available at:
+https://Christian-B@github.com/Christian-B/xlwrap.git
+or
+git@github.com:Christian-B/xlwrap.git
+
+You only need to download on of these two as my version is forked of mark's and will include all his stuff.
