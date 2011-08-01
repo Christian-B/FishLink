@@ -11,22 +11,59 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.ZeroNullType;
 
 /**
+ * Methods for Writing the part of the mapping file for s single column. 
  *
  * @author Christian
  */
 public class SheetWrite extends AbstractSheet{
 
+    /**
+     * The number of this sheet in its workbook.
+     * Sheet number is required in the mapping file
+     */
     private int sheetNumber;
-
+    /**
+     * The URI to the workbook which holds this this sheet.
+     * DataPath is required in the mapping file
+     */
     private String dataPath;
+    /**
+     * The pid to the workbook which holds this this sheet.
+     * The pid is used to create workbook specific URIs.
+     */
     private String pid;
 
+    /**
+     * Stores Link to the NameChecker for later use.
+     */
     private NameChecker masterNameChecker;
 
+   /** 
+     * Maps the Categories of which there can only be one instance per row to the column that hold the Id.
+     * "row" is used if no Id column found.
+     */
     private HashMap<String,String> idValueLinks;
+    /**
+     * Maps the Categories the URI for that category.
+     */
     private HashMap<String,String> categoryUris;
+    /**
+     * Keeps track of the columns that have data which should be applied to all Observations.
+     */
     private ArrayList<String> allColumns;
 
+   /**
+     * Constructor based on the Sheet provided.
+     * 
+     * Minimal checking is done by superClass.
+     * 
+     * @param nameChecker Reference to the NameChecker to use as required.
+     * @param annotatedSheet Sheet which will (later) be added to the Mapping File
+     * @param sheetNumber Number of this Sheet within the workbook.
+     * @param uri URI to the workbook this sheet is part of. 
+     * @param pid PID to be used in URIs
+     * @throws FishLinkException Thrown if sheet is corrupt or badly formatted.
+     */
     SheetWrite (NameChecker nameChecker, Sheet annotatedSheet, int sheetNumber, String url, String pid)
             throws FishLinkException{
         super(annotatedSheet);
@@ -39,15 +76,20 @@ public class SheetWrite extends AbstractSheet{
         allColumns = new ArrayList<String>();
     }
 
-    String getSheetInfo(){
-        return sheet.getSheetInfo();
-    }
-
+    /**
+     * Unified name for the template
+     * @return Unified name for the template
+     */
     private String template(){
         return sheet.getName() + "template";
     }
 
-    void writeMapping(BufferedWriter writer) throws FishLinkException{
+    /**
+     * Writes the mapping for this Sheet (see XLWrap documentation)
+     * @param writer
+     * @throws FishLinkException 
+     */
+   void writeMapping(BufferedWriter writer) throws FishLinkException{
         try {
             writer.write("	xl:offline \"false\"^^xsd:boolean ;");
             writer.newLine();
@@ -84,6 +126,12 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
+   /**
+    * Determines if the String contains an link to another id or value column.
+    * @param idValueLink Possible link
+    * @return False If and only if it can be determined that the link is null, blank or a known ignore value.
+    *       Otherwise True
+    */
     private boolean hasIdValueLink(String idValueLink){
         if (idValueLink == null) return false;
         if (idValueLink.isEmpty()) return false;
@@ -178,7 +226,7 @@ public class SheetWrite extends AbstractSheet{
                     FishLinkConstants.OBSERVATION_LABEL + " and field " + FishLinkConstants.VALUE_LABEL + 
                     " needs an id/Value Link");
         }
-        String idNullZeroString = getCellValue (idValueLink, idTypeRow);
+        String idNullZeroString = getCellValue (idValueLink, idValueLinkRow);
         ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
         try {
             writer.write("[ xl:uri \"CELL_URI('" + uri + "', " + idValueLink + firstData + ", '" + idZeroNull + "' ,"
@@ -249,6 +297,15 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
+    /**
+     * Writes the predicate of a Triple.
+     * 
+     * All predicates that do not start with "is" or "has" will have "has" added.
+     * 
+     * @param writer
+     * @param vocab Vocabulary to be used
+     * @throws FishLinkException 
+     */
     private void writeVocab (BufferedWriter writer, String vocab) throws FishLinkException {
         try {
             if (vocab.startsWith("is") || vocab.startsWith("has")){
@@ -261,6 +318,12 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
+    /**
+     * Writes both the Predicate and Object for triples with the predicate rdf:type.
+     * @param writer
+     * @param type The Object or type being asserted.
+     * @throws FishLinkException 
+     */
     private void writeRdfType (BufferedWriter writer, String type) throws FishLinkException {
         try {
            writer.write ("	rdf:type");
@@ -269,7 +332,13 @@ public class SheetWrite extends AbstractSheet{
             throw new FishLinkException("Unable to write vocab", ex);
         }            
     }
-
+ 
+    /**
+     * Writes a type adding the prefix type:
+     * @param writer
+     * @param type The Object or type being asserted.
+     * @throws FishLinkException 
+     */
     private void writeType (BufferedWriter writer, String type) throws FishLinkException {
         try {
            writer.write (" type:" + type);
@@ -280,17 +349,22 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
-    private void writeConstant (BufferedWriter writer, String category, String column, int row) 
+   /**
+     * Write the data from one of the Constant rows in the Annotated sheet such that it will be repeated for each row.
+     * @param writer
+     * @param category category for the dataColumn being written
+     * @param dataColumn Column currently being written
+     * @param row Row in the Annotation Sheet the Constant is found in.
+     * @throws FishLinkException 
+     */
+    private void writeConstant (BufferedWriter writer, String category, String dataColumn, int row) 
             throws FishLinkException{
         String field = getCellValue ("A", row);
-        if (field == null){
+        if (field == null){ //Should never happen
             return;
         }
-        String value = getCellValue (column, row);
-        if (value == null){
-            return;
-        }
-        if (value.equalsIgnoreCase("n/a")){
+        String value = getCellValue (dataColumn, row);
+        if (value == null || value.isEmpty() || value.equalsIgnoreCase("n/a")){
             return;
         }
         if (FishLinkConstants.isRdfTypeField(field)){
@@ -314,22 +388,31 @@ public class SheetWrite extends AbstractSheet{
         }
     }
 
-    private ZeroNullType getZeroVsNull (String column) throws FishLinkException {
+    /**
+     * Gets the ZeroNull type for this dataColumn or the default ZeroNullType
+     * @param dataColumn
+     * @return The Type specified or the default type if none specified
+     * @throws FishLinkException If the String value is unknown.
+     */
+    private ZeroNullType getZeroNullType (String dataColumn) throws FishLinkException {
         if (ZeroNullRow >= 0){
-            String ignoreZeroString = getCellValue (column, ZeroNullRow);
-            if (ignoreZeroString == null){
-                return ZeroNullType.KEEP;
-            } else if (ignoreZeroString.isEmpty()){
-                return ZeroNullType.KEEP;
-            } return ZeroNullType.parse(ignoreZeroString);
+            String ignoreZeroString = getCellValue (dataColumn, ZeroNullRow);
+            return ZeroNullType.parse(ignoreZeroString);
         } else{
-            return ZeroNullType.KEEP;
+            //Get the default
+            return ZeroNullType.parse(null);
         }
     }
 
+    /**
+     * Determines the type of data/Object that a particular field in a particular column points to.
+     * @param subjectCategory Category of the Triple's subject 
+     * @param field Vocabulary used to create the Triple's Predicate
+     * @return Type of the Triple's Object
+     * @throws FishLinkException 
+     */
     private String refersToCategory(String subjectCategory, String field) throws FishLinkException{
        if ( masterNameChecker.isCategory(field)) {
-           System.out.println("£££");
            return field;
        }
        if (FishLinkConstants.refersToSameCategery(field)){
@@ -338,30 +421,42 @@ public class SheetWrite extends AbstractSheet{
        return FishLinkConstants.refersToCategory(field);
     }
 
-    private void writeData(BufferedWriter writer, String subjectCategory, String column, ZeroNullType zeroNull)
+    /**
+     * Writes the Predicate and Object of a Triple
+     * @param writer
+     * @param subjectCategory Category of the Triple's subject 
+     * @param dataColumn Column currently being written
+     * @param zeroNull Value for the dataColumn
+     * @throws FishLinkException 
+     */
+    private void writeData(BufferedWriter writer, String subjectCategory, String dataColumn, ZeroNullType zeroNull)
             throws FishLinkException {
-        String field = getCellValue (column, fieldRow);
+        //Write the Predicate
+        String field = getCellValue (dataColumn, fieldRow);
         writeVocab(writer, field);
+        //Write the Object
+        //Check if it is expected to be a link to another object
         String category = refersToCategory(subjectCategory, field);
-        System.out.println(field + " = " + category);
         try {
             if (category  == null) {
+                //Write raw data with Zero Null conversion as applicable
                 switch (zeroNull){
                     case KEEP:
-                        writer.write("\"" + column + firstData + "\"^^xl:Expr ;");
+                        writer.write("\"" + dataColumn + firstData + "\"^^xl:Expr ;");
                         break;
                     case ZEROS_AS_NULLS:   
-                        writer.write("\"ZERO_AS_NULL(" + column + firstData + ")\"^^xl:Expr ;");
+                        writer.write("\"ZERO_AS_NULL(" + dataColumn + firstData + ")\"^^xl:Expr ;");
                         break;
                     case NULLS_AS_ZERO:   
-                        writer.write("\"NULL_AS_ZERO(" + column + firstData + ")\"^^xl:Expr ;");
+                        writer.write("\"NULL_AS_ZERO(" + dataColumn + firstData + ")\"^^xl:Expr ;");
                         break;
                     default:
                         throw new FishLinkException("Unexpected ZeroNullType " + zeroNull);
                 }
             } else {
-                String uri = getUri(column, category);
-                writer.write("[ xl:uri \"ID_URI('" + uri + "'," + column + firstData + ", '" + zeroNull + 
+                //Write a link to another column
+                String uri = getUri(category, dataColumn);
+                writer.write("[ xl:uri \"ID_URI('" + uri + "'," + dataColumn + firstData + ", '" + zeroNull + 
                         "')\"^^xl:Expr ];");
             }
             writer.newLine();
@@ -370,18 +465,30 @@ public class SheetWrite extends AbstractSheet{
             }            
     }
 
-    private void writeAutoRelated(BufferedWriter writer, String category, String column, ZeroNullType dataZeroVsNulls)
+    /**
+     * Writes the auto related columns to this dataColumn.
+     * 
+     * This links a category to another category that are assume to be automatically related.
+     * For example if these is a Site and a Location the Site is assumed to be at that location.
+     * 
+     * @param writer
+     * @param category category for the dataColumn being written
+     * @param dataColumn Column currently being written
+     * @param dataZeroNull ZeroNull Setting for column being written
+     * @throws FishLinkException 
+     */
+    private void writeAutoRelated(BufferedWriter writer, String category, String dataColumn, ZeroNullType dataZeroNull)
             throws FishLinkException {
         String related = FishLinkConstants.autoRelatedCategory(category);
         if (related == null){
-            return;
+            return; //No autorelated category
         }
         String uri = categoryUris.get(related);
         if (uri == null){
-            return;
+            return; //No data for that category
         }
         writeVocab(writer, related);
-        writeUriForOther(writer, related, column, dataZeroVsNulls);
+        writeUriForOther(writer, related, dataColumn, dataZeroNull);
         try {
             writer.write(";");
             writer.newLine();
@@ -390,57 +497,92 @@ public class SheetWrite extends AbstractSheet{
         }            
     }
 
-    private void writeAllRelated(BufferedWriter writer, String category, ZeroNullType zeroVsNulls)
+    /**
+     * Applies the data assigned to all Observations to this column.
+     * 
+     * Only applies to Observation.Value so does nothing in any other case.
+     * 
+     * @param writer
+     * @param category category for the dataColumn being written
+     * @param field field for the dataColumn being written
+     * @throws FishLinkException 
+     */
+    private void writeAllRelated(BufferedWriter writer, String category, String field)
             throws FishLinkException {
         if (!category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)){
             return;
         }
-        String uri = categoryUris.get(category);
-        for (String column : allColumns){
-            String idNullZeroString = getCellValue (column, ZeroNullRow);
-            ZeroNullType idZeroNull = ZeroNullType.parse(idNullZeroString);
-            writeData(writer, category, column, idZeroNull);
+       if (!field.equalsIgnoreCase(FishLinkConstants.VALUE_LABEL)){
+            return;
+        }
+        for (String allColumn : allColumns){
+            String allZeroNullString = getCellValue (allColumn, ZeroNullRow);
+            ZeroNullType allZeroNull = ZeroNullType.parse(allZeroNullString);
+            writeData(writer, category, allColumn, allZeroNull);
         }
     }
 
-    private boolean writeTemplateColumn(BufferedWriter writer, String column)
-            throws FishLinkException{
-        String category = getCellValue (column, categoryRow);
-        //ystem.out.println(category + " " + metaColumn + " " + categoryRow);
-        String field = getCellValue (column, fieldRow);
-        String idType = getCellValue (column, idTypeRow);
-        String external = getExternal(column);
+    /**
+     * This function checks if a dataColumn should be written and then calls function to write it. 
+     * @param writer
+     * @param dataColumn Column currently being written
+     * @return True if and only if something was actually written.
+     * @throws FishLinkException 
+     */
+    private boolean writeTemplateColumn(BufferedWriter writer, String dataColumn) throws FishLinkException{
+        String category = getCellValue (dataColumn, categoryRow);
+        //ystem.out.println(category + " " + dataColumn + " " + categoryRow);
+        String field = getCellValue (dataColumn, fieldRow);
+        String idValueLink = getCellValue (dataColumn, idValueLinkRow);
+        String external = getExternal(dataColumn);
         if (category == null || category.toLowerCase().equals("undefined")) {
-            FishLinkUtils.report("Skippig column " + column + " as no Category provided");
+            FishLinkUtils.report("Skippig column " + dataColumn + " as no Category provided");
             return false;
         }
         if (field == null){
-            FishLinkUtils.report("Skippig column " + column + " as no Feild provided");
+            FishLinkUtils.report("Skippig column " + dataColumn + " as no Feild provided");
             return false;
         }
-        masterNameChecker.checkName(sheet.getSheetInfo(), category, field);
+        field = masterNameChecker.checkField(sheet.getSheetInfo(), category, field);
         if (field.equalsIgnoreCase("id") && !external.isEmpty()){
-            FishLinkUtils.report("Skipping column " + column + " as it is an external id");
+            FishLinkUtils.report("Skipping column " + dataColumn + " as it is an external id");
             return false;
         }
-        if (idType != null && idType.equals(FishLinkConstants.ALL_LABEL)){
-            FishLinkUtils.report("Skipping column " + column + " as it is an all column.");
+        if (idValueLink != null && idValueLink.equals(FishLinkConstants.ALL_LABEL)){
+            FishLinkUtils.report("Skipping column " + dataColumn + " as it is an all column.");
             return false;
-        }
-       
-        ZeroNullType zeroNull =getZeroVsNull(column);
-        writeUriForSubject(writer, category, field, idType, column, zeroNull);
+        }       
+        writeTemplateColumn(writer, category, field, idValueLink, external,dataColumn);
+        return true;
+    }
+
+    /**
+     * This function writes a dataColumn, including its constants, automatic and all linked in columns, 
+     * and the alternative rdfTypes.
+     * 
+     * @param writer
+     * @param category category for the column being written
+     * @param field field for column being written 
+     * @param idValueLink Possible link to the idValueLink
+     * @param dataColumn Column currently being written
+     * @param external An external link to another sheet (could even be in another workbook)
+     * @throws FishLinkException 
+     */
+    private void writeTemplateColumn(BufferedWriter writer, String category, String field, 
+            String idValueLink, String external, String dataColumn) throws FishLinkException{
+        ZeroNullType zeroNull = getZeroNullType(dataColumn);
+        writeUriForSubject(writer, category, field, idValueLink, dataColumn, zeroNull);
         try {
             writer.write (" a ");
             writeType (writer, category);
         }  catch (IOException ex) {
             throw new FishLinkException("Unable to write a type", ex);
         }            
-        writeData(writer, category, column, zeroNull);
-        writeAutoRelated(writer, category, column, zeroNull);
-        writeAllRelated(writer, category, zeroNull);
+        writeData(writer, category, dataColumn, zeroNull);
+        writeAutoRelated(writer, category, dataColumn, zeroNull);
+        writeAllRelated(writer, category, field);
         for (int row = firstConstant; row <= lastConstant; row++){
-            writeConstant(writer,  category, column, row);
+            writeConstant(writer,  category, dataColumn, row);
         }
 
         try {
@@ -454,29 +596,51 @@ public class SheetWrite extends AbstractSheet{
         }  catch (IOException ex) {
             throw new FishLinkException("Unable to other type ", ex);
         }            
-        return true;
     }
 
-    private String getExternal(String metaColumn) throws FishLinkException {
+    /**
+     * Gets the value of the ExtarnalSheet row if any otherwise a blank String
+     * @param dataColumn Column currently being written
+     * @return
+     * @throws FishLinkException 
+     */
+    private String getExternal(String dataColumn) throws FishLinkException {
         if (externalSheetRow < 1){
             return "";
         }
-        String externalFeild = getCellValue (metaColumn, externalSheetRow);
+        String externalFeild = getCellValue (dataColumn, externalSheetRow);
         if (externalFeild == null){
             return "";
         }
         return externalFeild;
-   }
+    }
 
-   private String getCatgerogyUri(String category){
-       return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet.getName() + "/";
-   }
+    /**
+     * Gets the URI for a category with no external link.
+     * 
+     * @param category
+     * @return 
+     */
+    private String getCategoryUri(String category){
+        return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + sheet.getName() + "/";
+    }
 
-   private String getUri(String metaColumn , String category) throws FishLinkException {
-        String externalField = getExternal(metaColumn);
+    /**
+     * gets the URI for a category.
+     * 
+     * This could be an external Link to a URI on a different Sheet (even different workbook)
+     * 
+     * @param category category for the column being written
+     * @param dataColumn Column currently being written
+     * @return
+     * @throws FishLinkException 
+     */
+    private String getUri(String category, String dataColumn) throws FishLinkException {
+        String externalField = getExternal(dataColumn);
         if (externalField.isEmpty()){
-            return getCatgerogyUri(category);
+            return getCategoryUri(category);
         }
+        //External link
         String externalPid;
         String externalSheet;
         if (externalField.startsWith("[")){
@@ -486,65 +650,85 @@ public class SheetWrite extends AbstractSheet{
             externalPid = pid;
             externalSheet = externalField;
         }
-        return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + pid + "_" + externalSheet + "/";
+        return  FishLinkConstants.RDF_BASE_URL + "resource/" + category + "_" + externalPid + "_" + externalSheet + "/";
     }
 
-   private void findId(String category, String column) throws FishLinkException{
-        String field = getCellValue (column, fieldRow);
+    /**
+     * Completes the category level information.
+     * @param category category for the dataColumn being written
+     * @param dataColumn Column currently being written
+     * @throws FishLinkException 
+     */
+    private void findCategoryLevelDataForColumn(String category, String dataColumn) throws FishLinkException{
+        String field = getCellValue (dataColumn, fieldRow);
         String id = idValueLinks.get(category);
         if (field.equalsIgnoreCase("id")){
             if (id == null || id.equalsIgnoreCase("row")){
-                System.out.println (column + " " +category + "    " + column);
-                idValueLinks.put(category, column);
-                categoryUris.put(category, getUri(column, category));
+                idValueLinks.put(category, dataColumn);
+                categoryUris.put(category, getUri(category,  dataColumn));
             } else {
                 throw new FishLinkException("Found two different id columns of type " + category);
             }
         } else {
             if (id == null){
-                System.out.println (column + " " + category + "    row");
                 idValueLinks.put(category, "row");
-            }//else leave the column or "row" already there.
+            }//else leave the dataColumn or "row" already there.
             if (categoryUris.get(category) == null){
-                categoryUris.put(category, getCatgerogyUri(category));
+                categoryUris.put(category, getCategoryUri(category));
             }
         }
     }
 
-   private void findAll(String category, String metaColumn) throws FishLinkException{
-        String idColumn = getCellValue (metaColumn, idTypeRow);
+    /**
+     * Looks for any All columns and records them for later use.
+     * 
+     * @param category category for the dataColumn being written
+     * @param dataColumn Column currently being written
+     * @throws FishLinkException 
+     */
+    private void findAllColumn(String category, String dataColumn) throws FishLinkException{
+        String idColumn = getCellValue (dataColumn, idValueLinkRow);
         if (idColumn == null || !idColumn.equalsIgnoreCase("all")){
             return;
         }
         if (category.equalsIgnoreCase(FishLinkConstants.OBSERVATION_LABEL)){
-            String field = getCellValue (metaColumn, fieldRow);
+            String field = getCellValue (dataColumn, fieldRow);
             if (field == null || field.isEmpty()){
-                throw new FishLinkException ("All id.Value Column " + metaColumn + " missing a field value");
+                throw new FishLinkException ("All id.Value Column " + dataColumn + " missing a field value");
             }
-            allColumns.add(metaColumn);
+            allColumns.add(dataColumn);
         } else {
             throw new FishLinkException ("All id.Value Column only supported for Categeroy " +
                     FishLinkConstants.OBSERVATION_LABEL);
         }
     }
 
-   private void findIds() throws FishLinkException{
+    /**
+     * Records the information for each used Category and finds the All columns
+     * @throws FishLinkException 
+     */
+    private void recordCategoryLevelDataAndFindAllColumns() throws FishLinkException{
         int maxColumn = FishLinkUtils.alphaToIndex(lastDataColumn);
         for (int i = 1; i < maxColumn; i++){
-            String metaColumn = FishLinkUtils.indexToAlpha(i);
-            String category = getCellValue (metaColumn, categoryRow);
+            String dataColumn = FishLinkUtils.indexToAlpha(i);
+            String category = getCellValue (dataColumn, categoryRow);
             if (category == null || category.isEmpty()){
                 //do nothing
             } else {
-                findId(category, metaColumn);
-                findAll(category, metaColumn);
+                findCategoryLevelDataForColumn(category, dataColumn);
+                findAllColumn(category, dataColumn);
             }
         }
      }
 
+    /**
+     * Writes the Template part of the mapping file
+     * @param writer
+     * @throws FishLinkException Any found exception possibly wrapped
+     */
     void writeTemplate(BufferedWriter writer) throws FishLinkException{
         FishLinkUtils.report("Writing template for "+sheet.getSheetInfo());
-        findIds();
+        recordCategoryLevelDataAndFindAllColumns();
         try {
             writer.write(":");
             writer.write(template());

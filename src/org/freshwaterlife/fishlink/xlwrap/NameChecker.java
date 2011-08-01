@@ -80,21 +80,30 @@ public class NameChecker {
     }
 
     /**
-     * Checks that the given field is in the given Category
+     * Checks that the given field is in the given Category and corrects any case differences.
+     * 
      * @param sheetInfo Info about the sheet used for error reporting only
      * @param category name of the Category
      * @param field Fields as in annotation sheet (Without the vocab:has)
+     * @return Field in the case format in the vocabulary
      * @throws FishLinkException If either the Category is unknown or the Fields is not applicable to this category.
      */
-    void checkName (String sheetInfo, String category, String field) throws FishLinkException{
+    String checkField (String sheetInfo, String category, String field) throws FishLinkException{
         ArrayList<String> fields = categories.get(category);
         if (fields == null){
             throw new FishLinkException("Map used catagory "+ category + " which is not in the Master");
         }
         if (!fields.contains(field)){
+            for (String theField: fields){
+                if (theField.equalsIgnoreCase(field)){
+                    //Close enough
+                    return theField;
+                }
+            }
             throw new FishLinkException(sheetInfo + " used field " + field + " in catagory "+ category +
                     " which is not in the Master");
         }
+        return field;
     }
 
     /**

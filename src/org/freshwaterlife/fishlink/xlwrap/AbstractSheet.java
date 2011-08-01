@@ -27,7 +27,7 @@ public class AbstractSheet {
     //Excell columns and Rows used here are Excell based and not 0 based as XLWrap uses internally
     int categoryRow = -1;
     int fieldRow = -1;
-    int idTypeRow = -1;
+    int idValueLinkRow = -1;
     int externalSheetRow = -1;
     int ZeroNullRow = -1;
     int firstConstant = -1;
@@ -74,7 +74,7 @@ public class AbstractSheet {
                 } else if (columnA.equalsIgnoreCase(FishLinkConstants.FIELD_LABEL)){
                     fieldRow = row;
                 } else if (columnA.startsWith(FishLinkConstants.ID_VALUE_LABEL)){
-                    idTypeRow = row;
+                    idValueLinkRow = row;
                 } else if (columnA.equalsIgnoreCase(FishLinkConstants.EXTERNAL_LABEL)){
                     externalSheetRow = row;
                 } else if (columnA.equalsIgnoreCase(FishLinkConstants.ZEROS_VS_NULLS_LABEL)){
@@ -119,7 +119,7 @@ public class AbstractSheet {
         if (fieldRow == -1) {
             throw new FishLinkException("Unable to find \"" + FishLinkConstants.FIELD_LABEL + "\" in column A.");
         }
-        if (idTypeRow == -1) {
+        if (idValueLinkRow == -1) {
             throw new FishLinkException("Unable to find \"" + FishLinkConstants.ID_VALUE_LABEL + "\" in column A.");
         }
     }
