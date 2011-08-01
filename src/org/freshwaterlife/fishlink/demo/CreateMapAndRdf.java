@@ -21,6 +21,7 @@ public class CreateMapAndRdf {
     
     public static void main(String[] args) throws FishLinkException {
         BrennRegister.register();
+        mapAndRdf(FishLinkPaths.META_FILE_ROOT + "MiniMetaData.xls", "Mini");
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "CumbriaTarnsPart1MetaData.xls", "CTP1");
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "FBA_TarnsMetaData.xls", "FBA345");
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "RecordsMetaData.xls", "rec12564");

@@ -1,10 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.freshwaterlife.fishlink.demo;
 
 import org.freshwaterlife.fishlink.FishLinkException;
+import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
 
 /**
@@ -14,6 +11,7 @@ import org.freshwaterlife.fishlink.metadatacreator.MetaDataCreator;
 public class CreateMetaData {
         public static void main(String[] args) throws FishLinkException{
         MetaDataCreator creator = new MetaDataCreator();
+        creator.createMetaData(FishLinkPaths.META_FILE_ROOT + "Mini.xlsx");
         /*
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\FBA_Tarns.xls");
@@ -32,5 +30,6 @@ public class CreateMetaData {
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\TarnsMetaData.xls");
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\TarnschemFinalMetaData.xls");
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Old Meta Data\\WillbyGroupsMetaData.xls");
+        /* */
     }
 }
