@@ -15,6 +15,7 @@ import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.FishLinkUtils;
 import org.freshwaterlife.fishlink.FishLinkConstants;
 import org.freshwaterlife.fishlink.FishLinkException;
+import org.freshwaterlife.fishlink.xlwrap.expr.func.FishLinkToXlWrapRegister;
 
 /**
  *
@@ -386,6 +387,7 @@ public class MetaDataCreator {
             usage();
             System.exit(2);
         }
+        FishLinkToXlWrapRegister.register();
         MetaDataCreator metaDataCreator = new MetaDataCreator();
         File output = metaDataCreator.createMetaData(args[0], args[1]);
         FishLinkUtils.report("Mapping file can be found at: "+output.getAbsolutePath());

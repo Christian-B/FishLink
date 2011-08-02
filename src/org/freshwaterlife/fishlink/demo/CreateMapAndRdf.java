@@ -4,7 +4,7 @@ import java.io.File;
 import org.freshwaterlife.fishlink.FishLinkException;
 import org.freshwaterlife.fishlink.FishLinkPaths;
 import org.freshwaterlife.fishlink.xlwrap.WorkbookWrite;
-import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
+import org.freshwaterlife.fishlink.xlwrap.expr.func.FishLinkToXlWrapRegister;
 import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
 /**
@@ -34,7 +34,7 @@ public class CreateMapAndRdf {
      * @throws FishLinkException 
      */
     public static void main(String[] args) throws FishLinkException {
-        BrennRegister.register();
+        FishLinkToXlWrapRegister.register();
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "MiniMetaData.xls", "Mini");
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "CumbriaTarnsPart1MetaData.xls", "CTP1");
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "FBA_TarnsMetaData.xls", "FBA345");
