@@ -1,7 +1,5 @@
 package org.freshwaterlife.fishlink;
 
-import org.freshwaterlife.fishlink.FishLinkConstants;
-
 /**
  * Enum for the different types of actions that can be done on Zeros and Nulls.
  * 
@@ -27,7 +25,10 @@ public enum ZeroNullType {
      */
     NULLS_AS_ZERO(FishLinkConstants.NULLS_AS_ZERO_LABEL);
         
-    String text;
+    /**
+     * Text for this type used by both toString and parse()
+     */
+    private String text;
     
     private ZeroNullType(String label){
         text = label;
