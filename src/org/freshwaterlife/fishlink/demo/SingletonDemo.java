@@ -6,18 +6,18 @@ import java.util.Date;
  * This is just an example of how to manage a single instance of a class.
  * @author Christian
  */
-public class FactoryDemo {
+public class SingletonDemo {
     
-    static FactoryDemo onlyInstance;
+    static SingletonDemo onlyInstance;
     
     private Date creation;
     
-    private FactoryDemo(){
+    private SingletonDemo(){
        creation = new Date(); 
     }
-    public static FactoryDemo getDemo(){
+    public static SingletonDemo getDemo(){
         if (onlyInstance == null){
-            onlyInstance = new FactoryDemo();
+            onlyInstance = new SingletonDemo();
         }
         return onlyInstance;
     }
@@ -27,9 +27,9 @@ public class FactoryDemo {
     }
     
     public static void main(String[] args) {
-        FactoryDemo d1 = FactoryDemo.getDemo();
+        SingletonDemo d1 = SingletonDemo.getDemo();
         System.out.println (d1.getCreation().getTime());
-        FactoryDemo d2 = FactoryDemo.getDemo();
+        SingletonDemo d2 = SingletonDemo.getDemo();
         System.out.println (d2.getCreation().getTime());
     }
 }
