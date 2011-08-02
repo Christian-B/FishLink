@@ -3,9 +3,7 @@ package org.freshwaterlife.fishlink;
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.spreadsheet.Cell;
 import at.jku.xlwrap.spreadsheet.Sheet;
-import at.jku.xlwrap.spreadsheet.Workbook;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import java.util.Date;
 
 /**
  * Static utility functions shared by several classes.
@@ -21,7 +19,7 @@ public class FishLinkUtils {
      * @param alpha Column name as Letters
      * @return zero-based numerical index
      */
-    public static final int alphaToIndex(String alpha) {
+    public static int alphaToIndex(String alpha) {
 	char[] letters = alpha.toUpperCase().toCharArray();
 	int index = 0;
 	for (int i = 0; i < letters.length; i++)
@@ -36,7 +34,7 @@ public class FishLinkUtils {
      * @param index zero-based numerical index
      * @return alpha Column name as letters
      */
-    public static final String indexToAlpha(int index){
+    public static String indexToAlpha(int index){
         String reply = "";
         if (index < 26){
            char first = (char)( index + 65);
