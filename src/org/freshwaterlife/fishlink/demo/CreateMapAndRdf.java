@@ -8,10 +8,18 @@ import org.freshwaterlife.fishlink.xlwrap.expr.func.BrennRegister;
 import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
 /**
+ * Class Used by Christian to the creation of mapping files and rdf.
  * @author christian
  */
 public class CreateMapAndRdf {
 
+    /**
+     * Creates the mapping file and rdf for a single file.
+     * 
+     * @param dataUrl URL (in xlwrap format) to the Workbook that holds the Annotated Data
+     * @param pid Unique identifier to this data. Used in URIs and file naming.
+     * @throws FishLinkException 
+     */
     private static void mapAndRdf(String dataUrl, String pid) throws FishLinkException{
         //Adjust this file to the your local path
         WorkbookWrite mapWrite = new WorkbookWrite(dataUrl, pid, FishLinkPaths.MASTER_FILE); 
@@ -19,6 +27,12 @@ public class CreateMapAndRdf {
         MapRun.runMap(mapping, pid);
     }
     
+    /**
+     * Runs through all the test files.
+     * 
+     * @param args NONE
+     * @throws FishLinkException 
+     */
     public static void main(String[] args) throws FishLinkException {
         BrennRegister.register();
         mapAndRdf(FishLinkPaths.META_FILE_ROOT + "MiniMetaData.xls", "Mini");
