@@ -8,7 +8,7 @@ import org.freshwaterlife.fishlink.xlwrap.expr.func.FishLinkToXlWrapRegister;
 import org.freshwaterlife.fishlink.xlwrap.run.MapRun;
 
 /**
- * Class Used by Christian to the creation of mapping files and rdf.
+ * Class Used by Christian to test the creation of mapping files and rdf.
  * @author christian
  */
 public class CreateMapAndRdf {
