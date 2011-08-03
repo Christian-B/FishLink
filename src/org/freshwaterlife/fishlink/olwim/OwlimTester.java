@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.freshwaterlife.fishlink.olwim;
 
 import java.io.BufferedReader;
@@ -53,7 +48,10 @@ import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.sail.memory.MemoryStore;
 
 /**
- *
+ * This is a test class for Christian to load and Test an Owlim implementation.
+ * It is a hack that worked last time it was tested.
+ * It should not be taken as even example code.
+ * 
  * @author christian
  */
 public class OwlimTester {
