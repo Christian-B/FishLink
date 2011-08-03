@@ -15,8 +15,8 @@ public class CreateMetaData {
      * @param args NONE
      * @throws FishLinkException 
      */
-        public static void main(String[] args) throws FishLinkException{
-        MetaDataCreator creator = new MetaDataCreator();
+    public static void main(String[] args) throws FishLinkException{
+        MetaDataCreator creator = new MetaDataCreator(FishLinkPaths.MASTER_FILE);
         creator.createMetaData(FishLinkPaths.META_FILE_ROOT + "Mini.xlsx");
         /* 
         creator.createMetaData("file:c:\\Dropbox\\FishLink XLWrap data\\Raw Data\\CumbriaTarnsPart1.xls");
