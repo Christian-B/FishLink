@@ -47,17 +47,17 @@ public class MasterReader extends AbstractSheet {
      * @throws FishLinkException If the Annotation Sheet contains an Annotation Row not in the MetaMaster
      */
     void check (SheetWrite other) throws FishLinkException {
-       if (other.externalSheetRow > 0){
-           if (this.externalSheetRow == -1){
+       if (other.externalSheetRow != NOT_FOUND){
+           if (this.externalSheetRow == NOT_FOUND){
                 throw new FishLinkException("Map contains \"external sheet\" but master does not.");
            }
        }
-       if (other.ZeroNullRow > 0){
-           if (this.ZeroNullRow == -1){
+       if (other.ZeroNullRow != NOT_FOUND){
+           if (this.ZeroNullRow == NOT_FOUND){
                 throw new FishLinkException("Map contains \"ignore zero\" but master does not.");
            }
        }
-       if (other.firstConstant > 0){
+       if (other.firstConstant != NOT_FOUND){
            for (int i = other.firstConstant; i <= other.lastConstant; i++){
                checkConstant (other.getCellValue("A", i));
            }

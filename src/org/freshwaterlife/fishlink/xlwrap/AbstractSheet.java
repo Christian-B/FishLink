@@ -20,18 +20,67 @@ import org.freshwaterlife.fishlink.FishLinkUtils;
  */
 public class AbstractSheet {
 
+    /**
+     * XLWrap sheet being wrapped.
+     */
     Sheet sheet;
 
-    int firstData;
+    /**
+     * Flag to say this value was not yet found.
+     */
+    static int NOT_FOUND = -1;
 
+    /**
+     * First row of the AnnotationSheet that holds data to be copied into the RDF.
+     * Uses Excel indexing.
+     */
+    int firstData;
+    
     //Excell columns and Rows used here are Excell based and not 0 based as XLWrap uses internally
-    int categoryRow = -1;
-    int fieldRow = -1;
-    int idValueLinkRow = -1;
-    int externalSheetRow = -1;
-    int ZeroNullRow = -1;
-    int firstConstant = -1;
-    int lastConstant = -1;
+ 
+    /**
+     * Row row of the AnnotationSheet that holds the Category
+     * Uses Excel indexing.
+     */
+    int categoryRow = NOT_FOUND;
+    /**
+     * Row row of the AnnotationSheet that holds the Field
+     * Uses Excel indexing.
+     */
+    int fieldRow = NOT_FOUND;
+    /**
+     * Row row of the AnnotationSheet that holds the id/Value Link
+     * Uses Excel indexing.
+     */
+    int idValueLinkRow = NOT_FOUND;
+    /**
+     * Row row of the AnnotationSheet that holds the id/Value Link
+     * Uses Excel indexing.
+     */    
+    int externalSheetRow = NOT_FOUND;
+    /**
+     * Row row of the AnnotationSheet that holds the Zero/Null indication
+     * Uses Excel indexing.
+     */        
+    int ZeroNullRow = NOT_FOUND;
+    
+    /**
+     * First row of the AnnotationSheet that holds the other Annotations/dropdowns.
+     * Currently these include Factor, Unit, DerivationFactor and SubType
+     * Uses Excel indexing.
+     */
+    int firstConstant = NOT_FOUND;
+    /**
+     * Last row of the AnnotationSheet that holds the other Annotations/dropdowns.
+     * Currently these include Factor, Unit, DerivationFactor and SubType
+     * Uses Excel indexing.
+     */
+    int lastConstant = NOT_FOUND;
+    /**
+     * Last Columnof the Data Sheet that holds the other Annotations/dropdowns.
+     * Currently these include Factor, Unit, DerivationFactor and SubType
+     * Uses Excel indexing.
+     */
     String lastDataColumn;
 
     /**
@@ -45,10 +94,12 @@ public class AbstractSheet {
         findAndCheckMetaSplits();
     }
 
+    //TODO remove this
     private enum SplitType{
         NONE, CONSTANT
     }
 
+    //TODO remove this
     private void endMataSplit(int row, SplitType splitType){
          switch (splitType){
             case NONE:
@@ -113,13 +164,13 @@ public class AbstractSheet {
     private void findAndCheckMetaSplits() throws FishLinkException{
         lastDataColumn = FishLinkUtils.indexToAlpha(sheet.getColumns());
         findMetaSplits();
-        if (categoryRow == -1) {
+        if (categoryRow == NOT_FOUND) {
             throw new FishLinkException("Unable to find \"" + FishLinkConstants.CATEGORY_LABEL + "\" in column A.");
         }
-        if (fieldRow == -1) {
+        if (fieldRow == NOT_FOUND) {
             throw new FishLinkException("Unable to find \"" + FishLinkConstants.FIELD_LABEL + "\" in column A.");
         }
-        if (idValueLinkRow == -1) {
+        if (idValueLinkRow == NOT_FOUND) {
             throw new FishLinkException("Unable to find \"" + FishLinkConstants.ID_VALUE_LABEL + "\" in column A.");
         }
     }
