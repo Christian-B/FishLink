@@ -25,6 +25,9 @@ import org.freshwaterlife.fishlink.FishLinkException;
  */
 public class FishLinkSheet {
 
+    /**
+     * Apache poi sheet which does the actual work
+     */
     private Sheet poiSheet;
 
     /**
@@ -50,6 +53,12 @@ public class FishLinkSheet {
         return poiRow;
     }
 
+    /**
+     *
+     * @param row Using Excel counting
+     * @param column Using Excel names
+     * @return 
+     */
     private Cell getCell(String column, int row){
        Row poiRow = getRow(row);
         int columnNumber = FishLinkUtils.alphaToIndex(column);
@@ -60,6 +69,12 @@ public class FishLinkSheet {
         return cell;
     }
 
+    /**
+     * 
+     * @param row Zero based
+     * @param column zero based
+     * @return 
+     */
     private Cell getCellZeroBased(int column, int row){
         Row poiRow = poiSheet.getRow(row);
         if (poiRow == null){

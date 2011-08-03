@@ -18,6 +18,9 @@ import org.freshwaterlife.fishlink.FishLinkException;
  */
 public class FishLinkWorkbook {
 
+    /**
+     * Apache poi workbook which does the actual work
+     */
     private Workbook poiWorkbook;
 
     /**
