@@ -18,13 +18,11 @@ package org.freshwaterlife.fishlink.xlwrap.expr.func.spreadsheet;
 
 import at.jku.xlwrap.common.XLWrapException;
 import at.jku.xlwrap.exec.ExecutionContext;
-import at.jku.xlwrap.map.expr.func.XLExprFunction;
 import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
-import org.freshwaterlife.fishlink.FishLinkUtils;
 
 /**
- * @author dorgon
+ * Function to convert Zero to null while leaving all other values as is.
  * @author Christian
  *
  */
@@ -36,6 +34,17 @@ public class E_FuncZERO_AS_NULL extends E_Func_with_zero {
     public E_FuncZERO_AS_NULL() {
     }
 
+    /**
+     * Function to convert Zero to null while leaving all other values as is.
+     * 
+     * Uses the method {@link E_Func_with_zero#isZero(java.lang.Object) }.
+     * 
+     * @param context XlWrap content required to evaluate expressions in.
+     * @return The expression in the first argument unchanged, 
+     *         unless it evaluates to zero in which case null is returned.
+     * @throws XLWrapException
+     * @throws XLWrapEOFException 
+     */
     @Override
     public XLExprValue<?> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
         XLExprValue<?> value = getArg(0).eval(context);

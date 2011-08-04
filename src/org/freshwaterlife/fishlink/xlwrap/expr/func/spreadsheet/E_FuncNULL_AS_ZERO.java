@@ -24,7 +24,7 @@ import at.jku.xlwrap.map.expr.val.XLExprValue;
 import at.jku.xlwrap.spreadsheet.XLWrapEOFException;
 
 /**
- * @author dorgon
+ * Function to convert Nulls to zero while leaving all other values as is.
  * @author Christian
  *
  */
@@ -36,6 +36,14 @@ public class E_FuncNULL_AS_ZERO extends XLExprFunction {
     public E_FuncNULL_AS_ZERO() {
     }
 
+    /**
+     * Function to convert Nulls to zero while leaving all other values as is.
+     * @param context XlWrap content required to evaluate expressions in.
+     * @return The expression in the first argument unchanged, 
+     *         unless it evaluates to null in which case the long null is returned.
+     * @throws XLWrapException
+     * @throws XLWrapEOFException 
+     */
     @Override
     public XLExprValue<?> eval(ExecutionContext context) throws XLWrapException, XLWrapEOFException {
         XLExprValue<?> value = getArg(0).eval(context);
