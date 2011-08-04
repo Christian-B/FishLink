@@ -94,21 +94,6 @@ public class AbstractSheet {
         findAndCheckMetaSplits();
     }
 
-    //TODO remove this
-    private enum SplitType{
-        NONE, CONSTANT
-    }
-
-    //TODO remove this
-    private void endMataSplit(int row, SplitType splitType){
-         switch (splitType){
-            case NONE:
-                return;
-            case CONSTANT:
-                lastConstant = row - 1;
-        }
-    }
-
     /**
      * Finds all the values to the fields.
      * This approach allows for some changes to the MetaMaster without having to change the code.
@@ -116,39 +101,41 @@ public class AbstractSheet {
      */
     private void findMetaSplits() throws FishLinkException{
         int row = 1;
-        SplitType splitType = SplitType.NONE;
+        boolean inConstants = false;
         do {
             String columnA = getCellValue("A",row);
-           if (columnA != null){
-                if (columnA.equalsIgnoreCase(FishLinkConstants.CATEGORY_LABEL)){
-                    categoryRow = row;
-                } else if (columnA.equalsIgnoreCase(FishLinkConstants.FIELD_LABEL)){
-                    fieldRow = row;
-                } else if (columnA.startsWith(FishLinkConstants.ID_VALUE_LABEL)){
-                    idValueLinkRow = row;
-                } else if (columnA.equalsIgnoreCase(FishLinkConstants.EXTERNAL_LABEL)){
-                    externalSheetRow = row;
-                } else if (columnA.equalsIgnoreCase(FishLinkConstants.ZEROS_VS_NULLS_LABEL)){
-                    ZeroNullRow = row;
-                } else if (columnA.contains("links")){
-                    throw new FishLinkException ("Links not currently supported");
-                } else if (columnA.contains(FishLinkConstants.CONSTANTS_DIVIDER)){
-                    firstConstant = row + 1;
-                    endMataSplit(row, splitType);
-                    splitType = SplitType.CONSTANT;
-                } else if (columnA.equalsIgnoreCase(FishLinkConstants.HEADER_LABEL)) {
-                    endMataSplit(row, splitType);
-                    firstData = row + 1;
-                    return;
-                } else if (columnA.isEmpty()){
-                    endMataSplit(row, splitType);
-                    splitType = SplitType.NONE;
-                } else if (splitType == SplitType.NONE){
-                    throw new FishLinkException ("Found unexpected \"" + columnA + "\" before " + FishLinkConstants.CONSTANTS_DIVIDER);                    
+            if (columnA == null || columnA.isEmpty()){
+                 if (inConstants){
+                    inConstants = false;
+                    lastConstant = row - 1;
+                 } // esle no thing. Could be more than one blank.
+            } else if (columnA.equalsIgnoreCase(FishLinkConstants.CATEGORY_LABEL)){
+                categoryRow = row;
+            } else if (columnA.equalsIgnoreCase(FishLinkConstants.FIELD_LABEL)){
+                fieldRow = row;
+            } else if (columnA.startsWith(FishLinkConstants.ID_VALUE_LABEL)){
+                idValueLinkRow = row;
+            } else if (columnA.equalsIgnoreCase(FishLinkConstants.EXTERNAL_LABEL)){
+                externalSheetRow = row;
+            } else if (columnA.equalsIgnoreCase(FishLinkConstants.ZEROS_VS_NULLS_LABEL)){
+                ZeroNullRow = row;
+            } else if (columnA.contains("links")){
+                throw new FishLinkException ("Links not currently supported");
+            } else if (columnA.contains(FishLinkConstants.CONSTANTS_DIVIDER)){
+                firstConstant = row + 1;
+                inConstants = true;
+            } else if (columnA.equalsIgnoreCase(FishLinkConstants.HEADER_LABEL)) {
+                firstData = row + 1;
+                if (inConstants){
+                    System.exit(0);
+                    lastConstant = row - 1;                    
                 }
-              } else {
-                   endMataSplit(row, splitType);
-                   splitType = SplitType.NONE;
+                return;
+            } else if (inConstants){
+                //Do nothing anything allowed in Constants
+            } else {
+                throw new FishLinkException ("Found unexpected \"" + columnA + "\" in an unexpected place. " + 
+                        "It should be after " + FishLinkConstants.CONSTANTS_DIVIDER +  " and before the first blank.");                    
             }
             row++;
         } while (true); //will return out when finished
