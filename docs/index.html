@@ -7,25 +7,72 @@
 	<li><a href="#Introduction">Introduction</a>
 	<ul>
 		<li><a href="#Why">Why Meta Data Capture is Required</a>
-		<li><a href="RDF">Enough RDF to understand these documents.</a>
-
+		<li><a href="#RDF">Enough RDF to understand these documents.</a>
+		<li><a href="#Steps">Steps in RDF Creation Process</a>
 	</ul>
 	<li><a href="#ObtainData">Obtain the data</a>
 	<ul>
 		<li><a href="#DataRestriction">Restrictions on the Data</a>
 	</ul>
+	<li><a href="#Annotate">Add the column level metadata</a>
 	<li><a href="#MetaDataCreator">Create Meta Data Capture Spreadsheet</a>
 	<ul>
-		<li><a href="#MetaMaster">Meta Master spreadsheet</a>
+		<li><a href="#Information">Information Required</a>
+		<ul>
+			<li><a href="#Category">Category</a>
+			<ul>
+				<li><a href="#Designation">Designation</a>
+				<li><a href="#Entity">Entity</a>
+				<li><a href="#Location">Location</a>
+				<li><a href="#Observation">Observation</a>
+				<li><a href="#Site">Site</a>
+				<li><a href="#Survey">Survey</a>
+				<li><a href="#Taxon">Taxon</a>
+			</ul>
+			<li><a href="#Field">Field</a>
+			<ul>
+				<li><a href="#SharedFields">Shared Fields</a>
+				<li><a href="#DesignationsFields">Designations Fields</a>
+				<li><a href="#EntityFields">Entity Fields</a>
+				<li><a href="#LocationFields">Location Fields</a>
+				<li><a href="#ObservationFields">Observation Fields</a>
+				<li><a href="#SiteFields">Site Fields</a>
+				<li><a href="#SurveyFields">Survey Fields</a>
+				<li><a href="#TaxonFields">Taxon Fields</a>
+			</ul>
+			<li><a href="#Id">Id/Value Column (or "All")</a>
+			<li><a href="#External">External Sheet</a>
+			<li><a href="#ZeroNull">Zeros vs Nulls</a>
+			<li><a href="#Constants">Constants</a>
+			<ul>
+				<li><a href="#Factor">Factor</a>
+				<li><a href="#Unit">Unit</a>
+				<li><a href="#Deviation factor">Deviation factor</a>
+				<li><a href="#SubType">SubType</a>
+			</ul>
+		<li><a href="#AnnotationWorkbook">Annotation Workbook</a>
+		</ul>
 	</ul>
-	<li><a href="#Annotate">Add the column level metadata</a>
 	<li><a href="#Mapping">Generate XLwrap mapping file</a>
+	<ul>
+		<li><a href="#MappingFile"> XlWrap mapping File</a>
+		<li><a href="#Uri">Generate URI values</a>
+	</ul>
 	<li><a href="#rdf">Generate rdf files</a>
 	<li><a href="#sparql">Load rdf into a sparql server</a>
 	<li><a href="#query">Query the sparql endpoint</a>
-
+	<li><a href="#Admin">Administration Documents</a>
+	<ul>
+		<li><a href="#MetaMaster">The MetaMaster.xlss</a>
+		<ul>
+			<li><a href="#ChangingMetaMaster">Changing the MetaMaster</a>
+		</ul>
+	</ul>
+	<li><a href="#FutureWork">Future Work</a>
+	<ul>
+		<li><a href="#DerivedFrom">Derived From Series</a>
+	</ul>
 </ul>
-
 <h1 id=Introduction>Introduction</h1>
 This document describes the tools created to help the capture of metadata and the generation of rdf.
 
@@ -64,7 +111,7 @@ This section does not attempt to teach rdf but only to remind the reader.
 	<li> There are several different rdf formats. Some of which may group the declarations about the same subject.
 </ul>
 
-<h2 id="Steps">Steps</h2>
+<h2 id="Steps">Steps in RDF Creation Process</h2>
 This section lists the steps in the process of submitting data to producing rdf.
 
 <ol>
@@ -263,7 +310,7 @@ Type (or class) of the item being described.
 				<li>Anything that changes depending on the <a href="#MeasurmentMethodField">Measurement Method</a>.
 				<li>Anything that could be either a single value or a combination of several factors. Therefor there is a <a href="#DevriationFactor">DevriationFactor</a> field.
 				<li>Anything that has a <a href="#Unit">Unit</a>.
-				<li>Anything that be influenced by the <a href="#ContributorField">Contributor</a>.
+				<li>Anything that be influenced by the <a href="#SurveyorField">Surveyor(who made the measurement)/a>.
 				<li>All the fields that can be included in a site are described in the <a href="#ObservationFields">Observation Fields table.</a>.
 			</ul>
 		</td>
@@ -324,7 +371,7 @@ Type of value the data represents
 	<li>Field has a semi-closed vocabulary. Additions required a change to the Ontology
 </ul>
 <p>
-<table border="1">
+<table border="1" id="SharedFields">
 	<tr>
 		<th colspan="2">Fields shared by several Categories.</th>
 	</tr>
@@ -525,10 +572,6 @@ See <a href="#ChangingMetaMaster">Changing the Meta Master</a> Section on how to
 <table border="1" id="ObservationFields">
 	<tr>
 		<th colspan="2"><a href="#Observation">Observation</a> Fields.</th>
-	</tr>
-	<tr id="ContributorField">
-		<td>Contributor</td>
-		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Entity">Entity<a> that made the Observation.</td>
 	</tr>
 	<tr id="DateField">
 		<td>Date</td>
@@ -773,8 +816,8 @@ The high level of overlap between Survey and Observation fields is intentional, 
 		<td>AlternativeName</td>
 		<td>See <a href="#AlternativeName">Description in Shared Fields Table</a></td>
 	</tr>
-	<tr id="ContributorField">
-		<td>Contributor</td>
+	<tr>
+		<td>Authority</td>
 		<td>The Id part of an <a href="#External">External Reference<a> to the <a href="#Entity">Entity<a> that defined the Taxon.
 		<td></td>
 	</tr>
@@ -1118,7 +1161,7 @@ This step creates an XLwrap mapping file which will be used to create the actual
 	</ul>
 </ul>
 
-<h2 id:MappingFile> XlWrap mapping File</h2>
+<h2 id:"MappingFile"> XlWrap mapping File</h2>
 <ul>
 	<li>This file should never need editing
 	<li>Many of the annotation header values will be hard coded in here.
@@ -1324,7 +1367,7 @@ Again how to do this depends on the sparql endpoint used.
 	<li>Adding to the MetaMaster will never effect the checking of valid <a href="#AnnotationWorkbook">Annotation Workbook</a> Annotation Sheet(s)
 	<li>Changing the MetaMaster will only effect the checking of valid <a href="#AnnotationWorkbook">Annotation Workbook</a> Annotation Sheet(s) if the Sheet uses a value no longer in the MetaMaster.
 </ul>
-<h1>Future Work</h1>
+<h1 id="FutureWork">Future Work</h1>
 There is always a lot more work that can be done.
 <ul>
 	<li>Vocabularies need completing.
